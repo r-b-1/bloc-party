@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "705772480219",
+    "project_id": "blocparty-team6-cs3541",
+    "storage_bucket": "blocparty-team6-cs3541.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:705772480219:android:a8acb383293b43a2060efe",
+        "android_client_info": {
+          "package_name": "com.example.blocparty"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAe1Wv4AILrRU5Zi46rvvp63mUx72tFB28"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
