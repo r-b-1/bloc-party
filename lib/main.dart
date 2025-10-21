@@ -1,21 +1,72 @@
+import 'package:blocparty/flutter_backend/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:blocparty/view/navigation/navigation_bar.dart';
 import 'package:blocparty/view/chat_view.dart';
 import 'package:blocparty/view/item_descriptions_view.dart';
 import 'package:blocparty/view/login_view.dart';
 import 'package:blocparty/view/schedule_view.dart';
+import 'package:blocparty/flutter_backend/go_router.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:go_router/go_router.dart';
+
+const clientId = '';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  runApp(const MyApp(clientId: clientId));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.clientId});
+
+  final String clientId;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter MVVM Skeleton',
+    final GoRouter router = GoRouter(
+      initialLocation: '/auth',
+      refreshListenable: GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
+      routes: [
+        GoRoute(
+          path: '/auth',
+          builder: (context, state) => LoginView(),
+        ),
+        GoRoute(
+          path: '/home',
+          builder: (context, state) => const MainNavigation(),
+        ),
+        GoRoute(
+          path: '/item_description',
+          builder: (context, state) => const ItemDescriptionView(),
+        ),
+        GoRoute(
+          path: '/schedule',
+          builder: (context, state) => const ScheduleView(),
+        ),
+        GoRoute(
+          path: '/chat',
+          builder: (context, state) => const ChatView(),
+        ),
+      ],
+      redirect: (context, state) {
+        final user = FirebaseAuth.instance.currentUser;
+        final loggingIn = state.name == '/auth';
+
+        if (user == null && !loggingIn) return '/auth';
+        if (user != null && loggingIn) return '/home';
+        return null; // no redirect
+      },
+    );
+
+    return MaterialApp.router(
+      title: 'BlocParty',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
@@ -43,14 +94,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const LoginView(),
-        '/home': (context) => const MainNavigation(),
-        '/item_description': (context) => const ItemDescriptionView(),
-        '/schedule':(context) => const ScheduleView(),
-        '/chat':(context) => const ChatView(),
-      },
+      routerConfig: router,
     );
   }
 }

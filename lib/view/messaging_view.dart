@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MessagesView extends StatelessWidget {
   const MessagesView({super.key});
@@ -16,7 +17,7 @@ class MessagesView extends StatelessWidget {
             title: const Text('Neighborhood Group'),
             subtitle: const Text('John: See you there!'),
             onTap: () {
-              Navigator.pushNamed(context, '/chat');
+              context.push('/chat');
             },
           ),
           ListTile(
@@ -24,7 +25,7 @@ class MessagesView extends StatelessWidget {
             title: const Text('Jane Doe'),
             subtitle: const Text('Okay, sounds good.'),
             onTap: () {
-               Navigator.pushNamed(context, '/chat');
+               context.push('/chat');
             },
           ),
         ],

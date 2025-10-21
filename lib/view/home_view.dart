@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -28,7 +29,7 @@ class HomeView extends StatelessWidget {
             subtitle: const Text('Available'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              Navigator.pushNamed(context, '/item_description');
+              context.push('/item_description');
             },
           ),
           ListTile(
@@ -37,7 +38,7 @@ class HomeView extends StatelessWidget {
             subtitle: const Text('Borrowed'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              Navigator.pushNamed(context, '/item_description');
+              context.push('/item_description');
             },
           ),
         ],
