@@ -22,9 +22,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
+      appBar: AppBar(title: const Text('Home')),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -58,7 +56,10 @@ class _HomeViewState extends State<HomeView> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: item.isAvailable ? Colors.green : Colors.red,
                     borderRadius: BorderRadius.circular(12),
@@ -75,10 +76,12 @@ class _HomeViewState extends State<HomeView> {
                 const SizedBox(width: 8),
                 Text(
                   _getPortabilityText(item.portability),
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Listed by: ${item.userId}',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
               ],
             ),
