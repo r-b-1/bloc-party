@@ -1,17 +1,8 @@
 import 'package:blocparty/flutter_backend/firebase_options.dart';
-import 'package:blocparty/view/create_profile_view.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'package:blocparty/view/navigation/navigation_bar.dart';
-import 'package:blocparty/view/chat_view.dart';
-import 'package:blocparty/view/item_descriptions_view.dart';
-import 'package:blocparty/view/login_view.dart';
-import 'package:blocparty/view/schedule_view.dart';
-import 'package:blocparty/view/register_view.dart';
-import 'package:blocparty/flutter_backend/go_router.dart';
-
+import 'package:blocparty/view/navigation/routs.dart';
 import 'package:go_router/go_router.dart';
 
 const clientId = '';
@@ -32,48 +23,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GoRouter router = GoRouter(
-      initialLocation: '/auth',
-      refreshListenable: GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
-      routes: [
-        GoRoute(
-          path: '/auth',
-          builder: (context, state) => LoginView(),
-        ),
-        GoRoute(
-          path: '/register',
-         builder: (context, state) => const RegisterView(),
-        ),
-        GoRoute(
-          path: '/create-profile',
-          builder:(context, state) => const CreateProfileView(),
-          ),
-        GoRoute(
-          path: '/home',
-          builder: (context, state) => const MainNavigation(),
-        ),
-        GoRoute(
-          path: '/item_description',
-          builder: (context, state) => const ItemDescriptionView(),
-        ),
-        GoRoute(
-          path: '/schedule',
-          builder: (context, state) => const ScheduleView(),
-        ),
-        GoRoute(
-          path: '/chat',
-          builder: (context, state) => const ChatView(),
-        ),
-      ],
-      redirect: (context, state) {
-        final user = FirebaseAuth.instance.currentUser;
-        final loggingIn = state.name == '/auth';
-
-        if (user == null && !loggingIn) return '/auth';
-        if (user != null && loggingIn) return '/home';
-        return null; // no redirect
-      },
-    );
+    GoRouter router = goRouts();
 
     return MaterialApp.router(
       title: 'BlocParty',
