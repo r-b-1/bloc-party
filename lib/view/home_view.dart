@@ -39,6 +39,13 @@ class _HomeViewState extends State<HomeView> {
           const SizedBox(height: 10),
           // Display items from ItemViewModel
           ...itemViewModel.items.map((item) => _buildItemTile(context, item)),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              itemViewModel.fetchItems();
+              setState(() {}); // Force rebuild
+            },
+          ),
         ],
       ),
     );
