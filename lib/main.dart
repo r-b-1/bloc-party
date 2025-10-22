@@ -1,4 +1,5 @@
 import 'package:blocparty/flutter_backend/firebase_options.dart';
+import 'package:blocparty/view/create_profile_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:blocparty/view/chat_view.dart';
 import 'package:blocparty/view/item_descriptions_view.dart';
 import 'package:blocparty/view/login_view.dart';
 import 'package:blocparty/view/schedule_view.dart';
+import 'package:blocparty/view/register_view.dart';
 import 'package:blocparty/flutter_backend/go_router.dart';
 
 import 'package:go_router/go_router.dart';
@@ -38,6 +40,14 @@ class MyApp extends StatelessWidget {
           path: '/auth',
           builder: (context, state) => LoginView(),
         ),
+        GoRoute(
+          path: '/register',
+         builder: (context, state) => const RegisterView(),
+        ),
+        GoRoute(
+          path: '/create-profile',
+          builder:(context, state) => const CreateProfileView(),
+          ),
         GoRoute(
           path: '/home',
           builder: (context, state) => const MainNavigation(),
