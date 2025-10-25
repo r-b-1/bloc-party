@@ -1,7 +1,9 @@
+// lib/view/profile_view.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/view/home_view.dart'; 
+import 'package:blocparty/view/add_item_view.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -32,6 +34,14 @@ class _ProfileViewState extends State<ProfileView> {
     super.dispose();
   }
 
+  void _navigateToAddItem() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddItemView(profileViewModel: _profileViewModel),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +54,20 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ],
       ),
-      body: _buildBody(context), 
+      body: Stack(
+        children: [
+          _buildBody(context),
+          // adding Add Item button at bottom right
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              onPressed: _navigateToAddItem,
+              child: const Icon(Icons.add),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -118,9 +141,16 @@ class _ProfileViewState extends State<ProfileView> {
                 if (_profileViewModel.userItems.isEmpty)
                   const Expanded(
                     child: Center(
-                      child: Text(
-                        'No items listed yet',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.inventory_2, size: 64, color: Colors.grey),
+                          SizedBox(height: 16),
+                          Text(
+                            'No items listed yet',
+                            style: TextStyle(color: Colors.grey, fontSize: 16),
+                          ),
+                        ],
                       ),
                     ),
                   )
@@ -130,7 +160,6 @@ class _ProfileViewState extends State<ProfileView> {
                       itemCount: _profileViewModel.userItems.length,
                       itemBuilder: (context, index) {
                         final item = _profileViewModel.userItems[index];
-                        // Use the shared method from HomeView
                         return HomeView.buildItemTile(
                           context, 
                           item,

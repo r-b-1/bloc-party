@@ -70,7 +70,6 @@ class ProfileViewModel extends ChangeNotifier {
     required String description,
     required ItemPortability portability,
     required List<String> tags,
-    required String neighborhoodId,
   }) async {
     try {
       _error = null;
@@ -90,7 +89,7 @@ class ProfileViewModel extends ChangeNotifier {
         description: description,
         isAvailable: true,
         userId: _currentUser!.username,
-        neighborhoodId: neighborhoodId,
+        neighborhoodId: 'defualt',
         portability: portability,
         tags: tags,
       );
