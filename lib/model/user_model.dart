@@ -12,6 +12,7 @@ class User {
 
   User({required this.username, required this.name, required this.email, required this.address, this.address2, this.phonenumber, this.neighborhoodId});
 
+
   factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     if (!doc.exists) {
       throw Exception('Document does not exist');
