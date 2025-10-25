@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:blocparty/model/proflie_model.dart';
+import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/view/home_view.dart'; 
 
 class ProfileView extends StatefulWidget {
