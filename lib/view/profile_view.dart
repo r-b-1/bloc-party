@@ -1,9 +1,9 @@
-// lib/view/profile_view.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/view/home_view.dart'; 
 import 'package:blocparty/view/add_item_view.dart';
+import 'package:blocparty/model/item_model.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -33,13 +33,41 @@ class _ProfileViewState extends State<ProfileView> {
     _profileViewModel.removeListener(_onViewModelChanged);
     super.dispose();
   }
-
+  // Adding add item
   void _navigateToAddItem() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => AddItemView(profileViewModel: _profileViewModel),
       ),
     );
+  }
+  // Adding delete item function
+  Future<void> _deleteItem(Item item) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        // Adding delete item confirmation
+        return AlertDialog(
+          title: const Text('Delete Item'),
+          content: Text('Are you sure you want to delete "${item.name}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      await _profileViewModel.deleteItem(item.id);
+    }
   }
 
   @override
@@ -160,12 +188,22 @@ class _ProfileViewState extends State<ProfileView> {
                       itemCount: _profileViewModel.userItems.length,
                       itemBuilder: (context, index) {
                         final item = _profileViewModel.userItems[index];
-                        return HomeView.buildItemTile(
-                          context, 
-                          item,
-                          onTap: () {
-                            context.push('/item_description');
-                          },
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: HomeView.buildItemTile(
+                                context, 
+                                item,
+                                onTap: () {
+                                  context.push('/item_description');
+                                },
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _deleteItem(item),
+                            ),
+                          ],
                         );
                       },
                     ),

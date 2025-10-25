@@ -108,6 +108,28 @@ class ProfileViewModel extends ChangeNotifier {
       rethrow;
     }
   }
+  // Adding method to delete items
+  Future<void> deleteItem(String itemId) async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      if (_currentUser == null) {
+        throw Exception('No user logged in');
+      }
+
+      await FirebaseFirestore.instance.collection('items').doc(itemId).delete();
+
+      _userItems.removeWhere((item) => item.id == itemId);
+      notifyListeners();
+    } catch(e) {
+      _error = 'Failed to delete item: $e';
+      print('Error deleting item: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
+
 
   Future<void> refresh() async {
     await _fetchUserDataAndItems();
