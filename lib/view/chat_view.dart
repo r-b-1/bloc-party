@@ -7,11 +7,16 @@ class ChatView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat'),
+        title: const Text('Chat Name'),
       ),
-      body: const Center(
-        child: Text('This is the chat screen.'),
-      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            const Text("Message Sender: Example Message")
+          ],
+        )
+      )
     );
   }
 }

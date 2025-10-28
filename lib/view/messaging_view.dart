@@ -1,11 +1,21 @@
+import 'package:blocparty/view/create_chat_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class MessagesView extends StatelessWidget {
+class MessagesView extends StatefulWidget {
   const MessagesView({super.key});
 
+  @override
+  State<MessagesView> createState() => _MessagesViewState();
+}
+
+class _MessagesViewState extends State<MessagesView> {
   void _navigateToAddChat() {
-    print("add chat");
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateChatView(),
+      ),
+    );
   }
 
   @override
@@ -26,8 +36,8 @@ class MessagesView extends StatelessWidget {
           ),
           ListTile(
             leading: const CircleAvatar(child: Text('J')),
-            title: const Text('Jane Doe'),
-            subtitle: const Text('Okay, sounds good.'),
+            title: const Text('John Message'),
+            subtitle: const Text('I have a message for you...'),
             onTap: () {
                context.push('/chat');
             },
