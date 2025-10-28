@@ -13,7 +13,16 @@ class ChatView extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            const Text("Message Sender: Example Message")
+            ListTile(
+              leading: const CircleAvatar(child: Text('EM')),
+              title: const Text('Example Messager'),
+              subtitle: const Text('This is a message!'),
+            ),
+            ListTile(
+              leading: const CircleAvatar(child: Text('You')),
+              title: const Text('You'),
+              subtitle: const Text('Wow!'),
+            ),
           ],
         )
       )

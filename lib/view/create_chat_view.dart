@@ -35,6 +35,7 @@ class _CreateChatViewState extends State<CreateChatView> {
                 return null;
               },
             ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _chatReceiver,
               decoration: const InputDecoration(labelText: "Chat Recipient"),
@@ -45,6 +46,7 @@ class _CreateChatViewState extends State<CreateChatView> {
                 return null;
               },
             ),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _save, 
               child: Text("Create Chat")
