@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 class MessagesView extends StatelessWidget {
   const MessagesView({super.key});
 
+  void _navigateToAddChat() {
+    print("add chat");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,6 +31,14 @@ class MessagesView extends StatelessWidget {
             onTap: () {
                context.push('/chat');
             },
+          ),
+          Positioned(
+            right: 16,
+            bottom: 16,
+            child: FloatingActionButton(
+              onPressed: _navigateToAddChat,
+              child: const Icon(Icons.add),
+            ),
           ),
         ],
       ),
