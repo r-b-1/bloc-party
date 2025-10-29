@@ -1,12 +1,10 @@
+// lib/model/itemview_model.dart
 import 'package:flutter/foundation.dart';
 import 'package:blocparty/model/item_model.dart';
 import 'package:blocparty/model/auth_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ItemViewModel extends ChangeNotifier {
-  // Your logic for managing items will go here.
-  // For example, fetching items, adding new items, etc.
-
   List<Item> items = [];
   bool isLoading = false;
   final AuthViewModel _authViewModel;
@@ -25,7 +23,6 @@ class ItemViewModel extends ChangeNotifier {
   void fetchItems() async {
     isLoading = true;
     notifyListeners();
-
     try {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await FirebaseFirestore.instance.collection('items').get();
