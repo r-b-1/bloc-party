@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:blocparty/model/item_model.dart';
+
 
 class ItemDescriptionView extends StatelessWidget {
-  const ItemDescriptionView({super.key});
+  final Item item;
+  const ItemDescriptionView({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Item Description'),
+        title: Text(item.name),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -20,9 +23,9 @@ class ItemDescriptionView extends StatelessWidget {
               child: const Center(child: Icon(Icons.photo_camera, size: 50, color: Colors.grey)),
             ),
             const SizedBox(height: 16),
-            const Text('Status: Available', style: TextStyle(fontSize: 18)),
+            Text('Status: ${item.isAvailable ? 'Available' : 'Unavailable'}', style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 8),
-            const Text('Description: Detailed description of the item goes here.'),
+            Text('Description: ${item.description}'),
             const SizedBox(height: 8),
             const Text('Instructions: Instructions for use.'),
             const Spacer(),

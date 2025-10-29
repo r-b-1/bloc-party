@@ -10,7 +10,8 @@ import 'package:blocparty/view/register_view.dart';               //register
 import 'package:blocparty/view/create_profile_view.dart';         //Create Profile
 import 'package:firebase_auth/firebase_auth.dart';                //Fire_auth
 import 'package:blocparty/view/pick_neighborhood.dart';           //Pick Neighborhood
-  
+import 'package:blocparty/model/item_model.dart';              //Item Model
+
   GoRouter goRouts() {
     final GoRouter router = GoRouter(
       initialLocation: '/auth',
@@ -34,7 +35,10 @@ import 'package:blocparty/view/pick_neighborhood.dart';           //Pick Neighbo
         ),
         GoRoute(
           path: '/item_description',
-          builder: (context, state) => const ItemDescriptionView(),
+          builder: (context, state) {
+            final item = state.extra as Item;
+            return ItemDescriptionView(item: item);
+          },
         ),
         GoRoute(
           path: '/schedule',

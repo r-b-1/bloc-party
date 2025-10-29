@@ -64,7 +64,7 @@ class HomeView extends StatefulWidget {
         onTap:
             onTap ??
             () {
-              context.push('/item_description');
+              context.push('/item_description', extra: item);
             },
       ),
     );
