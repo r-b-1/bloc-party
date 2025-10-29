@@ -4,6 +4,7 @@ import 'package:blocparty/view/chat_view.dart';
 import 'package:blocparty/view/item_descriptions_view.dart';
 import 'package:blocparty/view/login_view.dart';
 import 'package:blocparty/view/schedule_view.dart';
+import 'package:blocparty/view/pick_neighborhood.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const LoginView(),
         '/home': (context) => const MainNavigation(),
         '/item_description': (context) => const ItemDescriptionView(),
+        '/pick_neighborhood': (context) => const PickNeighborhoodView(),
         '/schedule':(context) => const ScheduleView(),
         '/chat':(context) => const ChatView(),
       },

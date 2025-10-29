@@ -12,6 +12,18 @@ class HomeView extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
+          Align(
+            alignment: Alignment.topRight, // Positions the button at the bottom center
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/pick_neighborhood');
+              },
+              child: Text('  NEIGHBORHOOD SELECTION  '),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
           _buildInfoCard('Group Name', 'Neighborhood Watch'),
           _buildInfoCard('Notification Request', '0'),
           _buildInfoCard('Messages', '3 new'),
