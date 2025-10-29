@@ -45,7 +45,7 @@ class HomeView extends StatefulWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  _getPortabilityText(item.portability),
+                  getPortabilityText(item.portability),
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
                 const SizedBox(width: 8),
@@ -67,7 +67,7 @@ class HomeView extends StatefulWidget {
     );
   }
 
-  String _getPortabilityText(ItemPortability portability) {
+  static String getPortabilityText(ItemPortability portability) {
     switch (portability) {
       case ItemPortability.portable:
         return 'Portable';
