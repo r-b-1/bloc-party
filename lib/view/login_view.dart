@@ -1,61 +1,84 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    return SignInScreen(
+      providers: [
+        EmailAuthProvider(), // or any other providers you want
+      ],
+      headerBuilder: (context, constraints, shrinkOffset) {
+        return const Padding(
+          padding: EdgeInsets.all(20),
+          child: Icon(Icons.lock, size: 100, color: Colors.blue),
+        );
+      },
+      subtitleBuilder: (context, action) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            action == AuthAction.signIn
+                ? 'Welcome back! Please sign in.'
+                : 'Create your account below!',
+            textAlign: TextAlign.center,
+          ),
+        );
+      },
+      footerBuilder: (context, action) {
+       // action will be AuthAction.signIn or AuthAction.register
+        // We can show different footers for each
+        if (action == AuthAction.signIn) {
+          return Column(
             children: [
-              const Icon(Icons.lock, size: 80, color: Colors.blue),
-              const SizedBox(height: 20),
-              const Text(
-                'Login Screen',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 40),
-              const TextField(
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
+              const Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Text(
+                  'By continuing, you agree to our Terms of Service.',
+                  style: TextStyle(color: Colors.grey),
                 ),
               ),
-              const SizedBox(height: 16),
-              const TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                child: const Text('Login'),
+              TextButton(
                 onPressed: () {
-                  // Navigate to the home screen, replacing the login screen
-                  Navigator.pushReplacementNamed(context, '/home');
+                  // Navigate to your new registration route
+                  context.go('/register');
                 },
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {},
-                child: const Text('Forgot Password?'),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: const Text('Sign Up'),
+                child: const Text('Don\'t have an account? Sign up'),
               ),
             ],
-          ),
-        ),
-      ),
+          );
+        } else {
+          // You are on the built-in register view, show a "back to login"
+          return TextButton(
+            onPressed: () {
+              // This is how you manually switch the screen back
+              // (Though the back button also works)
+              FirebaseUIAuth.signOut(context: context);
+            },
+            child: const Text('Already have an account? Sign in'),
+          );
+        }
+      },
+      
+      actions: [
+        AuthStateChangeAction<UserCreated>((context, state) {
+          // This is the ideal place to create a user document in Firestore
+          // e.g., FirebaseFirestore.instance.collection('users').doc(state.user?.uid).set({
+          //   'email': state.user?.email,
+          //   'createdAt': FieldValue.serverTimestamp(),
+          // });
+    
+          // After creating the user, send them to a profile setup page
+          context.go('/create-profile');
+        }),
+        AuthStateChangeAction<SignedIn>((context, state) {
+          // GoRouter will handle navigation automatically
+          context.go('/home');
+        }),
+      ],
     );
   }
 }
