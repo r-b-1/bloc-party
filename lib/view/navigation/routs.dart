@@ -51,11 +51,19 @@ import 'package:blocparty/view/pick_neighborhood.dart';           //Pick Neighbo
       ],
       redirect: (context, state) {
         final user = FirebaseAuth.instance.currentUser;
-        final loggingIn = state.name == '/auth';
+      
+        final bool loggedIn = user != null;
+        final String location = state.matchedLocation;
+        final bool isAuthRoute = (location == '/auth' || location == '/register');
     
-        if (user == null && !loggingIn) return '/auth';
-        if (user != null && loggingIn) return '/home';
-        return null; // no redirect
+        if (!loggedIn) {
+          return isAuthRoute ? null : '/auth';
+        }
+
+        if (loggedIn && isAuthRoute) {
+          return '/home';
+        }
+        return null; 
       },
     );
     return router;
