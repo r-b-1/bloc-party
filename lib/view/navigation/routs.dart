@@ -9,6 +9,7 @@ import 'package:blocparty/view/schedule_view.dart';               //schedule
 import 'package:blocparty/view/register_view.dart';               //register      
 import 'package:blocparty/view/create_profile_view.dart';         //Create Profile
 import 'package:firebase_auth/firebase_auth.dart';                //Fire_auth
+import 'package:blocparty/view/pick_neighborhood.dart';           //Pick Neighborhood
   
   GoRouter goRouts() {
     final GoRouter router = GoRouter(
@@ -42,6 +43,10 @@ import 'package:firebase_auth/firebase_auth.dart';                //Fire_auth
         GoRoute(
           path: '/chat',
           builder: (context, state) => const ChatView(),
+        ),
+        GoRoute(
+          path: '/pick_neighborhood',
+          builder: (context, state) => const PickNeighborhoodView(),
         ),
       ],
       redirect: (context, state) {

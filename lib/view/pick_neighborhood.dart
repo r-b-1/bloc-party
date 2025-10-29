@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 //temp
 final List<String> available_neighborhoods = List<String>.generate(100, (i) => '$i');
@@ -30,7 +31,7 @@ class PickNeighborhoodView extends StatelessWidget {
                 //do neighborhood change/join logic here
 
                 //temp
-                Navigator.pushNamed(context, '/home');  //no animation on the button, so I put this here to show it works
+                context.go('/home');  //no animation on the button, so I put this here to show it works
                 //temp
               },
               child: Icon(Icons.add),

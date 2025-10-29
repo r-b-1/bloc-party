@@ -123,7 +123,7 @@ class _HomeViewState extends State<HomeView> {
             alignment: Alignment.topRight, // Positions the button at the bottom center
             child: ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/pick_neighborhood');
+                context.go('/pick_neighborhood');
               },
               child: Text('  NEIGHBORHOOD SELECTION  '),
             ),
