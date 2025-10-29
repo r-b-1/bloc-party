@@ -49,9 +49,12 @@ class HomeView extends StatefulWidget {
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  'Listed by: ${item.userId}',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                Flexible(
+                  child: Text(
+                    'Listed by: ${item.userId}',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
