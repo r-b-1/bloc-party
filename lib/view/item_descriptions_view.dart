@@ -16,9 +16,16 @@ class ItemDescriptionView extends StatelessWidget {
           children: [
             Container(
               height: 200,
+              width: double.infinity,
               color: Colors.grey[300],
-              child: const Center(
-                child: Icon(Icons.photo_camera, size: 50, color: Colors.grey),
+              child: Center(
+                child: Image.asset(
+                  item.imagePath,
+                  fit: BoxFit.fill,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text('Error loading image');
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 16),

@@ -94,6 +94,7 @@ class ProfileViewModel extends ChangeNotifier {
         neighborhoodId: 'defualt',
         portability: portability,
         tags: tags,
+        imagePath:  'assets/images/default_item.png',
       );
 
       // Saving to Firestore
