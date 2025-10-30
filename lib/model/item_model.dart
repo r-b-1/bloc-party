@@ -34,6 +34,7 @@ class Item {
       'neighborhoodId': neighborhoodId,
       'portability': portability.name,
       'tags': tags,
+      'imagePath': imagePath,
     };
   }
 

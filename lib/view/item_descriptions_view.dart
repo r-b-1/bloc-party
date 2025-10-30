@@ -15,7 +15,7 @@ class ItemDescriptionView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              height: 200,
+              height: 100,
               width: double.infinity,
               color: Colors.grey[300],
               child: Center(
@@ -23,7 +23,7 @@ class ItemDescriptionView extends StatelessWidget {
                   item.imagePath,
                   fit: BoxFit.fill,
                   errorBuilder: (context, error, stackTrace) {
-                    return Image.asset('/images/confused-person.jpg');
+                    return Image.asset('assets/images/confused-person.jpg');
                   },
                 ),
               ),

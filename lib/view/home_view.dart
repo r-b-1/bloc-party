@@ -16,13 +16,18 @@ class HomeView extends StatefulWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        leading: Image.asset( 
+        leading: Image.asset(
           item.imagePath,
           width: 50,
           height: 50,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            return Image.asset('/images/confused-person.jpg', width: 50, height: 50, fit: BoxFit.cover);
+            return Image.asset(
+              'assets/images/confused-person.jpg',
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            );
           },
         ),
         title: Text(item.name),
