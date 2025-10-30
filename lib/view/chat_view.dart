@@ -1,7 +1,17 @@
+import 'package:blocparty/model/message_model.dart';
 import 'package:flutter/material.dart';
 
 class ChatView extends StatelessWidget {
   const ChatView({super.key});
+
+  @override
+  Widget buildMessage(BuildContext context, Message message) {
+    return ListTile(
+      leading: Text(message.timestamp as String),
+      title: Text(message.sender.username),
+      subtitle: Text(message.message),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
