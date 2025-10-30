@@ -23,7 +23,7 @@ class ItemDescriptionView extends StatelessWidget {
                   item.imagePath,
                   fit: BoxFit.fill,
                   errorBuilder: (context, error, stackTrace) {
-                    return const Text('Error loading image');
+                    return Image.asset('/images/confused-person.jpg');
                   },
                 ),
               ),
