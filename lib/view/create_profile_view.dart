@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'package:blocparty/model/user_model.dart';
+
 
 class CreateProfileView extends StatefulWidget {
   const CreateProfileView({super.key});
@@ -18,8 +20,7 @@ class _CreateProfileViewState extends State<CreateProfileView> {
   final _addressController = TextEditingController();
   bool _isLoading = false;
 
-  // 2. Create the save function
-  Future<void> _saveProfile() async {
+ Future<void> _saveProfile() async {
     // Validate the form
     if (!_formKey.currentState!.validate()) {
       return;
@@ -41,17 +42,21 @@ class _CreateProfileViewState extends State<CreateProfileView> {
       }
       final uid = user.uid;
 
-      // 4. Save the data to Firestore
-      // We use .set() to create the document with the user's UID
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'username': _usernameController.text,
-        'fullName': _fullNameController.text,
-        'mainAddress': _addressController.text,
-        'email': user.email, // Save the email for convenience
-        'createdAt': FieldValue.serverTimestamp(), // Good practice
-      });
+      
+ final userModel = addUser(
+  username: _usernameController.text.trim(),
+  name: _fullNameController.text.trim(),
+  email: user.email ?? '',
+  address: _addressController.text.trim(),
+);
 
-      // 5. Navigate to the home page after saving
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .set(userModel.toFirestore());
+
+      
       if (mounted) {
         context.go('/home');
       }

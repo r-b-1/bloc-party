@@ -5,12 +5,12 @@ import 'package:blocparty/model/user_model.dart';
 import 'package:blocparty/model/item_model.dart';
 
 class ProfileViewModel extends ChangeNotifier {
-  User? _currentUser;        
+  addUser? _currentUser;        
   List<Item> _userItems = [];
   bool _isLoading = true;
   String? _error;
 
-  User? get currentUser => _currentUser;
+  addUser? get currentUser => _currentUser;
   List<Item> get userItems => _userItems;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -42,7 +42,7 @@ class ProfileViewModel extends ChangeNotifier {
       }
 
       // Store custom user data
-      _currentUser = User.fromFirestore(userDoc);
+      _currentUser = addUser.fromFirestore(userDoc);
       
       // Fetch items from 'items' collection where userId matches username
       final itemsSnapshot = await FirebaseFirestore.instance
