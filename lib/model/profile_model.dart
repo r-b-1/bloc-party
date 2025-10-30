@@ -96,7 +96,7 @@ class ProfileViewModel extends ChangeNotifier {
         neighborhoodId: 'defualt',
         portability: portability,
         tags: tags,
-        imagePath:  'assets/images/default_item.png',
+        imagePath: 'assets/images/confused-person.jpg',
       );
 
       // Saving to Firestore
@@ -134,46 +134,49 @@ class ProfileViewModel extends ChangeNotifier {
       rethrow;
     }
   }
+
   // Adding method to toggle the users item availability
-  Future<void> toggleItemAvailability(String itemId, bool newAvailability) async {
-     try {
+  Future<void> toggleItemAvailability(
+    String itemId,
+    bool newAvailability,
+  ) async {
+    try {
       _error = null;
       notifyListeners();
 
-    if (_currentUser == null) {
-      throw Exception('No user logged in');
-    }
+      if (_currentUser == null) {
+        throw Exception('No user logged in');
+      }
 
-    // Update in Firestore
-    await FirebaseFirestore.instance
-        .collection('items')
-        .doc(itemId)
-        .update({'isAvailable': newAvailability});
+      // Update in Firestore
+      await FirebaseFirestore.instance.collection('items').doc(itemId).update({
+        'isAvailable': newAvailability,
+      });
 
-    // Updates availability locally
-    final itemIndex = _userItems.indexWhere((item) => item.id == itemId);
-    if (itemIndex != -1) {
-      // Create a new Item with the updated availability
-      final oldItem = _userItems[itemIndex];
-      final updatedItem = Item(
-        id: oldItem.id,
-        name: oldItem.name,
-        description: oldItem.description,
-        isAvailable: newAvailability,
-        userId: oldItem.userId,
-        neighborhoodId: oldItem.neighborhoodId,
-        portability: oldItem.portability,
-        tags: oldItem.tags,
-        imagePath: oldItem.imagePath,
-      );
-      _userItems[itemIndex] = updatedItem;
+      // Updates availability locally
+      final itemIndex = _userItems.indexWhere((item) => item.id == itemId);
+      if (itemIndex != -1) {
+        // Create a new Item with the updated availability
+        final oldItem = _userItems[itemIndex];
+        final updatedItem = Item(
+          id: oldItem.id,
+          name: oldItem.name,
+          description: oldItem.description,
+          isAvailable: newAvailability,
+          userId: oldItem.userId,
+          neighborhoodId: oldItem.neighborhoodId,
+          portability: oldItem.portability,
+          tags: oldItem.tags,
+          imagePath: oldItem.imagePath,
+        );
+        _userItems[itemIndex] = updatedItem;
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = 'Failed to update availability: $e';
+      print('Error updating item availability: $e');
       notifyListeners();
-    }
-  } catch (e) {
-    _error = 'Failed to update availability: $e';
-    print('Error updating item availability: $e');
-    notifyListeners();
-    rethrow;
+      rethrow;
     }
   }
 
@@ -186,11 +189,7 @@ class ProfileViewModel extends ChangeNotifier {
 class Name extends StatelessWidget {
   final TextEditingController controller;
   final String labelName;
-  const Name({
-    super.key,
-    required this.controller,
-    required this.labelName,
-  });
+  const Name({super.key, required this.controller, required this.labelName});
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +198,7 @@ class Name extends StatelessWidget {
       decoration: InputDecoration(labelText: labelName),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter $labelName' ;
+          return 'Please enter $labelName';
         }
         return null;
       },
@@ -211,11 +210,7 @@ class Name extends StatelessWidget {
 class Address extends StatelessWidget {
   final TextEditingController controller;
   final String labelName;
-  const Address({
-    super.key,
-    required this.controller,
-    required this.labelName,
-  });
+  const Address({super.key, required this.controller, required this.labelName});
 
   @override
   Widget build(BuildContext context) {
@@ -229,6 +224,3 @@ class Address extends StatelessWidget {
     );
   }
 }
- 
-
-
