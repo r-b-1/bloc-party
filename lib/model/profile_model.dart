@@ -164,6 +164,7 @@ class ProfileViewModel extends ChangeNotifier {
         neighborhoodId: oldItem.neighborhoodId,
         portability: oldItem.portability,
         tags: oldItem.tags,
+        imagePath: oldItem.imagePath,
       );
       _userItems[itemIndex] = updatedItem;
       notifyListeners();
