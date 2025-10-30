@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:blocparty/model/user_model.dart';
 import 'package:blocparty/model/item_model.dart';
+import 'package:flutter/material.dart';
+import 'package:google_maps_places_autocomplete_widgets/address_autocomplete_widgets.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   AddUser? _currentUser;
@@ -136,3 +138,54 @@ class ProfileViewModel extends ChangeNotifier {
     await _fetchUserDataAndItems();
   }
 }
+
+class Name extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelName;
+  const Name({
+    super.key,
+    required this.controller,
+    required this.labelName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(labelText: labelName),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter $labelName' ;
+        }
+        return null;
+      },
+    );
+  }
+}
+
+class Address extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelName;
+  const Address({
+    super.key,
+    required this.controller,
+    required this.labelName,
+  }
+  
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return AddressAutocompleteTextField(
+      mapsApiKey: googleMapsApiKey,
+      controller: controller,
+      decoration: InputDecoration(labelText: labelName),
+      onSuggestionClick: (place) {
+        controller.text = place.formattedAddress ?? '';
+      },
+    );
+  }
+}
+ 
+
+
