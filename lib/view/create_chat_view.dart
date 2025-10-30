@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CreateChatView extends StatefulWidget {
   const CreateChatView({super.key});
-  
+
   @override
   State<CreateChatView> createState() => _CreateChatViewState();
 }
@@ -18,9 +18,7 @@ class _CreateChatViewState extends State<CreateChatView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create chat'),
-      ),
+      appBar: AppBar(title: const Text('Create chat')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
@@ -47,12 +45,9 @@ class _CreateChatViewState extends State<CreateChatView> {
               },
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _save, 
-              child: Text("Create Chat")
-            )
+            ElevatedButton(onPressed: _save, child: Text("Create Chat")),
           ],
-        )
+        ),
       ),
     );
   }

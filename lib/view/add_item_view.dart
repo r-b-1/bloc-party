@@ -6,7 +6,7 @@ import 'package:blocparty/view/home_view.dart';
 
 class AddItemView extends StatefulWidget {
   final ProfileViewModel profileViewModel;
-  
+
   const AddItemView({super.key, required this.profileViewModel});
 
   @override
@@ -62,9 +62,9 @@ class _AddItemViewState extends State<AddItemView> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add item: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to add item: $e')));
       }
     } finally {
       if (mounted) {

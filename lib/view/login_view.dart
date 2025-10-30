@@ -29,7 +29,7 @@ class LoginView extends StatelessWidget {
         );
       },
       footerBuilder: (context, action) {
-       // action will be AuthAction.signIn or AuthAction.register
+        // action will be AuthAction.signIn or AuthAction.register
         // We can show different footers for each
         if (action == AuthAction.signIn) {
           return Column(
@@ -62,7 +62,7 @@ class LoginView extends StatelessWidget {
           );
         }
       },
-      
+
       actions: [
         AuthStateChangeAction<UserCreated>((context, state) {
           // This is the ideal place to create a user document in Firestore
@@ -70,7 +70,7 @@ class LoginView extends StatelessWidget {
           //   'email': state.user?.email,
           //   'createdAt': FieldValue.serverTimestamp(),
           // });
-    
+
           // After creating the user, send them to a profile setup page
           context.go('/create-profile');
         }),

@@ -120,7 +120,8 @@ class _HomeViewState extends State<HomeView> {
         padding: const EdgeInsets.all(16.0),
         children: [
           Align(
-            alignment: Alignment.topRight, // Positions the button at the bottom center
+            alignment:
+                Alignment.topRight, // Positions the button at the bottom center
             child: ElevatedButton(
               onPressed: () {
                 context.go('/pick_neighborhood');

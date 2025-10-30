@@ -6,9 +6,7 @@ class ScheduleView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Schedule'),
-      ),
+      appBar: AppBar(title: const Text('Schedule')),
       body: Column(
         children: [
           // Placeholder for a calendar
@@ -23,13 +21,10 @@ class ScheduleView extends StatelessWidget {
           ),
           const Divider(),
           const Expanded(
-            child: Center(
-              child: Text('My Items list goes here.'),
-            ),
+            child: Center(child: Text('My Items list goes here.')),
           ),
         ],
       ),
     );
   }
 }
-

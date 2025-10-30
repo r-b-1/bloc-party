@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/profile_model.dart';
-import 'package:blocparty/view/home_view.dart'; 
+import 'package:blocparty/view/home_view.dart';
 import 'package:blocparty/view/add_item_view.dart';
 import 'package:blocparty/model/item_model.dart';
 
@@ -33,6 +33,7 @@ class _ProfileViewState extends State<ProfileView> {
     _profileViewModel.removeListener(_onViewModelChanged);
     super.dispose();
   }
+
   // Adding add item
   void _navigateToAddItem() {
     Navigator.of(context).push(
@@ -41,6 +42,7 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
+
   // Adding delete item function
   Future<void> _deleteItem(Item item) async {
     final shouldDelete = await showDialog<bool>(
@@ -78,7 +80,9 @@ class _ProfileViewState extends State<ProfileView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _profileViewModel.isLoading ? null : () => _profileViewModel.refresh(),
+            onPressed: _profileViewModel.isLoading
+                ? null
+                : () => _profileViewModel.refresh(),
           ),
         ],
       ),
@@ -138,7 +142,10 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(height: 16),
               Text(
                 _profileViewModel.currentUser?.username ?? 'No username',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 _profileViewModel.currentUser?.email ?? '',
@@ -152,7 +159,7 @@ class _ProfileViewState extends State<ProfileView> {
             ],
           ),
         ),
-        
+
         // User's items section
         Expanded(
           child: Padding(
@@ -165,7 +172,7 @@ class _ProfileViewState extends State<ProfileView> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-                
+
                 if (_profileViewModel.userItems.isEmpty)
                   const Expanded(
                     child: Center(
@@ -192,7 +199,7 @@ class _ProfileViewState extends State<ProfileView> {
                           children: [
                             Expanded(
                               child: HomeView.buildItemTile(
-                                context, 
+                                context,
                                 item,
                                 onTap: () {
                                   context.push('/item_description');

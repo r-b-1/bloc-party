@@ -11,19 +11,15 @@ class MessagesView extends StatefulWidget {
 
 class _MessagesViewState extends State<MessagesView> {
   void _navigateToAddChat() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => CreateChatView(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => CreateChatView()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Messages'),
-      ),
+      appBar: AppBar(title: const Text('Messages')),
       body: ListView(
         children: [
           ListTile(
@@ -39,7 +35,7 @@ class _MessagesViewState extends State<MessagesView> {
             title: const Text('John Message'),
             subtitle: const Text('I have a message for you...'),
             onTap: () {
-               context.push('/chat');
+              context.push('/chat');
             },
           ),
           Positioned(

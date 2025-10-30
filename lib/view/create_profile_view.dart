@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/user_model.dart';
 
-
 class CreateProfileView extends StatefulWidget {
   const CreateProfileView({super.key});
 
@@ -20,7 +19,7 @@ class _CreateProfileViewState extends State<CreateProfileView> {
   final _addressController = TextEditingController();
   bool _isLoading = false;
 
- Future<void> _saveProfile() async {
+  Future<void> _saveProfile() async {
     // Validate the form
     if (!_formKey.currentState!.validate()) {
       return;
@@ -42,30 +41,27 @@ class _CreateProfileViewState extends State<CreateProfileView> {
       }
       final uid = user.uid;
 
-      
- final userModel = addUser(
-  username: _usernameController.text.trim(),
-  name: _fullNameController.text.trim(),
-  email: user.email ?? '',
-  address: _addressController.text.trim(),
-);
-
+      final userModel = AddUser(
+        username: _usernameController.text.trim(),
+        name: _fullNameController.text.trim(),
+        email: user.email ?? '',
+        address: _addressController.text.trim(),
+      );
 
       await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .set(userModel.toFirestore());
 
-      
       if (mounted) {
         context.go('/home');
       }
     } catch (e) {
       // Handle errors (e.g., show a snackbar)
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save profile: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to save profile: $e')));
       }
     } finally {
       if (mounted) {
@@ -87,23 +83,21 @@ class _CreateProfileViewState extends State<CreateProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Your Profile'),
-      ),
+      appBar: AppBar(title: const Text('Create Your Profile')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              const SizedBox(height: 16,),
+              const SizedBox(height: 16),
               userName(),
               const SizedBox(height: 16),
               fullName(),
               const SizedBox(height: 16),
               mainAddress(),
               const SizedBox(height: 32),
-              
+
               // Show a loading indicator or the button
               _isLoading
                   ? const CircularProgressIndicator()
@@ -120,40 +114,40 @@ class _CreateProfileViewState extends State<CreateProfileView> {
 
   TextFormField mainAddress() {
     return TextFormField(
-              controller: _addressController,
-              decoration: const InputDecoration(labelText: 'Main Address'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please Enter a Address';
-                }
-                return null;
-              },
-            );
+      controller: _addressController,
+      decoration: const InputDecoration(labelText: 'Main Address'),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please Enter a Address';
+        }
+        return null;
+      },
+    );
   }
 
   TextFormField fullName() {
     return TextFormField(
-              controller: _fullNameController,
-              decoration: const InputDecoration(labelText: 'Full Name'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your full name';
-                }
-                return null;
-              },
-            );
+      controller: _fullNameController,
+      decoration: const InputDecoration(labelText: 'Full Name'),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your full name';
+        }
+        return null;
+      },
+    );
   }
 
   TextFormField userName() {
     return TextFormField(
-              controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a username';
-                }
-                return null;
-              },
-            );
+      controller: _usernameController,
+      decoration: const InputDecoration(labelText: 'Username'),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a username';
+        }
+        return null;
+      },
+    );
   }
 }
