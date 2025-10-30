@@ -139,6 +139,7 @@ class ProfileViewModel extends ChangeNotifier {
   }
 }
 
+//A widget that you can get ot change the Name/Username with
 class Name extends StatelessWidget {
   final TextEditingController controller;
   final String labelName;
@@ -163,6 +164,7 @@ class Name extends StatelessWidget {
   }
 }
 
+//widget for any address needed and uses an API to help with auto fill
 class Address extends StatelessWidget {
   final TextEditingController controller;
   final String labelName;
@@ -170,9 +172,7 @@ class Address extends StatelessWidget {
     super.key,
     required this.controller,
     required this.labelName,
-  }
-  
-  );
+  });
 
   @override
   Widget build(BuildContext context) {
