@@ -84,6 +84,13 @@ class _ProfileViewState extends State<ProfileView> {
                 ? null
                 : () => _profileViewModel.refresh(),
           ),
+          ElevatedButton(
+            onPressed: () async {
+              await _profileViewModel.signOutUser();
+              Navigator.of(context).pushReplacementNamed('/login');
+            },
+            child: const Text('Sign Out'),
+          ),
         ],
       ),
       body: Stack(

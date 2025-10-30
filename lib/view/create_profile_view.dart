@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/user_model.dart';
+import 'package:google_maps_places_autocomplete_widgets/address_autocomplete_widgets.dart';
 
 class CreateProfileView extends StatefulWidget {
   const CreateProfileView({super.key});
@@ -112,15 +113,13 @@ class _CreateProfileViewState extends State<CreateProfileView> {
     );
   }
 
-  TextFormField mainAddress() {
-    return TextFormField(
+  AddressAutocompleteTextField mainAddress() {
+    return AddressAutocompleteTextField(
+      mapsApiKey: googleMapsApiKey,
       controller: _addressController,
-      decoration: const InputDecoration(labelText: 'Main Address'),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please Enter a Address';
-        }
-        return null;
+      decoration: const InputDecoration(labelText: ('Main Address')),
+      onSuggestionClick: (place) {
+        _addressController.text = place.formattedAddress ?? '';
       },
     );
   }
