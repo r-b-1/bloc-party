@@ -34,7 +34,6 @@ class _ProfileViewState extends State<ProfileView> {
     super.dispose();
   }
 
-  // Adding add item
   void _navigateToAddItem() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -42,13 +41,11 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
-
-  // Adding delete item function
+  // Method to delete item
   Future<void> _deleteItem(Item item) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
-        // Adding delete item confirmation
         return AlertDialog(
           title: const Text('Delete Item'),
           content: Text('Are you sure you want to delete "${item.name}"?'),
@@ -69,6 +66,19 @@ class _ProfileViewState extends State<ProfileView> {
 
     if (shouldDelete == true) {
       await _profileViewModel.deleteItem(item.id);
+    }
+  }
+
+  // Method to toggle item availability
+  Future<void> _toggleItemAvailability(Item item) async {
+    try {
+      await _profileViewModel.toggleItemAvailability(item.id, !item.isAvailable);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update availability: $e')),
+        );
+      }
     }
   }
 
@@ -96,7 +106,6 @@ class _ProfileViewState extends State<ProfileView> {
       body: Stack(
         children: [
           _buildBody(context),
-          // adding Add Item button at bottom right
           Positioned(
             right: 16,
             bottom: 16,
@@ -137,7 +146,6 @@ class _ProfileViewState extends State<ProfileView> {
 
     return Column(
       children: [
-        // User info section
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -166,8 +174,6 @@ class _ProfileViewState extends State<ProfileView> {
             ],
           ),
         ),
-
-        // User's items section
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -179,7 +185,6 @@ class _ProfileViewState extends State<ProfileView> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-
                 if (_profileViewModel.userItems.isEmpty)
                   const Expanded(
                     child: Center(
@@ -202,23 +207,7 @@ class _ProfileViewState extends State<ProfileView> {
                       itemCount: _profileViewModel.userItems.length,
                       itemBuilder: (context, index) {
                         final item = _profileViewModel.userItems[index];
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: HomeView.buildItemTile(
-                                context,
-                                item,
-                                onTap: () {
-                                  context.push('/item_description', extra: item);
-                                },
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteItem(item),
-                            ),
-                          ],
-                        );
+                        return _buildProfileItemTile(item);
                       },
                     ),
                   ),
@@ -227,6 +216,47 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ),
       ],
+    );
+  }
+
+  // Method to build new item tile for the user profile using the home page item tile
+  Widget _buildProfileItemTile(Item item) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: HomeView.buildItemTile(
+                context,
+                item,
+                onTap: () {
+                  context.push('/item_description', extra: item);
+                },
+              ),
+            ),
+            Column(
+              children: [
+                // Toggle switch for availability
+                Switch(
+                  value: item.isAvailable,
+                  onChanged: (bool value) {
+                    _toggleItemAvailability(item);
+                  },
+                  activeColor: Colors.green,
+                ),
+                const SizedBox(height: 8),
+                // Delete button
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                  onPressed: () => _deleteItem(item),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
