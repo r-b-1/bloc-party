@@ -11,6 +11,7 @@ class Item {
   final String neighborhoodId;
   final ItemPortability portability;
   final List<String> tags;
+  final String imagePath;
 
   Item({
     required this.id,
@@ -21,6 +22,7 @@ class Item {
     required this.neighborhoodId,
     required this.portability,
     required this.tags,
+    required this.imagePath,
   });
 
   Map<String, dynamic> toFirestore() {
@@ -75,6 +77,7 @@ class Item {
       neighborhoodId: data['neighborhoodId'] ?? '',
       portability: portability,
       tags: tags,
+      imagePath: data['imagePath'] ?? '',
     );
   }
 }
