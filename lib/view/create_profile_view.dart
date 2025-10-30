@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/user_model.dart';
-import 'package:google_maps_places_autocomplete_widgets/address_autocomplete_widgets.dart';
+import 'package:blocparty/model/profile_model.dart';
 
 class CreateProfileView extends StatefulWidget {
   const CreateProfileView({super.key});
@@ -92,11 +92,11 @@ class _CreateProfileViewState extends State<CreateProfileView> {
           child: Column(
             children: [
               const SizedBox(height: 16),
-              userName(),
+              Name(controller: _usernameController,labelName: 'Username' ),
               const SizedBox(height: 16),
-              fullName(),
+              Name(controller:_fullNameController, labelName: 'Full Name',),
               const SizedBox(height: 16),
-              mainAddress(),
+              Address(controller: _addressController, labelName: 'Main Address',),
               const SizedBox(height: 32),
 
               // Show a loading indicator or the button
@@ -110,43 +110,6 @@ class _CreateProfileViewState extends State<CreateProfileView> {
           ),
         ),
       ),
-    );
-  }
-
-  AddressAutocompleteTextField mainAddress() {
-    return AddressAutocompleteTextField(
-      mapsApiKey: googleMapsApiKey,
-      controller: _addressController,
-      decoration: const InputDecoration(labelText: ('Main Address')),
-      onSuggestionClick: (place) {
-        _addressController.text = place.formattedAddress ?? '';
-      },
-    );
-  }
-
-  TextFormField fullName() {
-    return TextFormField(
-      controller: _fullNameController,
-      decoration: const InputDecoration(labelText: 'Full Name'),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your full name';
-        }
-        return null;
-      },
-    );
-  }
-
-  TextFormField userName() {
-    return TextFormField(
-      controller: _usernameController,
-      decoration: const InputDecoration(labelText: 'Username'),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a username';
-        }
-        return null;
-      },
     );
   }
 }

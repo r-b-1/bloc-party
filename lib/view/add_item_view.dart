@@ -2,7 +2,6 @@ import 'package:blocparty/view/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/model/item_model.dart';
-import 'package:blocparty/view/home_view.dart';
 
 class AddItemView extends StatefulWidget {
   final ProfileViewModel profileViewModel;
