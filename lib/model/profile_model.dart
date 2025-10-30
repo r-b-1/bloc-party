@@ -147,7 +147,7 @@ class ProfileViewModel extends ChangeNotifier {
         .doc(itemId)
         .update({'isAvailable': newAvailability});
 
-    // Update locally - without copyWith
+    // Updates availability locally
     final itemIndex = _userItems.indexWhere((item) => item.id == itemId);
     if (itemIndex != -1) {
       // Create a new Item with the updated availability
