@@ -8,9 +8,7 @@ class RegisterView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RegisterScreen(
-      providers: [
-        EmailAuthProvider(),
-      ],
+      providers: [EmailAuthProvider()],
       headerBuilder: (context, constraints, shrinkOffset) {
         return const Padding(
           padding: EdgeInsets.all(20),

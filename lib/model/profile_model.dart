@@ -5,12 +5,12 @@ import 'package:blocparty/model/user_model.dart';
 import 'package:blocparty/model/item_model.dart';
 
 class ProfileViewModel extends ChangeNotifier {
-  User? _currentUser;        
+  AddUser? _currentUser;
   List<Item> _userItems = [];
   bool _isLoading = true;
   String? _error;
 
-  User? get currentUser => _currentUser;
+  AddUser? get currentUser => _currentUser;
   List<Item> get userItems => _userItems;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -25,25 +25,25 @@ class ProfileViewModel extends ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      // Get the Firebase auth user 
+      // Get the Firebase auth user
       final authUser = auth.FirebaseAuth.instance.currentUser;
       if (authUser == null) {
         throw Exception('No user logged in');
       }
 
-      // Fetch user data from 'users' collection 
+      // Fetch user data from 'users' collection
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(authUser.uid)
           .get();
-      
+
       if (!userDoc.exists) {
         throw Exception('User document not found');
       }
 
       // Store custom user data
-      _currentUser = User.fromFirestore(userDoc);
-      
+      _currentUser = AddUser.fromFirestore(userDoc);
+
       // Fetch items from 'items' collection where userId matches username
       final itemsSnapshot = await FirebaseFirestore.instance
           .collection('items')
@@ -53,7 +53,6 @@ class ProfileViewModel extends ChangeNotifier {
       _userItems = itemsSnapshot.docs
           .map((doc) => Item.fromFirestore(doc))
           .toList();
-
     } catch (e) {
       _error = 'Failed to load profile: $e';
       print('Error in ProfileViewModel: $e');
@@ -62,7 +61,6 @@ class ProfileViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   // Add this method to create new items
   Future<void> addItem({
@@ -79,9 +77,9 @@ class ProfileViewModel extends ChangeNotifier {
         throw Exception('No user logged in');
       }
 
-      // Creating a new document in firestore 
+      // Creating a new document in firestore
       final docRef = FirebaseFirestore.instance.collection('items').doc();
-      
+
       // Creating the item
       final newItem = Item(
         id: docRef.id,
@@ -100,7 +98,6 @@ class ProfileViewModel extends ChangeNotifier {
       // Adding item to local list and update UI
       _userItems.add(newItem);
       notifyListeners();
-
     } catch (e) {
       _error = 'Failed to add item: $e';
       print('Error adding item: $e');
@@ -108,6 +105,7 @@ class ProfileViewModel extends ChangeNotifier {
       rethrow;
     }
   }
+
   // Adding method to delete items
   Future<void> deleteItem(String itemId) async {
     try {
@@ -122,14 +120,13 @@ class ProfileViewModel extends ChangeNotifier {
 
       _userItems.removeWhere((item) => item.id == itemId);
       notifyListeners();
-    } catch(e) {
+    } catch (e) {
       _error = 'Failed to delete item: $e';
       print('Error deleting item: $e');
       notifyListeners();
       rethrow;
     }
   }
-
 
   Future<void> refresh() async {
     await _fetchUserDataAndItems();

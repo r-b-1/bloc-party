@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 //temp
-final List<String> available_neighborhoods = List<String>.generate(100, (i) => '$i');
+final List<String> available_neighborhoods = List<String>.generate(
+  100,
+  (i) => '$i',
+);
 //temp
-
 
 class PickNeighborhoodView extends StatelessWidget {
   const PickNeighborhoodView({super.key});
@@ -12,9 +14,7 @@ class PickNeighborhoodView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Neighborhood Selection'),
-      ),
+      appBar: AppBar(title: const Text('Neighborhood Selection')),
       body: ListView.builder(
         itemCount: available_neighborhoods.length,
         itemBuilder: (context, index) {
@@ -31,7 +31,9 @@ class PickNeighborhoodView extends StatelessWidget {
                 //do neighborhood change/join logic here
 
                 //temp
-                context.go('/home');  //no animation on the button, so I put this here to show it works
+                context.go(
+                  '/home',
+                ); //no animation on the button, so I put this here to show it works
                 //temp
               },
               child: Icon(Icons.add),

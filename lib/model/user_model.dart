@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class User {
+class AddUser {
   final String username;
   final String name;
   final String email;
@@ -10,10 +10,17 @@ class User {
 
   final String? neighborhoodId;
 
-  User({required this.username, required this.name, required this.email, required this.address, this.address2, this.phonenumber, this.neighborhoodId});
+  AddUser({
+    required this.username,
+    required this.name,
+    required this.email,
+    required this.address,
+    this.address2,
+    this.phonenumber,
+    this.neighborhoodId,
+  });
 
-
-  factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory AddUser.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     if (!doc.exists) {
       throw Exception('Document does not exist');
     }
@@ -22,11 +29,26 @@ class User {
       throw Exception('Document data is null');
     }
 
-    return User(
+    return AddUser(
       username: data['username'] ?? '',
       name: data['fullName'] ?? '',
       email: data['email'] ?? '',
-      address:  data['mainAddress'] ?? '',
+      address: data['mainAddress'] ?? '',
     );
   }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'username': username,
+      'fullName': name,
+      'mainAddress': address,
+      'email': email,
+      if (address2 != null) 'address2': address2,
+      if (phonenumber != null) 'phonenumber': phonenumber,
+      if (neighborhoodId != null) 'neighborhoodId': neighborhoodId,
+      'createdAt': FieldValue.serverTimestamp(),
+    };
+  }
+
+  
 }
