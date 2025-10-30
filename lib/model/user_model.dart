@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+const String googleMapsApiKey = 'AIzaSyAkXgT0SlHd93wl19MHrijs7Hz85tA3OzI';
+
 class AddUser {
   final String username;
   final String name;
@@ -49,6 +51,4 @@ class AddUser {
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
-
-  
 }

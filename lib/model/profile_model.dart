@@ -62,6 +62,10 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> signOutUser() async {
+    await auth.FirebaseAuth.instance.signOut();
+  }
+
   // Add this method to create new items
   Future<void> addItem({
     required String name,
