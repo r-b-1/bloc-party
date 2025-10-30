@@ -131,6 +131,47 @@ class ProfileViewModel extends ChangeNotifier {
       rethrow;
     }
   }
+  // Adding method to toggle the users item availability
+  Future<void> toggleItemAvailability(String itemId, bool newAvailability) async {
+     try {
+      _error = null;
+      notifyListeners();
+
+    if (_currentUser == null) {
+      throw Exception('No user logged in');
+    }
+
+    // Update in Firestore
+    await FirebaseFirestore.instance
+        .collection('items')
+        .doc(itemId)
+        .update({'isAvailable': newAvailability});
+
+    // Updates availability locally
+    final itemIndex = _userItems.indexWhere((item) => item.id == itemId);
+    if (itemIndex != -1) {
+      // Create a new Item with the updated availability
+      final oldItem = _userItems[itemIndex];
+      final updatedItem = Item(
+        id: oldItem.id,
+        name: oldItem.name,
+        description: oldItem.description,
+        isAvailable: newAvailability,
+        userId: oldItem.userId,
+        neighborhoodId: oldItem.neighborhoodId,
+        portability: oldItem.portability,
+        tags: oldItem.tags,
+      );
+      _userItems[itemIndex] = updatedItem;
+      notifyListeners();
+    }
+  } catch (e) {
+    _error = 'Failed to update availability: $e';
+    print('Error updating item availability: $e');
+    notifyListeners();
+    rethrow;
+    }
+  }
 
   Future<void> refresh() async {
     await _fetchUserDataAndItems();
