@@ -46,7 +46,8 @@ class _CreateProfileViewState extends State<CreateProfileView> {
         username: _usernameController.text.trim(),
         name: _fullNameController.text.trim(),
         email: user.email ?? '',
-        address: _addressController.text.trim(),
+        addresses: [_addressController.text.trim()], 
+        currentAddress: _addressController.text.trim()
       );
 
       await FirebaseFirestore.instance
@@ -105,7 +106,7 @@ class _CreateProfileViewState extends State<CreateProfileView> {
                   : ElevatedButton(
                       onPressed: _saveProfile,
                       child: const Text('Save and Continue'),
-                    ),
+              ),
             ],
           ),
         ),

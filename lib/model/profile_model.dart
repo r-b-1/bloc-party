@@ -5,15 +5,20 @@ import 'package:blocparty/model/user_model.dart';
 import 'package:blocparty/model/item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_places_autocomplete_widgets/address_autocomplete_widgets.dart';
+import 'package:blocparty/model/user_model.dart'; 
 
 class ProfileViewModel extends ChangeNotifier {
   AddUser? _currentUser;
   List<Item> _userItems = [];
+  List<String> _addresses = [];
+  String? _currentAddress;
   bool _isLoading = true;
   String? _error;
 
   AddUser? get currentUser => _currentUser;
   List<Item> get userItems => _userItems;
+  List<String> get addresses => _addresses;
+  String? get currentAddress => _currentAddress;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -45,6 +50,15 @@ class ProfileViewModel extends ChangeNotifier {
 
       // Store custom user data
       _currentUser = AddUser.fromFirestore(userDoc);
+      // Get addresses from user model
+      _addresses = List<String>.from(_currentUser!.addresses);
+
+      // Set current address
+      _currentAddress = _currentUser!.currentAddress;
+      if ((_currentAddress == null || _currentAddress!.isEmpty) &&
+          _addresses.isNotEmpty) {
+        _currentAddress = _addresses[0];
+      }
 
       // Fetch items from 'items' collection where userId matches username
       final itemsSnapshot = await FirebaseFirestore.instance
@@ -180,6 +194,119 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
+
+  // Method for the user to add a new address
+  Future<void> addAddress(String newAddress) async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      final authUser = auth.FirebaseAuth.instance.currentUser;
+      if (authUser == null) {
+        throw Exception('No user logged in');
+      }
+
+      if (newAddress.trim().isEmpty) {
+        throw Exception('Address cannot be empty');
+      }
+
+      // Checks to see if address already exists
+      if (_addresses.contains(newAddress.trim())) {
+        throw Exception('Address already exists');
+      }
+
+      // Adds address to local list
+      _addresses.add(newAddress.trim());
+
+      // If this is the first address, make it the current address
+      if (_addresses.length == 1) {
+        _currentAddress = newAddress.trim();
+      }
+
+      // Update Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(authUser.uid)
+          .update({
+        'addresses': _addresses,
+        if (_currentAddress != null) 'currentAddress': _currentAddress,
+      });
+
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to add address: $e';
+      print('Error adding address: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  // Method for the user to delete an address
+  Future<void> deleteAddress(String address) async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      final authUser = auth.FirebaseAuth.instance.currentUser;
+      if (authUser == null) {
+        throw Exception('No user logged in');
+      }
+
+      // Removes address from local list
+      _addresses.remove(address);
+
+      // If the deleted address was the current address, switch to first available address
+      if (_currentAddress == address) {
+        _currentAddress = _addresses.isNotEmpty ? _addresses[0] : null;
+      }
+
+      // Update Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(authUser.uid)
+          .update({
+        'addresses': _addresses,
+        if (_currentAddress != null) 'currentAddress': _currentAddress,
+      });
+
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to delete address: $e';
+      print('Error deleting address: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  // Method for user to switch current address
+  Future<void> setCurrentAddress(String address) async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      final authUser = auth.FirebaseAuth.instance.currentUser;
+      if (authUser == null) {
+        throw Exception('No user logged in');
+      }
+
+      _currentAddress = address;
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(authUser.uid)
+          .update({
+        'currentAddress': address,
+      });
+
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to set current address: $e';
+      print('Error setting current address: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   Future<void> refresh() async {
     await _fetchUserDataAndItems();
   }
@@ -217,7 +344,10 @@ class Address extends StatelessWidget {
     return AddressAutocompleteTextField(
       mapsApiKey: googleMapsApiKey,
       controller: controller,
-      decoration: InputDecoration(labelText: labelName),
+      decoration: InputDecoration(
+        labelText: labelName,
+        border: OutlineInputBorder(),
+        ),
       onSuggestionClick: (place) {
         controller.text = place.formattedAddress ?? '';
       },
