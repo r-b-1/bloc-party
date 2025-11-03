@@ -15,7 +15,7 @@ class ItemDescriptionView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              height: 100,
+              height: 300,
               width: double.infinity,
               color: Colors.grey[300],
               child: Center(
