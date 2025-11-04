@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/itemview_model.dart';
 import 'package:blocparty/model/item_model.dart';
-import 'package:blocparty/model/auth_model.dart';
+import 'package:blocparty/model/login_model/auth_model.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -16,7 +16,20 @@ class HomeView extends StatefulWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        leading: const Icon(Icons.card_giftcard),
+        leading: Image.asset(
+          item.imagePath,
+          width: 50,
+          height: 50,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              'assets/images/confused-person.jpg',
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            );
+          },
+        ),
         title: Text(item.name),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
