@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/itemview_model.dart';
 import 'package:blocparty/model/item_model.dart';
-import 'package:blocparty/model/auth_model.dart';
+import 'package:blocparty/model/login_model/auth_model.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});

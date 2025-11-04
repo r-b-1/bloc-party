@@ -1,7 +1,7 @@
 // lib/model/itemview_model.dart
 import 'package:flutter/foundation.dart';
 import 'package:blocparty/model/item_model.dart';
-import 'package:blocparty/model/auth_model.dart';
+import 'package:blocparty/model/login_model/auth_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ItemViewModel extends ChangeNotifier {

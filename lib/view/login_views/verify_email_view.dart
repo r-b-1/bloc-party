@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:blocparty/model/email_verification_model.dart';
+import 'package:blocparty/model/login_model/email_verification_model.dart';
+
 
 class VerifyEmailView extends StatelessWidget {
   const VerifyEmailView({super.key});
@@ -24,7 +25,7 @@ class VerifyEmailView extends StatelessWidget {
           },
           actions: [
             EmailVerifiedAction(() {
-              context.go('/create-profile');
+                context.go('/create-profile');
             }),
             AuthCancelledAction((context) {
               FirebaseUIAuth.signOut(context: context);
