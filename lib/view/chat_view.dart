@@ -7,9 +7,9 @@ class ChatView extends StatelessWidget {
   @override
   Widget buildMessage(BuildContext context, Message message) {
     return ListTile(
-      leading: Text(message.timestamp as String),
       title: Text(message.sender.username),
       subtitle: Text(message.message),
+      trailing: Text(message.timestamp as String)
     );
   }
 
