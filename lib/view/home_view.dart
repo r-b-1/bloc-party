@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/itemview_model.dart';
 import 'package:blocparty/model/item_model.dart';
-import 'package:blocparty/model/auth_model.dart';
 import 'package:blocparty/view/widgets/item_search_filter_widget.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
-
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -149,8 +147,7 @@ class _HomeViewState extends State<HomeView> {
           const SizedBox(height: 16),
 
           _buildInfoCard(
-            'Group Name',
-            AddUser.neighborhoodId ?? 'Not selected',
+            'Group Name', 'neighborhoodId',
           ),
           _buildInfoCard('Notification Request', '0'),
           _buildInfoCard('Messages', '3 new'),
