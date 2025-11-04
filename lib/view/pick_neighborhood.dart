@@ -87,11 +87,21 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
       appBar: AppBar(
         title: Text('Neighborhoods Avaliable'),
         leading: IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              neighborhoodViewModel.fetchItems();
-            },
-          ),
+          icon: const Icon(Icons.refresh),
+          onPressed: () {
+            neighborhoodViewModel.fetchNeighborhoods();
+          },
+        ),
+        actions: [
+          IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            
+            //add new neighborhood
+          },
+        ),
+        ],
+
       ),
       
       
@@ -101,11 +111,11 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
         itemBuilder: (context, index) {
           return ListTile(
             leading: CircleAvatar(
-              backgroundColor: const Color.fromARGB(255, 114, 26, 255),
-              child: Text(neighborhoodViewModel.neighborhoods[index].neighborhoodId),
+              backgroundColor: Color.fromARGB(255, 0, (index % 25) * 2 + 200, (index % 25) * 2 + 200),
+              child: Icon(Icons.house, color: Color.fromARGB(255, 0, 0, 0),),
             ),
 
-            title: Text('Neighborhood ${neighborhoodViewModel.neighborhoods[index].neighborhoodId}'),
+            title: Text('Neighborhood: ${neighborhoodViewModel.neighborhoods[index].neighborhoodId}'),
             subtitle: Text('Description'),
             trailing: GestureDetector(
               onTap: () {
