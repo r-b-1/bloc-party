@@ -106,7 +106,7 @@ class ProfileViewModel extends ChangeNotifier {
         description: description,
         isAvailable: true,
         userId: _currentUser!.username,
-        neighborhoodId: 'defualt',
+        neighborhoodId: '1',
         portability: portability,
         tags: tags,
         imagePath: 'assets/images/confused-person.jpg',
