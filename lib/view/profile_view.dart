@@ -82,6 +82,102 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
+  // Method for the user to add a new address using the google API 
+  void _showAddAddressDialog() {
+    final TextEditingController addressController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add New Address'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Address(
+                controller: addressController,
+                labelName: 'New Address',
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (addressController.text.trim().isNotEmpty) {
+                  try {
+                    await _profileViewModel.addAddress(
+                        addressController.text.trim());
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Address added successfully!')),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to add address: $e')),
+                      );
+                    }
+                  }
+                }
+              },
+              child: const Text('Add Address'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Method for user to delete addresses
+  Future<void> _deleteAddress(String address) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Address'),
+          content: Text('Are you sure you want to delete this address?\n\n$address'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      try {
+        await _profileViewModel.deleteAddress(address);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Address deleted successfully!')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$e')),
+          );
+        }
+      }
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,6 +267,8 @@ class _ProfileViewState extends State<ProfileView> {
                 '${_profileViewModel.userItems.length} items listed',
                 style: TextStyle(color: Colors.grey[600]),
               ),
+              const SizedBox(height: 16),
+              _buildAddressSection(),
             ],
           ),
         ),
@@ -219,7 +317,90 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  // Method to build new item tile for the user profile using the home page item tile
+// Widget to build the UI for the user address section
+  Widget _buildAddressSection() {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'My Addresses',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_location, color: Colors.blue),
+                  onPressed: _showAddAddressDialog,
+                  tooltip: 'Add new address',
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (_profileViewModel.addresses.isEmpty)
+              const Text(
+                'No addresses found. Add your first address!',
+                style: TextStyle(color: Colors.grey),
+              )
+            else
+              Column(
+                children: [
+                  const Text(
+                    'Tap an address to set it as your current address:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ...(_profileViewModel.addresses.map((address) {
+                    final isCurrent = address == _profileViewModel.currentAddress;
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      color: isCurrent ? Colors.blue.shade50 : null,
+                      child: ListTile(
+                        dense: true,
+                        leading: Icon(
+                          isCurrent ? Icons.location_on : Icons.location_on_outlined,
+                          size: 20,
+                          color: isCurrent ? Colors.blue : Colors.grey,
+                        ),
+                        title: Text(
+                          address,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                          onPressed: () => _deleteAddress(address),
+                        ),
+                        onTap: () {
+                          if (!isCurrent) {
+                            _profileViewModel.setCurrentAddress(address);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Current address set to: $address')),
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  })).toList(),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget to build new item tile for the user profile using the home page item tile
   Widget _buildProfileItemTile(Item item) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),

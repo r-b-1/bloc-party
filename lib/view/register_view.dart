@@ -25,10 +25,9 @@ class RegisterView extends StatelessWidget {
         );
       },
       actions: [
-        // Use the UserCreated action here
         AuthStateChangeAction<UserCreated>((context, state) {
           // Go to a profile setup page or directly to home
-          context.go('/create-profile');
+          context.go('/verify-email');
         }),
       ],
     );

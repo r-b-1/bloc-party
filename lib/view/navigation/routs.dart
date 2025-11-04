@@ -11,6 +11,7 @@ import 'package:blocparty/view/create_profile_view.dart'; //Create Profile
 import 'package:firebase_auth/firebase_auth.dart'; //Fire_auth
 import 'package:blocparty/view/pick_neighborhood.dart'; //Pick Neighborhood
 import 'package:blocparty/model/item_model.dart'; //Item Model
+import 'package:blocparty/view/verify_email_view.dart'; //Verify that there email is real
 
 GoRouter goRouts() {
   final GoRouter router = GoRouter(
@@ -19,11 +20,17 @@ GoRouter goRouts() {
       FirebaseAuth.instance.authStateChanges(),
     ),
     routes: [
-      GoRoute(path: '/auth', builder: (context, state) => LoginView()),
+      GoRoute(
+       path: '/auth',
+       builder: (context, state) => LoginView()),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterView(),
       ),
+      GoRoute(
+        path: '/verify-email',
+        builder: (context, state) => const VerifyEmailView(),
+       ),
       GoRoute(
         path: '/create-profile',
         builder: (context, state) => const CreateProfileView(),

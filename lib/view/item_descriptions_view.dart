@@ -15,10 +15,17 @@ class ItemDescriptionView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              height: 200,
+              height: 300,
+              width: double.infinity,
               color: Colors.grey[300],
-              child: const Center(
-                child: Icon(Icons.photo_camera, size: 50, color: Colors.grey),
+              child: Center(
+                child: Image.asset(
+                  item.imagePath,
+                  fit: BoxFit.fill,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset('assets/images/confused-person.jpg');
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 16),

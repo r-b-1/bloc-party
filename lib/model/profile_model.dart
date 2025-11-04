@@ -3,15 +3,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:blocparty/model/user_model.dart';
 import 'package:blocparty/model/item_model.dart';
+import 'package:flutter/material.dart';
+import 'package:google_maps_places_autocomplete_widgets/address_autocomplete_widgets.dart';
 
 class ProfileViewModel extends ChangeNotifier {
   AddUser? _currentUser;
   List<Item> _userItems = [];
+  List<String> _addresses = [];
+  String? _currentAddress;
   bool _isLoading = true;
   String? _error;
 
   AddUser? get currentUser => _currentUser;
   List<Item> get userItems => _userItems;
+  List<String> get addresses => _addresses;
+  String? get currentAddress => _currentAddress;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -43,6 +49,15 @@ class ProfileViewModel extends ChangeNotifier {
 
       // Store custom user data
       _currentUser = AddUser.fromFirestore(userDoc);
+      // Get addresses from user model
+      _addresses = List<String>.from(_currentUser!.addresses);
+
+      // Set current address
+      _currentAddress = _currentUser!.currentAddress;
+      if ((_currentAddress == null || _currentAddress!.isEmpty) &&
+          _addresses.isNotEmpty) {
+        _currentAddress = _addresses[0];
+      }
 
       // Fetch items from 'items' collection where userId matches username
       final itemsSnapshot = await FirebaseFirestore.instance
@@ -94,6 +109,7 @@ class ProfileViewModel extends ChangeNotifier {
         neighborhoodId: 'defualt',
         portability: portability,
         tags: tags,
+        imagePath: 'assets/images/confused-person.jpg',
       );
 
       // Saving to Firestore
@@ -131,49 +147,209 @@ class ProfileViewModel extends ChangeNotifier {
       rethrow;
     }
   }
+
   // Adding method to toggle the users item availability
-  Future<void> toggleItemAvailability(String itemId, bool newAvailability) async {
-     try {
+  Future<void> toggleItemAvailability(
+    String itemId,
+    bool newAvailability,
+  ) async {
+    try {
       _error = null;
       notifyListeners();
 
-    if (_currentUser == null) {
-      throw Exception('No user logged in');
-    }
+      if (_currentUser == null) {
+        throw Exception('No user logged in');
+      }
 
-    // Update in Firestore
-    await FirebaseFirestore.instance
-        .collection('items')
-        .doc(itemId)
-        .update({'isAvailable': newAvailability});
+      // Update in Firestore
+      await FirebaseFirestore.instance.collection('items').doc(itemId).update({
+        'isAvailable': newAvailability,
+      });
 
-    // Updates availability locally
-    final itemIndex = _userItems.indexWhere((item) => item.id == itemId);
-    if (itemIndex != -1) {
-      // Create a new Item with the updated availability
-      final oldItem = _userItems[itemIndex];
-      final updatedItem = Item(
-        id: oldItem.id,
-        name: oldItem.name,
-        description: oldItem.description,
-        isAvailable: newAvailability,
-        userId: oldItem.userId,
-        neighborhoodId: oldItem.neighborhoodId,
-        portability: oldItem.portability,
-        tags: oldItem.tags,
-      );
-      _userItems[itemIndex] = updatedItem;
+      // Updates availability locally
+      final itemIndex = _userItems.indexWhere((item) => item.id == itemId);
+      if (itemIndex != -1) {
+        // Create a new Item with the updated availability
+        final oldItem = _userItems[itemIndex];
+        final updatedItem = Item(
+          id: oldItem.id,
+          name: oldItem.name,
+          description: oldItem.description,
+          isAvailable: newAvailability,
+          userId: oldItem.userId,
+          neighborhoodId: oldItem.neighborhoodId,
+          portability: oldItem.portability,
+          tags: oldItem.tags,
+          imagePath: oldItem.imagePath,
+        );
+        _userItems[itemIndex] = updatedItem;
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = 'Failed to update availability: $e';
+      print('Error updating item availability: $e');
       notifyListeners();
+      rethrow;
     }
-  } catch (e) {
-    _error = 'Failed to update availability: $e';
-    print('Error updating item availability: $e');
-    notifyListeners();
-    rethrow;
+  }
+
+
+  // Method for the user to add a new address
+  Future<void> addAddress(String newAddress) async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      final authUser = auth.FirebaseAuth.instance.currentUser;
+      if (authUser == null) {
+        throw Exception('No user logged in');
+      }
+
+      if (newAddress.trim().isEmpty) {
+        throw Exception('Address cannot be empty');
+      }
+
+      // Checks to see if address already exists
+      if (_addresses.contains(newAddress.trim())) {
+        throw Exception('Address already exists');
+      }
+
+      // Adds address to local list
+      _addresses.add(newAddress.trim());
+
+      // If this is the first address, make it the current address
+      if (_addresses.length == 1) {
+        _currentAddress = newAddress.trim();
+      }
+
+      // Update Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(authUser.uid)
+          .update({
+        'addresses': _addresses,
+        if (_currentAddress != null) 'currentAddress': _currentAddress,
+      });
+
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to add address: $e';
+      print('Error adding address: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  // Method for the user to delete an address
+  Future<void> deleteAddress(String address) async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      final authUser = auth.FirebaseAuth.instance.currentUser;
+      if (authUser == null) {
+        throw Exception('No user logged in');
+      }
+
+      // Removes address from local list
+      _addresses.remove(address);
+
+      // If the deleted address was the current address, switch to first available address
+      if (_currentAddress == address) {
+        _currentAddress = _addresses.isNotEmpty ? _addresses[0] : null;
+      }
+
+      // Update Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(authUser.uid)
+          .update({
+        'addresses': _addresses,
+        if (_currentAddress != null) 'currentAddress': _currentAddress,
+      });
+
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to delete address: $e';
+      print('Error deleting address: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  // Method for user to switch current address
+  Future<void> setCurrentAddress(String address) async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      final authUser = auth.FirebaseAuth.instance.currentUser;
+      if (authUser == null) {
+        throw Exception('No user logged in');
+      }
+
+      _currentAddress = address;
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(authUser.uid)
+          .update({
+        'currentAddress': address,
+      });
+
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to set current address: $e';
+      print('Error setting current address: $e');
+      notifyListeners();
+      rethrow;
     }
   }
 
   Future<void> refresh() async {
     await _fetchUserDataAndItems();
+  }
+}
+
+//A widget that you can get ot change the Name/Username with
+class Name extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelName;
+  const Name({super.key, required this.controller, required this.labelName});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(labelText: labelName),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter $labelName';
+        }
+        return null;
+      },
+    );
+  }
+}
+
+//widget for any address needed and uses an API to help with auto fill
+class Address extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelName;
+  const Address({super.key, required this.controller, required this.labelName});
+
+  @override
+  Widget build(BuildContext context) {
+    return AddressAutocompleteTextField(
+      mapsApiKey: googleMapsApiKey,
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelName,
+        border: OutlineInputBorder(),
+        ),
+      onSuggestionClick: (place) {
+        controller.text = place.formattedAddress ?? '';
+      },
+    );
   }
 }
