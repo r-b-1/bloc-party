@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:blocparty/model/user_model.dart';
+import 'package:blocparty/model/login_model/user_model.dart';
 import 'package:blocparty/model/item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_places_autocomplete_widgets/address_autocomplete_widgets.dart';

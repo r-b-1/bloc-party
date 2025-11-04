@@ -176,8 +176,6 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,7 +202,7 @@ class _ProfileViewState extends State<ProfileView> {
           _buildBody(context),
           Positioned(
             right: 16,
-            bottom: 16,
+            bottom: 80, // CHANGED: Moved FAB up to avoid overlapping with items
             child: FloatingActionButton(
               onPressed: _navigateToAddItem,
               child: const Icon(Icons.add),
@@ -240,40 +238,40 @@ class _ProfileViewState extends State<ProfileView> {
       );
     }
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const CircleAvatar(
-                radius: 50,
-                child: Icon(Icons.person, size: 50),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                _profileViewModel.currentUser?.username ?? 'No username',
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                const CircleAvatar(
+                  radius: 50,
+                  child: Icon(Icons.person, size: 50),
                 ),
-              ),
-              Text(
-                _profileViewModel.currentUser?.email ?? '',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${_profileViewModel.userItems.length} items listed',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 16),
-              _buildAddressSection(),
-            ],
+                const SizedBox(height: 16),
+                Text(
+                  _profileViewModel.currentUser?.username ?? 'No username',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  _profileViewModel.currentUser?.email ?? '',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${_profileViewModel.userItems.length} items listed',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 16),
+                _buildAddressSection(),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: Padding(
+          Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,8 +282,9 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
                 const SizedBox(height: 16),
                 if (_profileViewModel.userItems.isEmpty)
-                  const Expanded(
-                    child: Center(
+                  Container(
+                    height: 200,
+                    child: const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -300,20 +299,20 @@ class _ProfileViewState extends State<ProfileView> {
                     ),
                   )
                 else
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _profileViewModel.userItems.length,
-                      itemBuilder: (context, index) {
-                        final item = _profileViewModel.userItems[index];
+                  Column(
+                    children: [
+                      ..._profileViewModel.userItems.map((item) {
                         return _buildProfileItemTile(item);
-                      },
-                    ),
+                      }).toList(),
+                    ],
                   ),
               ],
             ),
           ),
-        ),
-      ],
+          // CHANGED: Added bottom padding to ensure space for FAB
+          const SizedBox(height: 80),
+        ],
+      ),
     );
   }
 
