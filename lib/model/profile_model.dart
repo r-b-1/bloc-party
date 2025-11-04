@@ -5,7 +5,6 @@ import 'package:blocparty/model/user_model.dart';
 import 'package:blocparty/model/item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_places_autocomplete_widgets/address_autocomplete_widgets.dart';
-import 'package:blocparty/model/user_model.dart'; 
 
 class ProfileViewModel extends ChangeNotifier {
   AddUser? _currentUser;

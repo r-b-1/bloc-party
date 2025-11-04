@@ -9,7 +9,7 @@ class LoginView extends StatelessWidget {
   Widget build(BuildContext context) {
     return SignInScreen(
       providers: [
-        EmailAuthProvider(), // or any other providers you want
+        EmailAuthProvider(),
       ],
       headerBuilder: (context, constraints, shrinkOffset) {
         return const Padding(
@@ -46,7 +46,7 @@ class LoginView extends StatelessWidget {
                   // Navigate to your new registration route
                   context.go('/register');
                 },
-                child: const Text('Don\'t have an account? Sign up'),
+                child: const Text('Don\'t have an account? Sign up here'),
               ),
             ],
           );
@@ -65,18 +65,21 @@ class LoginView extends StatelessWidget {
 
       actions: [
         AuthStateChangeAction<UserCreated>((context, state) {
-          // This is the ideal place to create a user document in Firestore
-          // e.g., FirebaseFirestore.instance.collection('users').doc(state.user?.uid).set({
-          //   'email': state.user?.email,
-          //   'createdAt': FieldValue.serverTimestamp(),
-          // });
-
-          // After creating the user, send them to a profile setup page
-          context.go('/create-profile');
+          //verifying email
+          context.go('/verify-email');
         }),
+        // AuthStateChangeAction<UserCreated>((context, state) {
+        //   //user verify email
+        //   context.go('/create-profile');
+        // }),
         AuthStateChangeAction<SignedIn>((context, state) {
           // GoRouter will handle navigation automatically
+          if (state.user?.emailVerified == true){
           context.go('/home');
+          }
+          else {
+            context.go('/verify-email');
+          }
         }),
       ],
     );
