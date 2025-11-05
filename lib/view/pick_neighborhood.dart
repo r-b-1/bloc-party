@@ -1,3 +1,4 @@
+import 'package:blocparty/model/profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
@@ -25,11 +26,13 @@ class PickNeighborhoodView extends StatefulWidget {
 class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
   late NeighborhoodViewModel neighborhoodViewModel;
   late AuthViewModel authViewModel;
+  late ProfileViewModel profileViewModel;
 
   @override
   void initState() {
     super.initState();
     authViewModel = AuthViewModel();
+    profileViewModel = ProfileViewModel();
     neighborhoodViewModel = NeighborhoodViewModel(authViewModel);
     neighborhoodViewModel.addListener(_onNeighborhoodViewModelChanged);
   }
@@ -38,6 +41,7 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
   void dispose() {
     neighborhoodViewModel.removeListener(_onNeighborhoodViewModelChanged);
     authViewModel.dispose();
+    profileViewModel.dispose();
     neighborhoodViewModel.dispose();
     super.dispose();
   }
@@ -61,14 +65,15 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
         ),
         actions: [
           IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            
-            //add new neighborhoods
-            List<String> userToAdd = ["you"];
-            neighborhoodViewModel.addNeighborhood(neighborhoodIdToAdd: (neighborhoodViewModel.neighborhoods.length + 1).toString(), neighborhoodUsersToAdd: userToAdd);
-          },
-        ),
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              
+              //should just add the current user to the neighborhood by default
+              
+              List<String> userToAdd = [profileViewModel.currentUser!.username];
+              neighborhoodViewModel.addNeighborhood(neighborhoodIdToAdd: (neighborhoodViewModel.neighborhoods.length + 1).toString(), neighborhoodUsersToAdd: userToAdd);
+            },
+          ),
         ],
 
       ),
