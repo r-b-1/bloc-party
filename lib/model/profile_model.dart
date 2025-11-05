@@ -81,51 +81,6 @@ class ProfileViewModel extends ChangeNotifier {
     await auth.FirebaseAuth.instance.signOut();
   }
 
-  // Add this method to create new items
-  Future<void> addItem({
-    required String name,
-    required String description,
-    required ItemPortability portability,
-    required List<String> tags,
-  }) async {
-    try {
-      _error = null;
-      notifyListeners();
-
-      if (_currentUser == null) {
-        throw Exception('No user logged in');
-      }
-
-      // Creating a new document in firestore
-      final docRef = FirebaseFirestore.instance.collection('items').doc();
-
-      // Creating the item
-      final newItem = Item(
-        id: docRef.id,
-        name: name,
-        description: description,
-        isAvailable: true,
-        userId: _currentUser!.username,
-        neighborhoodId: '1',
-        portability: portability,
-        tags: tags,
-        imagePath: 'assets/images/confused-person.jpg',
-      );
-
-      // Saving to Firestore
-      await docRef.set(newItem.toFirestore());
-
-      // Adding item to local list and update UI
-      _userItems.add(newItem);
-      notifyListeners();
-    } catch (e) {
-      _error = 'Failed to add item: $e';
-      print('Error adding item: $e');
-      notifyListeners();
-      rethrow;
-    }
-  }
-
   // Adding method to delete items
   Future<void> deleteItem(String itemId) async {
     try {
@@ -192,7 +147,6 @@ class ProfileViewModel extends ChangeNotifier {
       rethrow;
     }
   }
-
 
   // Method for the user to add a new address
   Future<void> addAddress(String newAddress) async {

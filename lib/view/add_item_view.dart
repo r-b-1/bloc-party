@@ -2,6 +2,7 @@ import 'package:blocparty/view/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/model/item_model.dart';
+import 'package:blocparty/model/add_item_model.dart';
 
 class AddItemView extends StatefulWidget {
   final ProfileViewModel profileViewModel;
@@ -20,6 +21,9 @@ class _AddItemViewState extends State<AddItemView> {
 
   ItemPortability _selectedPortability = ItemPortability.portable;
   bool _isLoading = false;
+
+  // Create instance of AddItemViewModel
+  final AddItemViewModel _addItemViewModel = AddItemViewModel();
 
   @override
   void dispose() {
@@ -46,11 +50,13 @@ class _AddItemViewState extends State<AddItemView> {
           .where((tag) => tag.isNotEmpty)
           .toList();
 
-      await widget.profileViewModel.addItem(
+      // Use AddItemViewModel to add the item
+      await _addItemViewModel.addItem(
         name: _nameController.text,
         description: _descriptionController.text,
         portability: _selectedPortability,
         tags: tags,
+        username: widget.profileViewModel.currentUser!.username,
       );
 
       if (mounted) {
