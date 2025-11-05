@@ -1,5 +1,5 @@
 import 'package:blocparty/model/message_model.dart';
-import 'package:blocparty/model/user_model.dart';
+import 'package:blocparty/model/login_model/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 

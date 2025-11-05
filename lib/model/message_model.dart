@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'user_model.dart';
+import 'login_model/user_model.dart';
 
 class Message {
   final Timestamp timestamp;
