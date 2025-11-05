@@ -13,10 +13,11 @@ class ItemViewModel extends ChangeNotifier {
   // Filter state properties
   String _searchText = '';
   List<String> _selectedTags = [];
-
+  String? _neighborhoodId;
 
   String get searchText => _searchText;
   List<String> get selectedTags => UnmodifiableListView(_selectedTags);
+  String? get neighborhoodId => _neighborhoodId;
 
   ItemViewModel(this._authViewModel) {
     _authViewModel.addListener(_onAuthChanged);
@@ -27,6 +28,7 @@ class ItemViewModel extends ChangeNotifier {
     // Clear items immediately if user is null to avoid showing stale items
     if (_authViewModel.user == null) {
       items = [];
+      _neighborhoodId = null;
       notifyListeners();
     }
 
@@ -35,7 +37,6 @@ class ItemViewModel extends ChangeNotifier {
 
   List<Item> get filteredItems {
     List<Item> filtered = items;
-
 
     if (_searchText.isNotEmpty) {
       filtered = filtered.where((item) {
@@ -111,10 +112,10 @@ class ItemViewModel extends ChangeNotifier {
           .doc(user.uid)
           .get();
 
-      final neighborhoodId = userDoc.data()?['neighborhoodId'] as String?;
+      _neighborhoodId = userDoc.data()?['neighborhoodId'] as String?;
 
       // If user hasn't selected a neighborhood yet, return empty list
-      if (neighborhoodId == null) {
+      if (_neighborhoodId == null) {
         items = [];
         _guardSelectedTags();
         isLoading = false;
@@ -126,7 +127,7 @@ class ItemViewModel extends ChangeNotifier {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await FirebaseFirestore.instance
               .collection('items')
-              .where('neighborhoodId', isEqualTo: neighborhoodId)
+              .where('neighborhoodId', isEqualTo: _neighborhoodId)
               .get();
 
       items = snapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
