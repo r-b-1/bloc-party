@@ -1,7 +1,7 @@
 // lib/model/itemview_model.dart
 import 'package:flutter/foundation.dart';
 import 'package:blocparty/model/neighborhood_model.dart';
-import 'package:blocparty/model/auth_model.dart';
+import 'package:blocparty/model/login_model/auth_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NeighborhoodViewModel extends ChangeNotifier {
@@ -39,10 +39,7 @@ class NeighborhoodViewModel extends ChangeNotifier {
   }
 
   // Add this method to create new items
-  Future<void> addNeighborhood({
-    required String neighborhoodId,
-    required List<String> neighborhoodUsers,
-  }) async {
+  Future<void> addNeighborhood({required String neighborhoodIdToAdd, required List<String> neighborhoodUsersToAdd,}) async {
     try {
       _error = null;
       notifyListeners();
@@ -56,8 +53,8 @@ class NeighborhoodViewModel extends ChangeNotifier {
 
       // Creating the item
       final newNeighborhood = Neighborhood(
-        neighborhoodId: "neighborhood",
-        neighborhoodUsers: ["temp", "temp2"],
+        neighborhoodId: neighborhoodIdToAdd,
+        neighborhoodUsers: neighborhoodUsersToAdd,
       );
 
       // Saving to Firestore
