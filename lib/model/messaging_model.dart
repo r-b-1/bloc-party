@@ -2,7 +2,7 @@ import 'package:blocparty/model/chat_model.dart';
 import 'package:blocparty/model/message_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:blocparty/model/auth_model.dart';
+import 'package:blocparty/model/login_model/auth_model.dart';
 
 class MessagingModel extends ChangeNotifier {
   List<Chat>? currentChats;

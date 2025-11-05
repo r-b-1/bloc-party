@@ -2,16 +2,16 @@ import 'package:go_router/go_router.dart';
 import 'package:blocparty/flutter_backend/go_router.dart'; // main function to go from page to page
 
 import 'package:blocparty/view/navigation/navigation_bar.dart'; //Navigation
-import 'package:blocparty/view/chat_view.dart'; //chat view
+import 'package:blocparty/view/chat_view/chat_view.dart'; //chat view
 import 'package:blocparty/view/item_descriptions_view.dart'; //Item dicription
-import 'package:blocparty/view/login_view.dart'; //Login
+import 'package:blocparty/view/login_views/login_view.dart'; //Login
 import 'package:blocparty/view/schedule_view.dart'; //schedule
-import 'package:blocparty/view/register_view.dart'; //register
-import 'package:blocparty/view/create_profile_view.dart'; //Create Profile
+import 'package:blocparty/view/login_views/register_view.dart'; //register
+import 'package:blocparty/view/login_views/create_profile_view.dart'; //Create Profile
 import 'package:firebase_auth/firebase_auth.dart'; //Fire_auth
 import 'package:blocparty/view/pick_neighborhood.dart'; //Pick Neighborhood
 import 'package:blocparty/model/item_model.dart'; //Item Model
-import 'package:blocparty/view/verify_email_view.dart'; //Verify that there email is real
+import 'package:blocparty/view/login_views/verify_email_view.dart'; //Verify that there email is real
 
 GoRouter goRouts() {
   final GoRouter router = GoRouter(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
-import 'package:blocparty/model/user_model.dart';
+import 'package:blocparty/model/login_model/user_model.dart';
 import 'package:blocparty/model/profile_model.dart';
 
 class CreateProfileView extends StatefulWidget {
@@ -40,6 +40,21 @@ class _CreateProfileViewState extends State<CreateProfileView> {
         );
         return;
       }
+
+          final usernameQuery = await FirebaseFirestore.instance
+        .collection('users')
+        .where('username', isEqualTo: _usernameController.text.trim())
+        .limit(1)
+        .get();
+
+    if (usernameQuery.docs.isNotEmpty) {
+      // username is already taken
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username already taken. Please use another Username')),
+      );
+      return; // stop here
+    }
+
       final uid = user.uid;
 
       final userModel = AddUser(
@@ -104,7 +119,8 @@ class _CreateProfileViewState extends State<CreateProfileView> {
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
-                      onPressed: _saveProfile,
+                      onPressed:
+                      _saveProfile,
                       child: const Text('Save and Continue'),
               ),
             ],

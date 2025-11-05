@@ -1,5 +1,5 @@
 import 'package:blocparty/model/chat_model.dart';
-import 'package:blocparty/view/create_chat_view.dart';
+import 'package:blocparty/view/chat_view/create_chat_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
