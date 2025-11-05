@@ -1,3 +1,4 @@
+import 'package:blocparty/model/chat_model.dart';
 import 'package:blocparty/view/create_chat_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,10 +11,31 @@ class MessagesView extends StatefulWidget {
 }
 
 class _MessagesViewState extends State<MessagesView> {
+  late ChatModel _chatModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _chatModel = ChatModel();
+    _chatModel.addListener(_onViewModelChanged);
+  }
+
+  void _onViewModelChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _chatModel.removeListener(_onViewModelChanged);
+    super.dispose();
+  }
+
   void _navigateToAddChat() {
     Navigator.of(
       context,
-    ).push(MaterialPageRoute(builder: (context) => CreateChatView()));
+    ).push(MaterialPageRoute(builder: (context) => CreateChatView(chatModel: _chatModel,)));
   }
 
   @override

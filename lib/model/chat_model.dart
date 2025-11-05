@@ -1,16 +1,16 @@
 import 'package:blocparty/model/message_model.dart';
 import 'package:blocparty/model/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class Chat{
   final String name;
-  final List<AddUser> members;
-  final List<Message> messages;
+  final List<String> members;
+  List<Message> messages = [];
 
   Chat({
     required this.name,
     required this.members,
-    required this.messages
   });
 
   factory Chat.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -25,7 +25,6 @@ class Chat{
     return Chat(
       name: data['name'] ?? '',
       members: data['members'] ?? '',
-      messages: data['messages'] ?? '',
     );
   }
 
@@ -35,5 +34,37 @@ class Chat{
       'members': members,
       'messages': messages,
     };
+  }
+}
+
+class ChatModel extends ChangeNotifier{
+  ChatModel();
+
+  Future<void> addChat({
+    required String name,
+    required List<String> chatters,
+  }) async {
+    try {
+      notifyListeners();
+
+      // Creating a new document in firestore
+      final docRef = FirebaseFirestore.instance.collection('chats').doc();
+
+      // Creating the chat
+      final newItem = Chat(
+        name: name,
+        members: chatters
+      );
+
+      // Saving to Firestore
+      await docRef.set(newItem.toFirestore());
+
+      // Update UI
+      notifyListeners();
+    } catch (e) {
+      print('Error adding item: $e');
+      notifyListeners();
+      rethrow;
+    }
   }
 }
