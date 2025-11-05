@@ -147,7 +147,8 @@ class _HomeViewState extends State<HomeView> {
           const SizedBox(height: 16),
 
           _buildInfoCard(
-            'Group Name', 'neighborhoodId',
+            'Group Name',
+            itemViewModel.neighborhoodId ?? 'Not set',
           ),
           _buildInfoCard('Notification Request', '0'),
           _buildInfoCard('Messages', '3 new'),
