@@ -1,3 +1,4 @@
+import 'package:blocparty/model/messaging_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
@@ -5,9 +6,9 @@ import 'package:blocparty/model/chat_model.dart';
 import 'package:blocparty/model/login_model/user_model.dart';
 
 class CreateChatView extends StatefulWidget {
-  final ChatModel chatModel;
+  final MessagingModel messagingModel;
 
-  const CreateChatView({super.key, required this.chatModel});
+  const CreateChatView({super.key, required this.messagingModel});
 
   @override
   State<CreateChatView> createState() => _CreateChatViewState();
@@ -51,7 +52,7 @@ class _CreateChatViewState extends State<CreateChatView> {
       chatters.add(_currentUser!.username);
 
 
-      await widget.chatModel.addChat(
+      await widget.messagingModel.addChat(
         name: _chatName.text,
         chatters: chatters
       );

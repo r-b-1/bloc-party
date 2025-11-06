@@ -38,4 +38,34 @@ class MessagingModel extends ChangeNotifier {
     _authViewModel.removeListener(_onAuthChanged);
     super.dispose();
   }
+
+    Future<void> addChat({
+    required String name,
+    required List<String> chatters,
+  }) async {
+    try {
+      notifyListeners();
+
+      // Creating a new document in firestore
+      final docRef = FirebaseFirestore.instance.collection('chats').doc();
+
+      // Creating the chat
+      final newItem = Chat(
+        name: name,
+        members: chatters,
+        messages: []
+      );
+
+      // Saving to Firestore
+      await docRef.set(newItem.toFirestore());
+
+      // Update UI
+      notifyListeners();
+    } catch (e) {
+      print('Error adding item: $e');
+      notifyListeners();
+      rethrow;
+    }
+    fetchItems();
+  }
 }

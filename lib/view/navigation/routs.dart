@@ -50,7 +50,10 @@ GoRouter goRouts() {
         path: '/schedule',
         builder: (context, state) => const ScheduleView(),
       ),
-      GoRoute(path: '/chat', builder: (context, state) => const ChatView()),
+      GoRoute(
+        path: '/chat', 
+        builder: (context, state) => const ChatView()
+      ),
       GoRoute(
         path: '/pick_neighborhood',
         builder: (context, state) => const PickNeighborhoodView(),

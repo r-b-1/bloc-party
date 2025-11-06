@@ -1,4 +1,6 @@
 import 'package:blocparty/model/chat_model.dart';
+import 'package:blocparty/model/login_model/auth_model.dart';
+import 'package:blocparty/model/messaging_model.dart';
 import 'package:blocparty/view/chat_view/create_chat_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -11,13 +13,15 @@ class MessagesView extends StatefulWidget {
 }
 
 class _MessagesViewState extends State<MessagesView> {
-  late ChatModel _chatModel;
+  late MessagingModel _messagingModel;
+  late AuthViewModel _authViewModel;
 
   @override
   void initState() {
     super.initState();
-    _chatModel = ChatModel();
-    _chatModel.addListener(_onViewModelChanged);
+    _authViewModel = AuthViewModel();
+    _messagingModel = MessagingModel(_authViewModel);
+    _messagingModel.addListener(_onViewModelChanged);
   }
 
   void _onViewModelChanged() {
@@ -28,14 +32,14 @@ class _MessagesViewState extends State<MessagesView> {
 
   @override
   void dispose() {
-    _chatModel.removeListener(_onViewModelChanged);
+    _messagingModel.removeListener(_onViewModelChanged);
     super.dispose();
   }
 
   void _navigateToAddChat() {
     Navigator.of(
       context,
-    ).push(MaterialPageRoute(builder: (context) => CreateChatView(chatModel: _chatModel,)));
+    ).push(MaterialPageRoute(builder: (context) => CreateChatView(messagingModel: _messagingModel,)));
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:blocparty/model/message_model.dart';
 import 'package:blocparty/model/login_model/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 
 class Chat{
@@ -11,6 +12,7 @@ class Chat{
   Chat({
     required this.name,
     required this.members,
+    required this.messages
   });
 
   factory Chat.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -25,6 +27,7 @@ class Chat{
     return Chat(
       name: data['name'] ?? '',
       members: data['members'] ?? '',
+      messages: data['messages']
     );
   }
 
@@ -37,34 +40,44 @@ class Chat{
   }
 }
 
+// Handles functions of a single chat
 class ChatModel extends ChangeNotifier{
-  ChatModel();
+  Chat ?currentChat;
 
-  Future<void> addChat({
-    required String name,
-    required List<String> chatters,
-  }) async {
-    try {
-      notifyListeners();
-
-      // Creating a new document in firestore
-      final docRef = FirebaseFirestore.instance.collection('chats').doc();
-
-      // Creating the chat
-      final newItem = Chat(
-        name: name,
-        members: chatters
-      );
-
-      // Saving to Firestore
-      await docRef.set(newItem.toFirestore());
-
-      // Update UI
-      notifyListeners();
-    } catch (e) {
-      print('Error adding item: $e');
-      notifyListeners();
-      rethrow;
-    }
+  ChatModel(String doc) {
+    _fetchChat(doc);
   }
+
+  // Fetches the chat data from firebase
+  Future<void> _fetchChat(String doc) async {
+    final chatDoc = FirebaseFirestore.instance.collection('chats').doc(doc).get();
+    currentChat = Chat.fromFirestore(await chatDoc);
+  }
+
+  // Sends a message
+  Future<void> _addMessage(String messageText) async {
+
+    // Gets Current User's Username
+    AddUser _currentUser;
+    final authUser = auth.FirebaseAuth.instance.currentUser;
+    if (authUser == null) {
+      throw Exception('No user logged in');
+    }
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(authUser.uid).get();
+    if (!userDoc.exists) {
+      throw Exception('User document not found');
+    }
+    _currentUser = AddUser.fromFirestore(userDoc);
+
+    // Adds the message to firebase
+    currentChat?.messages.add(
+      Message(
+        timestamp: FieldValue.serverTimestamp(),
+        sender: _currentUser.username,
+        message: messageText
+      )
+    );
+  }
+
+
 }

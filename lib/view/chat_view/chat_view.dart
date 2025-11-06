@@ -1,13 +1,41 @@
+import 'package:blocparty/model/chat_model.dart';
 import 'package:blocparty/model/message_model.dart';
 import 'package:flutter/material.dart';
 
-class ChatView extends StatelessWidget {
-  const ChatView({super.key});
+class ChatView extends StatefulWidget {
+  const ChatView({super.key, });
+
+  @override
+  State<ChatView> createState() => _chatViewState();
+}
+
+class _chatViewState extends State<ChatView> {
+  late ChatModel _chatModel;
+  late String chatDocID;
+
+  @override
+  void initState() {
+    super.initState();
+    _chatModel = ChatModel(chatDocID);
+    _chatModel.addListener(_onViewModelChanged);
+  }
+
+  void _onViewModelChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _chatModel.removeListener(_onViewModelChanged);
+    super.dispose();
+  }
 
   @override
   Widget buildMessage(BuildContext context, Message message) {
     return ListTile(
-      title: Text(message.sender.username),
+      title: Text(message.sender),
       subtitle: Text(message.message),
       trailing: Text(message.timestamp as String)
     );
@@ -21,16 +49,7 @@ class ChatView extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            ListTile(
-              leading: const CircleAvatar(child: Text('EM')),
-              title: const Text('Example Messager'),
-              subtitle: const Text('This is a message!'),
-            ),
-            ListTile(
-              leading: const CircleAvatar(child: Text('You')),
-              title: const Text('You'),
-              subtitle: const Text('Wow!'),
-            ),
+            ..._chatModel.currentChat!.messages.map((item) => buildMessage(context, item))
           ],
         ),
       ),
