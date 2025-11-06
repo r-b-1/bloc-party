@@ -174,10 +174,17 @@ class _AddItemViewState extends State<AddItemView> {
                   border: OutlineInputBorder(),
                 ),
                 items: _imagePaths.map((path) {
-                  final parts = path.split('/');
+                  final parts = path.split(
+                    '/',
+                  ); // Removes the path from the filename
                   final filename = parts.isNotEmpty ? parts.last : path;
-                  final displayName = filename.contains('.')
-                      ? filename.split('.').first
+                  final displayName =
+                      filename.contains(
+                        '.',
+                      ) // Checks if it has a period, if so, then it has a extension.
+                      ? filename
+                            .split('.')
+                            .first // Removes the extension from the filename
                       : filename;
                   return DropdownMenuItem(
                     value: path,
