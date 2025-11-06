@@ -9,7 +9,7 @@ class AddUser {
   final List<String> addresses;
   final String? currentAddress;
   final String? phonenumber;
-  final String? neighborhoodId;
+  final List<String> neighborhoodId;
 
   AddUser({
     required this.username,
@@ -18,7 +18,7 @@ class AddUser {
     this.addresses = const [],
     this.currentAddress,
     this.phonenumber,
-    this.neighborhoodId,
+    this.neighborhoodId = const [],
   });
 
   factory AddUser.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -50,6 +50,18 @@ class AddUser {
       }
     }
 
+    // Normalize neighborhood IDs
+    final neighborhoodData = data['neighborhoodId'];
+    List<String> neighborhoodId = [];
+    if (neighborhoodData is List) {
+      neighborhoodId = neighborhoodData
+          .map((value) => value.toString())
+          .where((value) => value.isNotEmpty)
+          .toList();
+    } else if (neighborhoodData is String && neighborhoodData.isNotEmpty) {
+      neighborhoodId = [neighborhoodData];
+    }
+
     return AddUser(
       username: data['username'] ?? '',
       name: data['fullName'] ?? '',
@@ -57,7 +69,7 @@ class AddUser {
       addresses: addresses,
       currentAddress: data['currentAddress'] as String?,
       phonenumber: data['phonenumber'] as String?,
-      neighborhoodId: data['neighborhoodId'] as String?,
+      neighborhoodId: neighborhoodId,
     );
   }
 
@@ -69,7 +81,7 @@ class AddUser {
       'addresses': addresses,
       if (currentAddress != null) 'currentAddress': currentAddress,
       if (phonenumber != null) 'phonenumber': phonenumber,
-      if (neighborhoodId != null) 'neighborhoodId': neighborhoodId,
+      'neighborhoodId': neighborhoodId,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
@@ -82,7 +94,7 @@ class AddUser {
     List<String>? addresses,
     String? currentAddress,
     String? phonenumber,
-    String? neighborhoodId,
+    List<String>? neighborhoodId,
   }) {
     return AddUser(
       username: username ?? this.username,

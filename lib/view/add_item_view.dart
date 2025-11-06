@@ -63,6 +63,20 @@ class _AddItemViewState extends State<AddItemView> {
           .where((tag) => tag.isNotEmpty)
           .toList();
 
+      final neighborhoodIds =
+          widget.profileViewModel.currentUser?.neighborhoodId ?? [];
+
+      if (neighborhoodIds.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Select a neighborhood before adding an item.'),
+            ),
+          );
+        }
+        return;
+      }
+
       // Use AddItemViewModel to add the item
       await _addItemViewModel.addItem(
         name: _nameController.text,
@@ -71,6 +85,7 @@ class _AddItemViewState extends State<AddItemView> {
         tags: tags,
         username: widget.profileViewModel.currentUser!.username,
         imagePath: _selectedImagePath ?? 'assets/images/confused-person.jpg',
+        neighborhoodId: neighborhoodIds,
       );
 
       if (mounted) {
