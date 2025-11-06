@@ -20,6 +20,19 @@ class _AddItemViewState extends State<AddItemView> {
   final _tagsController = TextEditingController();
 
   ItemPortability _selectedPortability = ItemPortability.portable;
+  final List<String> _imagePaths = [
+    'assets/images/confused-person.jpg',
+    'assets/images/garden-tools.jpg',
+    'assets/images/coffee-table.jpg',
+    'assets/images/dining-table.jpg',
+    'assets/images/dawg.jpg',
+    'assets/images/lawn-mower.jpg',
+    'assets/images/trapped_dog.jpg',
+    'assets/images/bike.jpg',
+    'assets/images/wood-bookshelf.jpg',
+    'assets/images/power-drill.jpg',
+  ];
+  String? _selectedImagePath = 'assets/images/confused-person.jpg';
   bool _isLoading = false;
 
   // Create instance of AddItemViewModel
@@ -57,6 +70,7 @@ class _AddItemViewState extends State<AddItemView> {
         portability: _selectedPortability,
         tags: tags,
         username: widget.profileViewModel.currentUser!.username,
+        imagePath: _selectedImagePath ?? 'assets/images/confused-person.jpg',
       );
 
       if (mounted) {
@@ -150,6 +164,36 @@ class _AddItemViewState extends State<AddItemView> {
                       _selectedPortability = value;
                     });
                   }
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _selectedImagePath,
+                decoration: const InputDecoration(
+                  labelText: 'Item Image',
+                  border: OutlineInputBorder(),
+                ),
+                items: _imagePaths.map((path) {
+                  final parts = path.split('/');
+                  final filename = parts.isNotEmpty ? parts.last : path;
+                  final displayName = filename.contains('.')
+                      ? filename.split('.').first
+                      : filename;
+                  return DropdownMenuItem(
+                    value: path,
+                    child: Text(displayName),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedImagePath = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select an image';
+                  }
+                  return null;
                 },
               ),
               const SizedBox(height: 16),

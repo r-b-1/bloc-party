@@ -16,6 +16,7 @@ class AddItemViewModel extends ChangeNotifier {
     required ItemPortability portability,
     required List<String> tags,
     required String username,
+    required String imagePath,
   }) async {
     try {
       _error = null;
@@ -35,7 +36,7 @@ class AddItemViewModel extends ChangeNotifier {
         neighborhoodId: '1',
         portability: portability,
         tags: tags,
-        imagePath: 'assets/images/confused-person.jpg',
+        imagePath: imagePath,
       );
 
       // Saving to Firestore
