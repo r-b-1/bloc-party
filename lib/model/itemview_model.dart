@@ -28,7 +28,7 @@ class ItemViewModel extends ChangeNotifier {
     // Clear items immediately if user is null to avoid showing stale items
     if (_authViewModel.user == null) {
       items = [];
-      _neighborhoodId = [];
+      _neighborhoodId = ['0']; // Default neighborhood ID
       notifyListeners();
     }
 
