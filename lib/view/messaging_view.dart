@@ -43,27 +43,35 @@ class _MessagesViewState extends State<MessagesView> {
   }
 
   @override
+  Widget buildChatTile(BuildContext context, Chat chat) {
+    if(chat.messages.isEmpty) {
+      return ListTile(
+        leading: CircleAvatar(child: Text(chat.name.characters.first),),
+        title: Text(chat.name),
+        subtitle: Text("No messages yet..."),
+        onTap: () {
+          context.push('/chat', extra: chat);
+        },
+      );
+    } else {
+      return ListTile(
+        leading: CircleAvatar(child: Text(chat.name.characters.first),),
+        title: Text(chat.name),
+        subtitle: Text(chat.messages.last.sender + ": " + chat.messages.last.message),
+        onTap: () {
+          context.push('/chat', extra: chat);
+        },
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Messages')),
       body: ListView(
         children: [
-          ListTile(
-            leading: const CircleAvatar(child: Text('N')),
-            title: const Text('Neighborhood Group'),
-            subtitle: const Text('John: See you there!'),
-            onTap: () {
-              context.push('/chat');
-            },
-          ),
-          ListTile(
-            leading: const CircleAvatar(child: Text('J')),
-            title: const Text('John Message'),
-            subtitle: const Text('I have a message for you...'),
-            onTap: () {
-              context.push('/chat');
-            },
-          ),
+          ..._messagingModel.currentChats!.map((item) => buildChatTile(context, item)),
           Positioned(
             right: 16,
             bottom: 16,

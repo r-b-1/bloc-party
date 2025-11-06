@@ -51,6 +51,10 @@ class _CreateChatViewState extends State<CreateChatView> {
       _currentUser = AddUser.fromFirestore(userDoc);
       chatters.add(_currentUser!.username);
 
+      final QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance.collection('chats').where('name', isEqualTo: _chatName.text).get();
+      if (snapshot.docs.isNotEmpty) {
+        throw Exception('Same name as another chat');
+      }
 
       await widget.messagingModel.addChat(
         name: _chatName.text,
@@ -94,7 +98,7 @@ class _CreateChatViewState extends State<CreateChatView> {
             children: [
               TextFormField(
                 controller: _chatName,
-                decoration: const InputDecoration(labelText: "Chat name"),
+                decoration: const InputDecoration(labelText: "Chat name (must be unique across the platform)"),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a chat name';

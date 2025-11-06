@@ -3,20 +3,27 @@ import 'package:blocparty/model/message_model.dart';
 import 'package:flutter/material.dart';
 
 class ChatView extends StatefulWidget {
-  const ChatView({super.key, });
+  final Chat curChat;
+  const ChatView({super.key, required this.curChat});
 
   @override
-  State<ChatView> createState() => _chatViewState();
+  State<ChatView> createState() => _chatViewState(curChat);
 }
 
 class _chatViewState extends State<ChatView> {
   late ChatModel _chatModel;
-  late String chatDocID;
+  Chat ?currChat;
+  final _formKey = GlobalKey<FormState>();
+  final _messageText = TextEditingController();
+
+  _chatViewState(Chat curChat) {
+    currChat = curChat;
+  }
 
   @override
   void initState() {
     super.initState();
-    _chatModel = ChatModel(chatDocID);
+    _chatModel = ChatModel(currChat!);
     _chatModel.addListener(_onViewModelChanged);
   }
 
@@ -32,24 +39,41 @@ class _chatViewState extends State<ChatView> {
     super.dispose();
   }
 
+  Future<void> _sendMessage() async {
+    await _chatModel.addMessage(_messageText.text);
+  }
+
   @override
   Widget buildMessage(BuildContext context, Message message) {
     return ListTile(
       title: Text(message.sender),
       subtitle: Text(message.message),
-      trailing: Text(message.timestamp as String)
+      trailing: Text(message.timestamp)
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat Name')),
+      appBar: AppBar(title: Text(currChat!.name)),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            ..._chatModel.currentChat!.messages.map((item) => buildMessage(context, item))
+            TextField(
+              decoration: const InputDecoration(labelText: "Message"),
+              controller: _messageText
+            ),
+            ElevatedButton(onPressed: _sendMessage, child: Text("Send Message")),
+            if (_chatModel.isLoading)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: CircularProgressIndicator(),
+              ),
+            )
+            else
+            ..._chatModel.currentChat!.messages.map((item) => buildMessage(context, item)),
           ],
         ),
       ),

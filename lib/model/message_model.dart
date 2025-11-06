@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_model/user_model.dart';
 
 class Message {
-  final FieldValue timestamp;
+  final String timestamp;
   final String sender;
   final String message;
 
@@ -31,7 +31,7 @@ class Message {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'timestamp': FieldValue.serverTimestamp(),
+      'timestamp': FieldValue.serverTimestamp().toString(),
       'sender': sender,
       'message': message,
     };

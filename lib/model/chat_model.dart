@@ -24,10 +24,26 @@ class Chat{
       throw Exception('Document data is null');
     }
 
+    final messageData = data['messages'];
+    List<Message> message;
+    if (messageData is List) {
+      message = messageData.map((e) => Message(timestamp: e.timestamp, sender: e.sender.toString(), message: e.message.toString())).toList();
+    } else {
+      message = [];
+    }
+
+    final memberData = data['members'];
+    List<String> membersList;
+    if (messageData is List) {
+      membersList = messageData.map((e) => e.toString()).toList();
+    } else {
+      membersList = [];
+    }
+
     return Chat(
       name: data['name'] ?? '',
-      members: data['members'] ?? '',
-      messages: data['messages']
+      members: membersList,
+      messages: message
     );
   }
 
@@ -43,21 +59,18 @@ class Chat{
 // Handles functions of a single chat
 class ChatModel extends ChangeNotifier{
   Chat ?currentChat;
+  bool isLoading = false;
 
-  ChatModel(String doc) {
-    _fetchChat(doc);
-  }
-
-  // Fetches the chat data from firebase
-  Future<void> _fetchChat(String doc) async {
-    final chatDoc = FirebaseFirestore.instance.collection('chats').doc(doc).get();
-    currentChat = Chat.fromFirestore(await chatDoc);
+  ChatModel(Chat curChat) {
+    currentChat = curChat;
   }
 
   // Sends a message
-  Future<void> _addMessage(String messageText) async {
+  Future<void> addMessage(String messageText) async {
 
-    // Gets Current User's Username
+    isLoading = true;
+
+    // Gets Current User
     AddUser _currentUser;
     final authUser = auth.FirebaseAuth.instance.currentUser;
     if (authUser == null) {
@@ -72,11 +85,16 @@ class ChatModel extends ChangeNotifier{
     // Adds the message to firebase
     currentChat?.messages.add(
       Message(
-        timestamp: FieldValue.serverTimestamp(),
+        timestamp: FieldValue.serverTimestamp().toString(),
         sender: _currentUser.username,
         message: messageText
       )
     );
+
+    final activeDoc = FirebaseFirestore.instance.collection('chats').doc(currentChat!.name);
+
+    await activeDoc.set(currentChat!.toFirestore());
+    notifyListeners();
   }
 
 
