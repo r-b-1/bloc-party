@@ -33,7 +33,7 @@ class AddItemViewModel extends ChangeNotifier {
         description: description,
         isAvailable: true,
         userId: username,
-        neighborhoodId: '1',
+        neighborhoodId: ['1'],
         portability: portability,
         tags: tags,
         imagePath: imagePath,

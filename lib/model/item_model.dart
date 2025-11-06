@@ -8,7 +8,7 @@ class Item {
   final String description;
   final bool isAvailable;
   final String userId;
-  final String neighborhoodId;
+  final List<String> neighborhoodId;
   final ItemPortability portability;
   final List<String> tags;
   final String imagePath;

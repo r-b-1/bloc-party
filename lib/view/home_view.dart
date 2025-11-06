@@ -148,7 +148,7 @@ class _HomeViewState extends State<HomeView> {
 
           _buildInfoCard(
             'Group Name',
-            itemViewModel.neighborhoodId ?? 'Not set',
+            itemViewModel.neighborhoodId?.first ?? 'Not set',
           ),
           _buildInfoCard('Notification Request', '0'),
           _buildInfoCard('Messages', '3 new'),
