@@ -22,7 +22,8 @@ class ProfileViewModel extends ChangeNotifier {
   String? get error => _error;
 
   ProfileViewModel() {
-    _fetchUserDataAndItems();
+    // Use Future.microtask to defer initialization until after build
+    Future.microtask(() => _fetchUserDataAndItems());
   }
 
   Future<void> _fetchUserDataAndItems() async {
