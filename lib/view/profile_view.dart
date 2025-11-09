@@ -4,6 +4,7 @@ import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/view/home_view.dart';
 import 'package:blocparty/view/add_item_view.dart';
 import 'package:blocparty/model/item_model.dart';
+import 'package:blocparty/view/widgets/neighborhood_selection_widget.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -266,6 +267,9 @@ class _ProfileViewState extends State<ProfileView> {
                   '${_profileViewModel.userItems.length} items listed',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
+                const SizedBox(height: 16),
+                // ADD: Neighborhood selection dropdown widget
+                NeighborhoodSelectionWidget(),
                 const SizedBox(height: 16),
                 _buildAddressSection(),
               ],

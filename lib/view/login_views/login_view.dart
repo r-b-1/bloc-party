@@ -12,9 +12,14 @@ class LoginView extends StatelessWidget {
         EmailAuthProvider(),
       ],
       headerBuilder: (context, constraints, shrinkOffset) {
-        return const Padding(
-          padding: EdgeInsets.all(20),
-          child: Icon(Icons.lock, size: 100, color: Colors.blue),
+        return Padding(
+          padding: EdgeInsets.all(1),
+          child: Image.asset(
+            'assets/images/BlocParty_logo.png',
+            height: 1000,
+            width: 1000,
+            //fit: BoxFit.contain,
+          ),
         );
       },
       subtitleBuilder: (context, action) {

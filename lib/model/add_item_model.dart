@@ -17,6 +17,7 @@ class AddItemViewModel extends ChangeNotifier {
     required List<String> tags,
     required String username,
     required String imagePath,
+    required List<String> neighborhoodId,
   }) async {
     try {
       _error = null;
@@ -26,6 +27,18 @@ class AddItemViewModel extends ChangeNotifier {
       // Creating a new document in firestore
       final docRef = FirebaseFirestore.instance.collection('items').doc();
 
+      // Normalize neighborhood IDs and ensure the active one is present
+      final normalizedNeighborhoodIds = neighborhoodId
+          .map((id) => id.trim())
+          .where((id) => id.isNotEmpty)
+          .toList();
+
+      if (normalizedNeighborhoodIds.isEmpty) {
+        throw Exception(
+          'A neighborhood must be selected before adding an item.',
+        );
+      }
+
       // Creating the item
       final newItem = Item(
         id: docRef.id,
@@ -33,7 +46,7 @@ class AddItemViewModel extends ChangeNotifier {
         description: description,
         isAvailable: true,
         userId: username,
-        neighborhoodId: '1',
+        neighborhoodId: normalizedNeighborhoodIds,
         portability: portability,
         tags: tags,
         imagePath: imagePath,

@@ -8,7 +8,7 @@ class Item {
   final String description;
   final bool isAvailable;
   final String userId;
-  final String neighborhoodId;
+  final List<String> neighborhoodId;
   final ItemPortability portability;
   final List<String> tags;
   final String imagePath;
@@ -69,13 +69,27 @@ class Item {
       tags = [];
     }
 
+    // Defensive casting for neighborhoodId
+    final neighborhoodData = data['neighborhoodId'];
+    List<String> neighborhoodId;
+    if (neighborhoodData is List) {
+      neighborhoodId = neighborhoodData
+          .map((e) => e.toString())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    } else if (neighborhoodData is String && neighborhoodData.isNotEmpty) {
+      neighborhoodId = [neighborhoodData];
+    } else {
+      neighborhoodId = [];
+    }
+
     return Item(
       id: doc.id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
       isAvailable: data['isAvailable'] ?? false,
       userId: data['userId'] ?? '',
-      neighborhoodId: data['neighborhoodId'] ?? '',
+      neighborhoodId: neighborhoodId,
       portability: portability,
       tags: tags,
       imagePath: data['imagePath'] ?? '',
