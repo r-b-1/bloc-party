@@ -69,6 +69,8 @@ class MessagingModel extends ChangeNotifier {
       final newItem = Chat(
         name: name,
         members: chatters,
+        messagesText: [],
+        messagesSender: [],
         messages: []
       );
 

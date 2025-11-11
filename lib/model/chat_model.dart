@@ -7,11 +7,15 @@ import 'package:flutter/material.dart';
 class Chat{
   final String name;
   final List<String> members;
+  List<String> messagesText = [];
+  List<String> messagesSender = [];
   List<Message> messages = [];
 
   Chat({
     required this.name,
     required this.members,
+    required this.messagesText,
+    required this.messagesSender,
     required this.messages
   });
 
@@ -24,26 +28,42 @@ class Chat{
       throw Exception('Document data is null');
     }
 
-    final messageData = data['messages'];
-    List<Message> message;
-    if (messageData is List) {
-      message = messageData.map((e) => Message(timestamp: e.timestamp, sender: e.sender.toString(), message: e.message.toString())).toList();
+    final memberData = data['members'];
+    List<String> memberDataList;
+    if (memberData is List) {
+      memberDataList = memberData.map((e) => e.toString()).toList();
     } else {
-      message = [];
+      memberDataList = [];
     }
 
-    final memberData = data['members'];
-    List<String> membersList;
+    final messageData = data['messagetext'];
+    List<String> messageTextData;
     if (messageData is List) {
-      membersList = messageData.map((e) => e.toString()).toList();
+      messageTextData = messageData.map((e) => e.toString()).toList();
     } else {
-      membersList = [];
+      messageTextData = [];
+    }
+
+    final messageSendData = data['messagesender'];
+    List<String> messageSenderData;
+    if (messageSendData is List) {
+      messageSenderData = messageSendData.map((e) => e.toString()).toList();
+    } else {
+      messageSenderData = [];
+    }
+
+    List<Message> messagesToAdd = [];
+    for(int i = 0; i < messageTextData.length; i++) {
+      messagesToAdd.add(Message(sender: messageSenderData.elementAt(i), message: messageTextData.elementAt(i)));
+      print('message added');
     }
 
     return Chat(
       name: data['name'] ?? '',
-      members: membersList,
-      messages: message
+      members: memberDataList,
+      messagesText: messageTextData,
+      messagesSender: messageSenderData,
+      messages: messagesToAdd
     );
   }
 
@@ -51,7 +71,8 @@ class Chat{
     return {
       'name': name,
       'members': members,
-      'messages': messages,
+      'messagetext': messagesText,
+      'messagesender': messagesSender
     };
   }
 }
@@ -83,18 +104,15 @@ class ChatModel extends ChangeNotifier{
     _currentUser = AddUser.fromFirestore(userDoc);
 
     // Adds the message to firebase
-    currentChat?.messages.add(
-      Message(
-        timestamp: FieldValue.serverTimestamp().toString(),
-        sender: _currentUser.username,
-        message: messageText
-      )
-    );
+    currentChat?.messagesText.add(messageText);
+    currentChat?.messagesSender.add(_currentUser.username);
 
     final activeDoc = FirebaseFirestore.instance.collection('chats').doc(currentChat!.name);
 
     await activeDoc.set(currentChat!.toFirestore());
     notifyListeners();
+
+    isLoading = false;
   }
 
 

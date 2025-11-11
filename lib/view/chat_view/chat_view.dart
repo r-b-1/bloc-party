@@ -13,7 +13,6 @@ class ChatView extends StatefulWidget {
 class _chatViewState extends State<ChatView> {
   late ChatModel _chatModel;
   Chat ?currChat;
-  final _formKey = GlobalKey<FormState>();
   final _messageText = TextEditingController();
 
   _chatViewState(Chat curChat) {
@@ -44,11 +43,10 @@ class _chatViewState extends State<ChatView> {
   }
 
   @override
-  Widget buildMessage(BuildContext context, Message message) {
+  Widget buildMessage(BuildContext context, Message mes) {
     return ListTile(
-      title: Text(message.sender),
-      subtitle: Text(message.message),
-      trailing: Text(message.timestamp)
+      title: Text(mes.sender),
+      subtitle: Text(mes.message),
     );
   }
 
@@ -73,7 +71,7 @@ class _chatViewState extends State<ChatView> {
               ),
             )
             else
-            ..._chatModel.currentChat!.messages.map((item) => buildMessage(context, item)),
+            ..._chatModel.currentChat!.messages.map((mes) => buildMessage(context, mes)),
           ],
         ),
       ),
