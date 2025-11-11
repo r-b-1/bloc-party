@@ -1,4 +1,5 @@
 // lib/model/itemview_model.dart
+import 'package:blocparty/model/profile_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:blocparty/model/neighborhood_model.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
@@ -9,8 +10,9 @@ class NeighborhoodViewModel extends ChangeNotifier {
   bool isLoading = false;
   String ?_error;
   final AuthViewModel _authViewModel;
+  final ProfileViewModel _profileViewModel;
 
-  NeighborhoodViewModel(this._authViewModel) {
+  NeighborhoodViewModel(this._authViewModel, this._profileViewModel) {
     _authViewModel.addListener(_onAuthChanged);
     _onAuthChanged();
   }
@@ -24,11 +26,18 @@ class NeighborhoodViewModel extends ChangeNotifier {
   void fetchNeighborhoods() async {
     isLoading = true;
     notifyListeners();
+
+    //dont fetch neighborhoods that the current user is in? or or maybe make them unjoinable
+    String currentUser = _authViewModel.user!.uid;
+
     try {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
-          await FirebaseFirestore.instance.collection('neighborhood').get();
+        await FirebaseFirestore.instance.collection('neighborhood').get();
 
       neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
+      //removes all neighborhoods that has the current user in them
+      neighborhoods.removeWhere(((x) => x.neighborhoodUsers.contains(currentUser)));
+
     } catch (e) {
       print('Error fetching neighborhoods: $e');
       // Keep empty list on error
