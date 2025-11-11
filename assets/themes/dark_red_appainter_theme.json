@@ -1,10 +1,10 @@
 {
   "applyElevationOverlayColor": false,
-  "brightness": "light",
+  "brightness": "dark",
   "buttonTheme": {
     "alignedDropdown": false,
     "colorScheme": {
-      "brightness": "light",
+      "brightness": "dark",
       "error": "#ffba1a1a",
       "errorContainer": "#ffffdad6",
       "inversePrimary": "#ffffb1c5",
@@ -97,7 +97,7 @@
   "canvasColor": "#fffff8f8",
   "cardColor": "#fffff8f8",
   "colorScheme": {
-    "brightness": "light",
+    "brightness": "dark",
     "error": "#ffba1a1a",
     "errorContainer": "#ffffdad6",
     "inversePrimary": "#ffffb1c5",
