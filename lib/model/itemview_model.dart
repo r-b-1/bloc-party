@@ -13,11 +13,11 @@ class ItemViewModel extends ChangeNotifier {
   // Filter state properties
   String _searchText = '';
   List<String> _selectedTags = [];
-  String? _neighborhoodId;
+  List<String>? _neighborhoodId = [];
 
   String get searchText => _searchText;
   List<String> get selectedTags => UnmodifiableListView(_selectedTags);
-  String? get neighborhoodId => _neighborhoodId;
+  List<String>? get neighborhoodId => _neighborhoodId;
 
   ItemViewModel(this._authViewModel) {
     _authViewModel.addListener(_onAuthChanged);
@@ -28,7 +28,7 @@ class ItemViewModel extends ChangeNotifier {
     // Clear items immediately if user is null to avoid showing stale items
     if (_authViewModel.user == null) {
       items = [];
-      _neighborhoodId = null;
+      _neighborhoodId = ['0']; // Default neighborhood ID
       notifyListeners();
     }
 
@@ -112,10 +112,21 @@ class ItemViewModel extends ChangeNotifier {
           .doc(user.uid)
           .get();
 
-      _neighborhoodId = userDoc.data()?['neighborhoodId'] as String?;
+      final neighborhoodData = userDoc.data()?['neighborhoodId'];
+      List<String> neighborhoodIds = [];
+      if (neighborhoodData is List) {
+        neighborhoodIds = neighborhoodData
+            .map((value) => value.toString())
+            .where((value) => value.isNotEmpty)
+            .toList();
+      } else if (neighborhoodData is String && neighborhoodData.isNotEmpty) {
+        neighborhoodIds = [neighborhoodData];
+      }
+
+      _neighborhoodId = neighborhoodIds;
 
       // If user hasn't selected a neighborhood yet, return empty list
-      if (_neighborhoodId == null) {
+      if (_neighborhoodId == null || _neighborhoodId!.isEmpty) {
         items = [];
         _guardSelectedTags();
         isLoading = false;
@@ -127,7 +138,7 @@ class ItemViewModel extends ChangeNotifier {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await FirebaseFirestore.instance
               .collection('items')
-              .where('neighborhoodId', isEqualTo: _neighborhoodId)
+              .where('neighborhoodId', arrayContains: _neighborhoodId!.first)
               .get();
 
       items = snapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();

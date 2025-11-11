@@ -22,7 +22,8 @@ class ProfileViewModel extends ChangeNotifier {
   String? get error => _error;
 
   ProfileViewModel() {
-    _fetchUserDataAndItems();
+    // Use Future.microtask to defer initialization until after build
+    Future.microtask(() => _fetchUserDataAndItems());
   }
 
   Future<void> _fetchUserDataAndItems() async {
@@ -181,9 +182,9 @@ class ProfileViewModel extends ChangeNotifier {
           .collection('users')
           .doc(authUser.uid)
           .update({
-        'addresses': _addresses,
-        if (_currentAddress != null) 'currentAddress': _currentAddress,
-      });
+            'addresses': _addresses,
+            if (_currentAddress != null) 'currentAddress': _currentAddress,
+          });
 
       notifyListeners();
     } catch (e) {
@@ -218,9 +219,9 @@ class ProfileViewModel extends ChangeNotifier {
           .collection('users')
           .doc(authUser.uid)
           .update({
-        'addresses': _addresses,
-        if (_currentAddress != null) 'currentAddress': _currentAddress,
-      });
+            'addresses': _addresses,
+            if (_currentAddress != null) 'currentAddress': _currentAddress,
+          });
 
       notifyListeners();
     } catch (e) {
@@ -247,9 +248,7 @@ class ProfileViewModel extends ChangeNotifier {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(authUser.uid)
-          .update({
-        'currentAddress': address,
-      });
+          .update({'currentAddress': address});
 
       notifyListeners();
     } catch (e) {
@@ -300,7 +299,7 @@ class Address extends StatelessWidget {
       decoration: InputDecoration(
         labelText: labelName,
         border: OutlineInputBorder(),
-        ),
+      ),
       onSuggestionClick: (place) {
         controller.text = place.formattedAddress ?? '';
       },

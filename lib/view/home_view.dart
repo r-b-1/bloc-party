@@ -4,6 +4,7 @@ import 'package:blocparty/model/itemview_model.dart';
 import 'package:blocparty/model/item_model.dart';
 import 'package:blocparty/view/widgets/item_search_filter_widget.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
+import 'package:blocparty/view/widgets/neighborhood_selection_widget.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -126,6 +127,11 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+  //  method to refresh items when neighborhood changes
+  void _refreshItems() {
+    itemViewModel.fetchItems();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,10 +152,10 @@ class _HomeViewState extends State<HomeView> {
 
           const SizedBox(height: 16),
 
-          _buildInfoCard(
-            'Group Name',
-            itemViewModel.neighborhoodId ?? 'Not set',
-          ),
+          // neighborhood selection dropdown widget
+          NeighborhoodSelectionWidget(onNeighborhoodChanged: _refreshItems),
+          const SizedBox(height: 16),
+          
           _buildInfoCard('Notification Request', '0'),
           _buildInfoCard('Messages', '3 new'),
           const SizedBox(height: 20),
