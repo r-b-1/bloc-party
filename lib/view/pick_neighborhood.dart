@@ -132,8 +132,8 @@ void _showAddNeighborhoodDialog() {
         itemBuilder: (context, index) {
           return ListTile(
             leading: CircleAvatar(
-              backgroundColor: Color.fromARGB(255, 255 * (index % 2), 0, 255 * ((index-1) % 2)),
-              child: Icon(Icons.home, color: Color.fromARGB(255, 255 * ((index-1) % 2), 0, 255 * (index % 2))),
+              backgroundColor: Color.fromARGB(255, 240 * (index % 2), 0, 240 * ((index-1) % 2)),
+              child: Icon(Icons.home, color: Color.fromARGB(255, 240 * ((index-1) % 2), 0, 240 * (index % 2))),
             ),
 
             title: Text('Neighborhood: ${neighborhoodViewModel.neighborhoods[index].neighborhoodId}'),
@@ -141,12 +141,7 @@ void _showAddNeighborhoodDialog() {
             trailing: IconButton(
               onPressed: () {
                 //do neighborhood change/join logic here
-
-                //temp
-                context.go(
-                  '/home',
-                ); //no animation on the button, so I put this here to show it works
-                //temp
+                neighborhoodViewModel.joinNeighborhood(neighborhoodIdToJoin: neighborhoodViewModel.neighborhoods[index].neighborhoodId);
               },
               icon: Icon(Icons.add_home_work),
             ),

@@ -79,6 +79,46 @@ class NeighborhoodViewModel extends ChangeNotifier {
     }
   }
 
+
+
+  // Add this method to create new items
+  Future<void> joinNeighborhood({required String neighborhoodIdToJoin,}) async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      /*if (_currentUser == null) {
+        throw Exception('No user logged in');
+      }*/
+
+      // Creating a new document in firestore
+      final docRef = FirebaseFirestore.instance.collection('neighborhood').doc();
+
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('neighborhood').get();
+
+      neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
+
+      final neighborhoodBeingJoined = neighborhoods.firstWhere((doc) => doc.neighborhoodId == neighborhoodIdToJoin);
+
+      //adds the current user to the list of users in a neighborhood
+      neighborhoodBeingJoined.neighborhoodUsers.add(_authViewModel.user!.uid);
+
+      // Saving to Firestore
+      await docRef.set(neighborhoodBeingJoined.toFirestore());
+
+      // Adding item to local list and update UI
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to add item: $e';
+      print('Error adding item: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+
+
   @override
   void dispose() {
     _authViewModel.removeListener(_onAuthChanged);
