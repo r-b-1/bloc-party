@@ -11,6 +11,7 @@ class ScheduleView extends StatelessWidget {
       body: Container(
         child: SfCalendar(
           view: CalendarView.month,
+          
         ),
       ),
     );
