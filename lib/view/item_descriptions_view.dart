@@ -33,6 +33,12 @@ class ItemDescriptionView extends StatelessWidget {
               'Status: ${item.isAvailable ? 'Available' : 'Unavailable'}',
               style: const TextStyle(fontSize: 18),
             ),
+             const SizedBox(height: 8),
+            // display neighborhood information
+            Text(
+              'Neighborhood: ${item.neighborhoodId.join(', ')}',
+              style: const TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 8),
             Text('Description: ${item.description}'),
             const SizedBox(height: 8),

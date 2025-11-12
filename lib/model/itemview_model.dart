@@ -1,4 +1,5 @@
 // lib/model/itemview_model.dart
+import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:blocparty/model/item_model.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
@@ -9,14 +10,85 @@ class ItemViewModel extends ChangeNotifier {
   bool isLoading = false;
   final AuthViewModel _authViewModel;
 
+  // Filter state properties
+  String _searchText = '';
+  List<String> _selectedTags = [];
+  List<String>? _neighborhoodId = [];
+
+  String get searchText => _searchText;
+  List<String> get selectedTags => UnmodifiableListView(_selectedTags);
+  List<String>? get neighborhoodId => _neighborhoodId;
+
   ItemViewModel(this._authViewModel) {
     _authViewModel.addListener(_onAuthChanged);
     _onAuthChanged();
   }
 
   void _onAuthChanged() {
-    if (_authViewModel.isSignedIn) {
-      fetchItems();
+    // Clear items immediately if user is null to avoid showing stale items
+    if (_authViewModel.user == null) {
+      items = [];
+      _neighborhoodId = ['0']; // Default neighborhood ID
+      notifyListeners();
+    }
+
+    fetchItems();
+  }
+
+  List<Item> get filteredItems {
+    List<Item> filtered = items;
+
+    if (_searchText.isNotEmpty) {
+      filtered = filtered.where((item) {
+        return item.name.toLowerCase().contains(_searchText.toLowerCase());
+      }).toList();
+    }
+
+    if (_selectedTags.isNotEmpty) {
+      filtered = filtered.where((item) {
+        return _selectedTags.every((tag) => item.tags.contains(tag));
+      }).toList();
+    }
+
+    return filtered;
+  }
+
+  List<String> getAvailableTags() {
+    Set<String> uniqueTags = {};
+    for (var item in items) {
+      uniqueTags.addAll(item.tags);
+    }
+    return uniqueTags.toList();
+  }
+
+  // Update search text
+  void updateSearchText(String searchText) {
+    _searchText = searchText;
+    notifyListeners();
+  }
+
+  // Update selected tags
+  void updateSelectedTags(List<String> tags) {
+    _selectedTags = tags;
+    notifyListeners();
+  }
+
+  // Clear all filters
+  void clearFilters() {
+    _searchText = '';
+    _selectedTags = [];
+    notifyListeners();
+  }
+
+  // Guard selected tags against becoming stale after items are updated
+  void _guardSelectedTags() {
+    final available = getAvailableTags().toSet();
+    final filteredSelected = _selectedTags
+        .where((tag) => available.contains(tag))
+        .toList();
+    if (filteredSelected.length != _selectedTags.length) {
+      _selectedTags = filteredSelected;
+      notifyListeners();
     }
   }
 
@@ -24,10 +96,55 @@ class ItemViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
+      // Get the current user
+      final user = _authViewModel.user;
+      if (user == null) {
+        items = [];
+        _guardSelectedTags();
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      // Always fetch user's neighborhoodId to ensure we get the latest value
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      final neighborhoodData = userDoc.data()?['neighborhoodId'];
+      List<String> neighborhoodIds = [];
+      if (neighborhoodData is List) {
+        neighborhoodIds = neighborhoodData
+            .map((value) => value.toString())
+            .where((value) => value.isNotEmpty)
+            .toList();
+      } else if (neighborhoodData is String && neighborhoodData.isNotEmpty) {
+        neighborhoodIds = [neighborhoodData];
+      }
+
+      _neighborhoodId = neighborhoodIds;
+
+      // If user hasn't selected a neighborhood yet, return empty list
+      if (_neighborhoodId == null || _neighborhoodId!.isEmpty) {
+        items = [];
+        _guardSelectedTags();
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      // Query items filtered by neighborhoodId
       final QuerySnapshot<Map<String, dynamic>> snapshot =
-          await FirebaseFirestore.instance.collection('items').get();
+          await FirebaseFirestore.instance
+              .collection('items')
+              .where('neighborhoodId', arrayContains: _neighborhoodId!.first)
+              .get();
 
       items = snapshot.docs.map((doc) => Item.fromFirestore(doc)).toList();
+
+      // Guard selected tags against becoming stale after a refresh/fetch
+      _guardSelectedTags();
     } catch (e) {
       print('Error fetching items: $e');
       // Keep empty list on error

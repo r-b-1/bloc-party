@@ -22,7 +22,8 @@ class ProfileViewModel extends ChangeNotifier {
   String? get error => _error;
 
   ProfileViewModel() {
-    _fetchUserDataAndItems();
+    // Use Future.microtask to defer initialization until after build
+    Future.microtask(() => _fetchUserDataAndItems());
   }
 
   Future<void> _fetchUserDataAndItems() async {
@@ -79,51 +80,6 @@ class ProfileViewModel extends ChangeNotifier {
 
   Future<void> signOutUser() async {
     await auth.FirebaseAuth.instance.signOut();
-  }
-
-  // Add this method to create new items
-  Future<void> addItem({
-    required String name,
-    required String description,
-    required ItemPortability portability,
-    required List<String> tags,
-  }) async {
-    try {
-      _error = null;
-      notifyListeners();
-
-      if (_currentUser == null) {
-        throw Exception('No user logged in');
-      }
-
-      // Creating a new document in firestore
-      final docRef = FirebaseFirestore.instance.collection('items').doc();
-
-      // Creating the item
-      final newItem = Item(
-        id: docRef.id,
-        name: name,
-        description: description,
-        isAvailable: true,
-        userId: _currentUser!.username,
-        neighborhoodId: 'defualt',
-        portability: portability,
-        tags: tags,
-        imagePath: 'assets/images/confused-person.jpg',
-      );
-
-      // Saving to Firestore
-      await docRef.set(newItem.toFirestore());
-
-      // Adding item to local list and update UI
-      _userItems.add(newItem);
-      notifyListeners();
-    } catch (e) {
-      _error = 'Failed to add item: $e';
-      print('Error adding item: $e');
-      notifyListeners();
-      rethrow;
-    }
   }
 
   // Adding method to delete items
@@ -193,7 +149,6 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
-
   // Method for the user to add a new address
   Future<void> addAddress(String newAddress) async {
     try {
@@ -227,9 +182,9 @@ class ProfileViewModel extends ChangeNotifier {
           .collection('users')
           .doc(authUser.uid)
           .update({
-        'addresses': _addresses,
-        if (_currentAddress != null) 'currentAddress': _currentAddress,
-      });
+            'addresses': _addresses,
+            if (_currentAddress != null) 'currentAddress': _currentAddress,
+          });
 
       notifyListeners();
     } catch (e) {
@@ -264,9 +219,9 @@ class ProfileViewModel extends ChangeNotifier {
           .collection('users')
           .doc(authUser.uid)
           .update({
-        'addresses': _addresses,
-        if (_currentAddress != null) 'currentAddress': _currentAddress,
-      });
+            'addresses': _addresses,
+            if (_currentAddress != null) 'currentAddress': _currentAddress,
+          });
 
       notifyListeners();
     } catch (e) {
@@ -293,9 +248,7 @@ class ProfileViewModel extends ChangeNotifier {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(authUser.uid)
-          .update({
-        'currentAddress': address,
-      });
+          .update({'currentAddress': address});
 
       notifyListeners();
     } catch (e) {
@@ -346,7 +299,7 @@ class Address extends StatelessWidget {
       decoration: InputDecoration(
         labelText: labelName,
         border: OutlineInputBorder(),
-        ),
+      ),
       onSuggestionClick: (place) {
         controller.text = place.formattedAddress ?? '';
       },

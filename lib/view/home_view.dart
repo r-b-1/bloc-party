@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/itemview_model.dart';
 import 'package:blocparty/model/item_model.dart';
+import 'package:blocparty/view/widgets/item_search_filter_widget.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
+import 'package:blocparty/view/widgets/neighborhood_selection_widget.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -125,6 +127,11 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+  //  method to refresh items when neighborhood changes
+  void _refreshItems() {
+    itemViewModel.fetchItems();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,13 +152,28 @@ class _HomeViewState extends State<HomeView> {
 
           const SizedBox(height: 16),
 
-          _buildInfoCard('Group Name', 'Neighborhood Watch'),
+          // neighborhood selection dropdown widget
+          NeighborhoodSelectionWidget(onNeighborhoodChanged: _refreshItems),
+          const SizedBox(height: 16),
+          
           _buildInfoCard('Notification Request', '0'),
           _buildInfoCard('Messages', '3 new'),
           const SizedBox(height: 20),
-          const Text(
-            'List of Items',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ItemSearchFilterWidget(
+            availableTags: itemViewModel.getAvailableTags(),
+            onSearchChanged: (searchText) {
+              itemViewModel.updateSearchText(searchText);
+            },
+            onTagsChanged: (tags) {
+              itemViewModel.updateSelectedTags(tags);
+            },
+            initialSearchText: itemViewModel.searchText,
+            initialSelectedTags: itemViewModel.selectedTags,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'List of Items (${itemViewModel.filteredItems.length})',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           // Show loading indicator if items are being fetched
@@ -164,7 +186,7 @@ class _HomeViewState extends State<HomeView> {
             )
           else
             // Using the static method
-            ...itemViewModel.items.map(
+            ...itemViewModel.filteredItems.map(
               (item) => HomeView.buildItemTile(context, item),
             ),
           IconButton(

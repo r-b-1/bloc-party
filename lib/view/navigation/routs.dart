@@ -1,3 +1,4 @@
+import 'package:blocparty/model/chat_model.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/flutter_backend/go_router.dart'; // main function to go from page to page
 
@@ -50,7 +51,13 @@ GoRouter goRouts() {
         path: '/schedule',
         builder: (context, state) => const ScheduleView(),
       ),
-      GoRoute(path: '/chat', builder: (context, state) => const ChatView()),
+      GoRoute(
+        path: '/chat', 
+        builder: (context, state) {
+          final chat = state.extra as Chat;
+          return ChatView(curChat: chat);
+        }
+      ),
       GoRoute(
         path: '/pick_neighborhood',
         builder: (context, state) => const PickNeighborhoodView(),
