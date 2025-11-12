@@ -91,13 +91,14 @@ class NeighborhoodViewModel extends ChangeNotifier {
         throw Exception('No user logged in');
       }*/
 
-      // Creating a new document in firestore
-      final docRef = FirebaseFirestore.instance.collection('neighborhood').doc();
 
       final QuerySnapshot<Map<String, dynamic>> snapshot =
         await FirebaseFirestore.instance.collection('neighborhood').get();
-
+      
       neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
+
+      // Creating a new document in firestore
+      final docRef = FirebaseFirestore.instance.collection('neighborhood').doc();
 
       final neighborhoodBeingJoined = neighborhoods.firstWhere((doc) => doc.neighborhoodId == neighborhoodIdToJoin);
 
@@ -105,8 +106,7 @@ class NeighborhoodViewModel extends ChangeNotifier {
       neighborhoodBeingJoined.neighborhoodUsers.add(_authViewModel.user!.uid);
 
       // Saving to Firestore
-      await docRef.set(neighborhoodBeingJoined.toFirestore());
-
+      await docRef.update(neighborhoodBeingJoined.toFirestore());
       // Adding item to local list and update UI
       notifyListeners();
     } catch (e) {
