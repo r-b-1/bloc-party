@@ -86,6 +86,14 @@ class ChatModel extends ChangeNotifier{
     currentChat = curChat;
   }
 
+  Future<void> updateChat() async {
+    isLoading = true;
+    final activeDoc = FirebaseFirestore.instance.collection('chats').doc(currentChat!.name);
+    currentChat = Chat.fromFirestore(await activeDoc.get());
+    notifyListeners();
+    isLoading = false;
+  }
+
   // Sends a message
   Future<void> addMessage(String messageText) async {
 
@@ -102,6 +110,8 @@ class ChatModel extends ChangeNotifier{
       throw Exception('User document not found');
     }
     _currentUser = AddUser.fromFirestore(userDoc);
+    
+    await updateChat();
 
     // Adds the message to firebase
     currentChat?.messagesText.add(messageText);
@@ -111,7 +121,7 @@ class ChatModel extends ChangeNotifier{
 
     await activeDoc.set(currentChat!.toFirestore());
     notifyListeners();
-
+    await updateChat();
     isLoading = false;
   }
 

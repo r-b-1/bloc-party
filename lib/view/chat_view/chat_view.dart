@@ -62,7 +62,9 @@ class _chatViewState extends State<ChatView> {
               decoration: const InputDecoration(labelText: "Message"),
               controller: _messageText
             ),
+            const SizedBox(height: 16,),
             ElevatedButton(onPressed: _sendMessage, child: Text("Send Message")),
+            const SizedBox(height: 16,),
             if (_chatModel.isLoading)
             const Center(
               child: Padding(
@@ -72,6 +74,8 @@ class _chatViewState extends State<ChatView> {
             )
             else
             ..._chatModel.currentChat!.messages.map((mes) => buildMessage(context, mes)),
+            const SizedBox(height: 16,),
+            ElevatedButton(onPressed: _chatModel.updateChat, child: Icon(Icons.refresh)),
           ],
         ),
       ),

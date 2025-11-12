@@ -72,6 +72,7 @@ class _MessagesViewState extends State<MessagesView> {
       body: ListView(
         children: [
           ..._messagingModel.currentChats.map((item) => buildChatTile(context, item)),
+          const SizedBox(height: 16),
           Positioned(
             right: 16,
             bottom: 16,
@@ -79,6 +80,11 @@ class _MessagesViewState extends State<MessagesView> {
               onPressed: _navigateToAddChat,
               child: const Icon(Icons.add),
             ),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            onPressed: _messagingModel.fetchItems,
+            child: const Icon(Icons.refresh),
           ),
         ],
       ),
