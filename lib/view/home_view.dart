@@ -16,71 +16,65 @@ class HomeView extends StatefulWidget {
     VoidCallback? onTap,
   }) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Image.asset(
-          item.imagePath,
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              'assets/images/confused-person.jpg',
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-            );
-          },
-        ),
-        title: Text(item.name),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(item.description),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: item.isAvailable ? Colors.green : Colors.red,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    item.isAvailable ? 'Available' : 'Unavailable',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  getPortabilityText(item.portability),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    'Listed by: ${item.userId}',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      margin: const EdgeInsets.all(2),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
         onTap:
             onTap ??
             () {
               context.push('/item_description', extra: item);
             },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: 1.2,
+              child: Image.asset(
+                item.imagePath,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/confused-person.jpg',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      text: item.name,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: ' - ${item.description}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -136,66 +130,81 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          Align(
-            alignment:
-                Alignment.topRight, // Positions the button at the bottom center
-            child: ElevatedButton(
-              onPressed: () {
-                context.go('/pick_neighborhood');
-              },
-              child: Text('  NEIGHBORHOOD SELECTION  '),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // neighborhood selection dropdown widget
-          NeighborhoodSelectionWidget(onNeighborhoodChanged: _refreshItems),
-          const SizedBox(height: 16),
-          
-          _buildInfoCard('Notification Request', '0'),
-          _buildInfoCard('Messages', '3 new'),
-          const SizedBox(height: 20),
-          ItemSearchFilterWidget(
-            availableTags: itemViewModel.getAvailableTags(),
-            onSearchChanged: (searchText) {
-              itemViewModel.updateSearchText(searchText);
-            },
-            onTagsChanged: (tags) {
-              itemViewModel.updateSelectedTags(tags);
-            },
-            initialSearchText: itemViewModel.searchText,
-            initialSelectedTags: itemViewModel.selectedTags,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'List of Items (${itemViewModel.filteredItems.length})',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          // Show loading indicator if items are being fetched
-          if (itemViewModel.isLoading)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: CircularProgressIndicator(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.go('/pick_neighborhood');
+                  },
+                  child: Text('  NEIGHBORHOOD SELECTION  '),
+                ),
               ),
-            )
-          else
-            // Using the static method
-            ...itemViewModel.filteredItems.map(
-              (item) => HomeView.buildItemTile(context, item),
-            ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              itemViewModel.fetchItems();
-            },
+              const SizedBox(height: 16),
+              NeighborhoodSelectionWidget(onNeighborhoodChanged: _refreshItems),
+              const SizedBox(height: 16),
+              _buildInfoCard('Notification Request', '0'),
+              _buildInfoCard('Messages', '3 new'),
+              const SizedBox(height: 20),
+              ItemSearchFilterWidget(
+                availableTags: itemViewModel.getAvailableTags(),
+                onSearchChanged: (searchText) {
+                  itemViewModel.updateSearchText(searchText);
+                },
+                onTagsChanged: (tags) {
+                  itemViewModel.updateSelectedTags(tags);
+                },
+                initialSearchText: itemViewModel.searchText,
+                initialSelectedTags: itemViewModel.selectedTags,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'List of Items (${itemViewModel.filteredItems.length})',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (itemViewModel.isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1,
+                    crossAxisSpacing: 0,
+                    mainAxisSpacing: 0,
+                  ),
+                  itemCount: itemViewModel.filteredItems.length,
+                  itemBuilder: (context, index) {
+                    return HomeView.buildItemTile(
+                      context,
+                      itemViewModel.filteredItems[index],
+                    );
+                  },
+                ),
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                onPressed: () {
+                  itemViewModel.fetchItems();
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
