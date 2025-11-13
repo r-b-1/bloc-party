@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:blocparty/view/messaging_view.dart';
+import 'package:blocparty/view/chat_view/messaging_view.dart';
 import 'package:blocparty/view/profile_view.dart';
 import 'package:blocparty/view/schedule_view.dart';
 import 'package:blocparty/view/home_view.dart';
