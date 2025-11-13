@@ -338,12 +338,40 @@ class _ProfileViewState extends State<ProfileView> {
                     return Column(
                       children: [
                         Expanded(
-                          child: HomeView.buildItemTile(
-                            context,
-                            item,
-                            onTap: () {
-                              context.push('/item_description', extra: item);
-                            },
+                          child: Stack(
+                            children: [
+                              HomeView.buildItemTile(
+                                context,
+                                item,
+                                onTap: () {
+                                  context.push('/item_description', extra: item);
+                                },
+                              ),
+                              // ADD: Edit icon positioned in top-right corner of item tile
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.9),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: Colors.blue,
+                                      size: 18,
+                                    ),
+                                    onPressed: () => _navigateToEditItem(item),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                      minWidth: 36,
+                                      minHeight: 36,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Row(
