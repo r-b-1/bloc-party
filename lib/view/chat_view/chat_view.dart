@@ -1,5 +1,6 @@
 import 'package:blocparty/model/chat_model.dart';
 import 'package:blocparty/model/message_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ChatView extends StatefulWidget {
@@ -24,6 +25,7 @@ class _chatViewState extends State<ChatView> {
     super.initState();
     _chatModel = ChatModel(currChat!);
     _chatModel.addListener(_onViewModelChanged);
+    _chatModel.docRef.snapshots().listen((DocumentSnapshot snapshot) {_chatModel.updateChat();});
   }
 
   void _onViewModelChanged() {
@@ -58,13 +60,6 @@ class _chatViewState extends State<ChatView> {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            TextField(
-              decoration: const InputDecoration(labelText: "Message"),
-              controller: _messageText
-            ),
-            const SizedBox(height: 16,),
-            ElevatedButton(onPressed: _sendMessage, child: Text("Send Message")),
-            const SizedBox(height: 16,),
             if (_chatModel.isLoading)
             const Center(
               child: Padding(
@@ -75,7 +70,12 @@ class _chatViewState extends State<ChatView> {
             else
             ..._chatModel.currentChat!.messages.map((mes) => buildMessage(context, mes)),
             const SizedBox(height: 16,),
-            ElevatedButton(onPressed: _chatModel.updateChat, child: Icon(Icons.refresh)),
+            TextField(
+              decoration: const InputDecoration(labelText: "Message"),
+              controller: _messageText
+            ),
+            const SizedBox(height: 16,),
+            ElevatedButton(onPressed: _sendMessage, child: Text("Send Message")),
           ],
         ),
       ),
