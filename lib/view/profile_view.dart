@@ -371,6 +371,7 @@ class _ProfileViewState extends State<ProfileView> {
   // Widget to build the UI for the user address section
   Widget _buildAddressSection() {
     return Card(
+      margin: EdgeInsets.zero,
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -15,7 +15,7 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Change file name here to change themes
-  final themeData = await loadThemeFromJson('yellow_appainter_theme.json');
+  final themeData = await loadThemeFromJson('blue_appainter_theme.json');
 
   runApp(MyApp(clientId: clientId, theme: themeData));
 }
