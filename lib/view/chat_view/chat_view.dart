@@ -1,6 +1,9 @@
 import 'package:blocparty/model/chat_model.dart';
+import 'package:blocparty/model/login_model/user_model.dart';
 import 'package:blocparty/model/message_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 
 class ChatView extends StatefulWidget {
@@ -25,6 +28,7 @@ class _chatViewState extends State<ChatView> {
     super.initState();
     _chatModel = ChatModel(currChat!);
     _chatModel.addListener(_onViewModelChanged);
+    _chatModel.docRef.snapshots().listen((DocumentSnapshot snapshot) {_chatModel.updateChat();});
   }
 
   void _onViewModelChanged() {
@@ -43,47 +47,85 @@ class _chatViewState extends State<ChatView> {
     await _chatModel.addMessage(_messageText.text);
   }
 
-
-
-
   Widget buildMessage(BuildContext context, Message mes) {
-  final theme = Theme.of(context);
-  
- 
-    return Column(
+    final theme = Theme.of(context);
+    if(_chatModel.currentUser?.username == mes.sender) {
+      return Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-    children: [ 
-      Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey, width: 1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [ 
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
+              border: Border.all(color: Colors.blue.shade600, width: 3),
               borderRadius: BorderRadius.circular(8),
-              color: Colors.blue.shade800,
+              color: Colors.blue.shade700,
             ),
-            child: Text(
-              mes.sender,
-              style: theme.textTheme.bodyLarge,
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  mes.sender,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  mes.message,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white
+                  ),
+                ),
+              ],
             ),
           ),
-         const SizedBox(height: 4),
-         Text(mes.message),
         ],
-      ),
-    ),
-    ],
-    );
-
+      );
+    } else {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [ 
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade600, width: 3),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey.shade700,
+            ),
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  mes.sender,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  mes.message,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
   }
 
   @override
@@ -94,11 +136,6 @@ class _chatViewState extends State<ChatView> {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            TextField(
-              decoration: const InputDecoration(labelText: "Message"),
-              controller: _messageText
-            ),
-            ElevatedButton(onPressed: _sendMessage, child: Text("Send Message")),
             if (_chatModel.isLoading)
             const Center(
               child: Padding(
@@ -108,6 +145,13 @@ class _chatViewState extends State<ChatView> {
             )
             else
             ..._chatModel.currentChat!.messages.map((mes) => buildMessage(context, mes)),
+            const SizedBox(height: 16,),
+            TextField(
+              decoration: const InputDecoration(labelText: "Message"),
+              controller: _messageText
+            ),
+            const SizedBox(height: 16,),
+            ElevatedButton(onPressed: _sendMessage, child: Text("Send Message")),
           ],
         ),
       ),

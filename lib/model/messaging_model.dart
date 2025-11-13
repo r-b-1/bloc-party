@@ -37,15 +37,14 @@ class MessagingModel extends ChangeNotifier {
       }
       _currentUser = AddUser.fromFirestore(userDoc);
 
+      // Gets all chats with the current user's username in the 'members' list
       final QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance.collection('chats').where('members', arrayContains: _currentUser.username).get();
-
       currentChats = snapshot.docs.map((doc) => Chat.fromFirestore(doc)).toList();
 
     } catch (e) {
       print('Error fetching items: $e');
-      // Keep empty list on error
     } finally {
-      notifyListeners(); // Update the UI
+      notifyListeners();
     }
   }
 
@@ -55,10 +54,7 @@ class MessagingModel extends ChangeNotifier {
     super.dispose();
   }
 
-    Future<void> addChat({
-    required String name,
-    required List<String> chatters,
-  }) async {
+    Future<void> addChat({required String name, required List<String> chatters}) async {
     try {
       notifyListeners();
 
@@ -79,6 +75,7 @@ class MessagingModel extends ChangeNotifier {
 
       // Update UI
       notifyListeners();
+
     } catch (e) {
       print('Error adding item: $e');
       notifyListeners();
