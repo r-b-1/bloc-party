@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/view/home_view.dart';
 import 'package:blocparty/view/add_item_view.dart';
-import 'package:blocparty/view/edit_item_view.dart'; 
+import 'package:blocparty/view/edit_item_view.dart';
 import 'package:blocparty/model/item_model.dart';
 import 'package:blocparty/view/widgets/neighborhood_selection_widget.dart';
 
@@ -44,19 +44,15 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-
   // ADD: Method to navigate to edit item view
   void _navigateToEditItem(Item item) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => EditItemView(
-          profileViewModel: _profileViewModel,
-          item: item,
-        ),
+        builder: (context) =>
+            EditItemView(profileViewModel: _profileViewModel, item: item),
       ),
     );
   }
-
 
   // Method to delete item
   Future<void> _deleteItem(Item item) async {
@@ -479,8 +475,6 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
-}
-
 
   // updated widget to build new item tile for the user profile with edit button
   Widget _buildProfileItemTile(Item item) {
@@ -529,4 +523,3 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 }
-
