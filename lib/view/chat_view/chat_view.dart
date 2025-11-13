@@ -47,53 +47,85 @@ class _chatViewState extends State<ChatView> {
     await _chatModel.addMessage(_messageText.text);
   }
 
-  Future<AddUser> _getCurrentUser() async {
-    final authUser = auth.FirebaseAuth.instance.currentUser;
-    if (authUser == null) {
-      throw Exception('No user logged in');
-    }
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(authUser.uid).get();
-    if (!userDoc.exists) {
-      throw Exception('User document not found');
-    }
-    return AddUser.fromFirestore(userDoc);
-  }
-
-
   Widget buildMessage(BuildContext context, Message mes) {
-  final theme = Theme.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-
-      
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [ 
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey, width: 1),
-            borderRadius: BorderRadius.circular(8),
-            color: theme.primaryColorLight,
-          ),
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                mes.sender,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+    final theme = Theme.of(context);
+    if(_chatModel.currentUser?.username == mes.sender) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [ 
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.blue.shade600, width: 3),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.blue.shade700,
+            ),
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  mes.sender,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(mes.message),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  mes.message,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    } else {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [ 
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade600, width: 3),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey.shade700,
+            ),
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  mes.sender,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  mes.message,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
   }
 
   @override

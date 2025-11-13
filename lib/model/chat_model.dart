@@ -90,9 +90,11 @@ class ChatModel extends ChangeNotifier{
   Chat ?currentChat;
   bool isLoading = false;
   late DocumentReference<Map<String, dynamic>> docRef;
+  AddUser ?currentUser;
 
   // Initializes with a specific chat
   ChatModel(Chat curChat) {
+    getCurrentChatUser();
     currentChat = curChat;
     docRef = FirebaseFirestore.instance.collection('chats').doc(currentChat?.name);
   }
@@ -107,6 +109,19 @@ class ChatModel extends ChangeNotifier{
 
     notifyListeners();
     isLoading = false;
+  }
+
+  Future<void> getCurrentChatUser() async {
+    final authUser = auth.FirebaseAuth.instance.currentUser;
+    if (authUser == null) {
+      throw Exception('No user logged in');
+    }
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(authUser.uid).get();
+    if (!userDoc.exists) {
+      throw Exception('User document not found');
+    }
+    currentUser = AddUser.fromFirestore(userDoc);
+    notifyListeners();
   }
 
   // Sends a message
