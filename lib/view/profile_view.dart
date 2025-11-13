@@ -42,6 +42,7 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
+
   // Method to delete item
   Future<void> _deleteItem(Item item) async {
     final shouldDelete = await showDialog<bool>(
@@ -73,7 +74,10 @@ class _ProfileViewState extends State<ProfileView> {
   // Method to toggle item availability
   Future<void> _toggleItemAvailability(Item item) async {
     try {
-      await _profileViewModel.toggleItemAvailability(item.id, !item.isAvailable);
+      await _profileViewModel.toggleItemAvailability(
+        item.id,
+        !item.isAvailable,
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -83,7 +87,7 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
-  // Method for the user to add a new address using the google API 
+  // Method for the user to add a new address using the google API
   void _showAddAddressDialog() {
     final TextEditingController addressController = TextEditingController();
 
@@ -95,10 +99,7 @@ class _ProfileViewState extends State<ProfileView> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Address(
-                controller: addressController,
-                labelName: 'New Address',
-              ),
+              Address(controller: addressController, labelName: 'New Address'),
             ],
           ),
           actions: [
@@ -111,12 +112,14 @@ class _ProfileViewState extends State<ProfileView> {
                 if (addressController.text.trim().isNotEmpty) {
                   try {
                     await _profileViewModel.addAddress(
-                        addressController.text.trim());
+                      addressController.text.trim(),
+                    );
                     if (context.mounted) {
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('Address added successfully!')),
+                          content: Text('Address added successfully!'),
+                        ),
                       );
                     }
                   } catch (e) {
@@ -143,7 +146,9 @@ class _ProfileViewState extends State<ProfileView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Address'),
-          content: Text('Are you sure you want to delete this address?\n\n$address'),
+          content: Text(
+            'Are you sure you want to delete this address?\n\n$address',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -169,9 +174,9 @@ class _ProfileViewState extends State<ProfileView> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('$e')));
         }
       }
     }
@@ -275,18 +280,21 @@ class _ProfileViewState extends State<ProfileView> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
                   'My Listed Items',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 16),
-                if (_profileViewModel.userItems.isEmpty)
-                  Container(
+              ),
+              const SizedBox(height: 16),
+              if (_profileViewModel.userItems.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Container(
                     height: 200,
                     child: const Center(
                       child: Column(
@@ -301,17 +309,57 @@ class _ProfileViewState extends State<ProfileView> {
                         ],
                       ),
                     ),
-                  )
-                else
-                  Column(
-                    children: [
-                      ..._profileViewModel.userItems.map((item) {
-                        return _buildProfileItemTile(item);
-                      }).toList(),
-                    ],
                   ),
-              ],
-            ),
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.79,
+                    crossAxisSpacing: 0,
+                    mainAxisSpacing: 0,
+                  ),
+                  itemCount: _profileViewModel.userItems.length,
+                  itemBuilder: (context, index) {
+                    final item = _profileViewModel.userItems[index];
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: HomeView.buildItemTile(
+                            context,
+                            item,
+                            onTap: () {
+                              context.push('/item_description', extra: item);
+                            },
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Switch(
+                              value: item.isAvailable,
+                              onChanged: (bool value) {
+                                _toggleItemAvailability(item);
+                              },
+                              activeColor: Colors.green,
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                              onPressed: () => _deleteItem(item),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+            ],
           ),
           // CHANGED: Added bottom padding to ensure space for FAB
           const SizedBox(height: 80),
@@ -320,7 +368,7 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-// Widget to build the UI for the user address section
+  // Widget to build the UI for the user address section
   Widget _buildAddressSection() {
     return Card(
       elevation: 2,
@@ -362,14 +410,17 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   const SizedBox(height: 8),
                   ...(_profileViewModel.addresses.map((address) {
-                    final isCurrent = address == _profileViewModel.currentAddress;
+                    final isCurrent =
+                        address == _profileViewModel.currentAddress;
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       color: isCurrent ? Colors.blue.shade50 : null,
                       child: ListTile(
                         dense: true,
                         leading: Icon(
-                          isCurrent ? Icons.location_on : Icons.location_on_outlined,
+                          isCurrent
+                              ? Icons.location_on
+                              : Icons.location_on_outlined,
                           size: 20,
                           color: isCurrent ? Colors.blue : Colors.grey,
                         ),
@@ -377,18 +428,28 @@ class _ProfileViewState extends State<ProfileView> {
                           address,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: isCurrent
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                            size: 20,
+                          ),
                           onPressed: () => _deleteAddress(address),
                         ),
                         onTap: () {
                           if (!isCurrent) {
                             _profileViewModel.setCurrentAddress(address);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Current address set to: $address')),
+                              SnackBar(
+                                content: Text(
+                                  'Current address set to: $address',
+                                ),
+                              ),
                             );
                           }
                         },
@@ -397,47 +458,6 @@ class _ProfileViewState extends State<ProfileView> {
                   })).toList(),
                 ],
               ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Widget to build new item tile for the user profile using the home page item tile
-  Widget _buildProfileItemTile(Item item) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: HomeView.buildItemTile(
-                context,
-                item,
-                onTap: () {
-                  context.push('/item_description', extra: item);
-                },
-              ),
-            ),
-            Column(
-              children: [
-                // Toggle switch for availability
-                Switch(
-                  value: item.isAvailable,
-                  onChanged: (bool value) {
-                    _toggleItemAvailability(item);
-                  },
-                  activeColor: Colors.green,
-                ),
-                const SizedBox(height: 8),
-                // Delete button
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                  onPressed: () => _deleteItem(item),
-                ),
-              ],
-            ),
           ],
         ),
       ),

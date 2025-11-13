@@ -44,7 +44,7 @@ class HomeView extends StatefulWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(5.0),
+              padding: const EdgeInsets.all(9.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -136,38 +136,58 @@ class _HomeViewState extends State<HomeView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.go('/pick_neighborhood');
-                  },
-                  child: Text('  NEIGHBORHOOD SELECTION  '),
+              Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      context.go('/pick_neighborhood');
+                    },
+                    child: Text('  NEIGHBORHOOD SELECTION  '),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
-              NeighborhoodSelectionWidget(onNeighborhoodChanged: _refreshItems),
-              const SizedBox(height: 16),
-              _buildInfoCard('Notification Request', '0'),
-              _buildInfoCard('Messages', '3 new'),
-              const SizedBox(height: 20),
-              ItemSearchFilterWidget(
-                availableTags: itemViewModel.getAvailableTags(),
-                onSearchChanged: (searchText) {
-                  itemViewModel.updateSearchText(searchText);
-                },
-                onTagsChanged: (tags) {
-                  itemViewModel.updateSelectedTags(tags);
-                },
-                initialSearchText: itemViewModel.searchText,
-                initialSelectedTags: itemViewModel.selectedTags,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: NeighborhoodSelectionWidget(
+                  onNeighborhoodChanged: _refreshItems,
+                ),
               ),
               const SizedBox(height: 16),
-              Text(
-                'List of Items (${itemViewModel.filteredItems.length})',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: _buildInfoCard('Notification Request', '0'),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: _buildInfoCard('Messages', '3 new'),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: ItemSearchFilterWidget(
+                  availableTags: itemViewModel.getAvailableTags(),
+                  onSearchChanged: (searchText) {
+                    itemViewModel.updateSearchText(searchText);
+                  },
+                  onTagsChanged: (tags) {
+                    itemViewModel.updateSelectedTags(tags);
+                  },
+                  initialSearchText: itemViewModel.searchText,
+                  initialSelectedTags: itemViewModel.selectedTags,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: Text(
+                  'List of Items (${itemViewModel.filteredItems.length})',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -196,11 +216,16 @@ class _HomeViewState extends State<HomeView> {
                     );
                   },
                 ),
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  itemViewModel.fetchItems();
-                },
+              SizedBox(
+                width: double.infinity,
+                child: Center(
+                  child: IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () {
+                      itemViewModel.fetchItems();
+                    },
+                  ),
+                ),
               ),
             ],
           ),
