@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/view/home_view.dart';
 import 'package:blocparty/view/add_item_view.dart';
+import 'package:blocparty/view/edit_item_view.dart'; 
 import 'package:blocparty/model/item_model.dart';
 import 'package:blocparty/view/widgets/neighborhood_selection_widget.dart';
 
@@ -42,6 +43,20 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
+
+
+  // ADD: Method to navigate to edit item view
+  void _navigateToEditItem(Item item) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditItemView(
+          profileViewModel: _profileViewModel,
+          item: item,
+        ),
+      ),
+    );
+  }
+
 
   // Method to delete item
   Future<void> _deleteItem(Item item) async {
@@ -208,7 +223,7 @@ class _ProfileViewState extends State<ProfileView> {
           _buildBody(context),
           Positioned(
             right: 16,
-            bottom: 80, // CHANGED: Moved FAB up to avoid overlapping with items
+            bottom: 80, // moved button up to avoid overlapping with items
             child: FloatingActionButton(
               onPressed: _navigateToAddItem,
               child: const Icon(Icons.add),
@@ -273,7 +288,7 @@ class _ProfileViewState extends State<ProfileView> {
                   style: TextStyle(color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 16),
-                // ADD: Neighborhood selection dropdown widget
+                // neighborhood selection dropdown widget
                 NeighborhoodSelectionWidget(),
                 const SizedBox(height: 16),
                 _buildAddressSection(),
@@ -361,7 +376,7 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
             ],
           ),
-          // CHANGED: Added bottom padding to ensure space for FAB
+          // added bottom padding to ensure space for the button
           const SizedBox(height: 80),
         ],
       ),
@@ -465,3 +480,53 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 }
+
+
+  // updated widget to build new item tile for the user profile with edit button
+  Widget _buildProfileItemTile(Item item) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: HomeView.buildItemTile(
+                context,
+                item,
+                onTap: () {
+                  context.push('/item_description', extra: item);
+                },
+              ),
+            ),
+            Column(
+              children: [
+                // edit button
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                  onPressed: () => _navigateToEditItem(item),
+                ),
+                const SizedBox(height: 8),
+                // Toggle switch for availability
+                Switch(
+                  value: item.isAvailable,
+                  onChanged: (bool value) {
+                    _toggleItemAvailability(item);
+                  },
+                  activeColor: Colors.green,
+                ),
+                const SizedBox(height: 8),
+                // Delete button
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                  onPressed: () => _deleteItem(item),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
