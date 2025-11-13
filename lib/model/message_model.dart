@@ -10,6 +10,6 @@ class Message {
 
   Message({
     required this.sender,
-    required this.message
+    required this.message,
   });
 }

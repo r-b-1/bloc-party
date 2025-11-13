@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/view/home_view.dart';
 import 'package:blocparty/view/add_item_view.dart';
+import 'package:blocparty/view/edit_item_view.dart';
 import 'package:blocparty/model/item_model.dart';
 import 'package:blocparty/view/widgets/neighborhood_selection_widget.dart';
 
@@ -42,6 +43,17 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
+
+  // ADD: Method to navigate to edit item view
+  void _navigateToEditItem(Item item) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) =>
+            EditItemView(profileViewModel: _profileViewModel, item: item),
+      ),
+    );
+  }
+
   // Method to delete item
   Future<void> _deleteItem(Item item) async {
     final shouldDelete = await showDialog<bool>(
@@ -73,7 +85,10 @@ class _ProfileViewState extends State<ProfileView> {
   // Method to toggle item availability
   Future<void> _toggleItemAvailability(Item item) async {
     try {
-      await _profileViewModel.toggleItemAvailability(item.id, !item.isAvailable);
+      await _profileViewModel.toggleItemAvailability(
+        item.id,
+        !item.isAvailable,
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -83,7 +98,7 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
-  // Method for the user to add a new address using the google API 
+  // Method for the user to add a new address using the google API
   void _showAddAddressDialog() {
     final TextEditingController addressController = TextEditingController();
 
@@ -95,10 +110,7 @@ class _ProfileViewState extends State<ProfileView> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Address(
-                controller: addressController,
-                labelName: 'New Address',
-              ),
+              Address(controller: addressController, labelName: 'New Address'),
             ],
           ),
           actions: [
@@ -111,12 +123,14 @@ class _ProfileViewState extends State<ProfileView> {
                 if (addressController.text.trim().isNotEmpty) {
                   try {
                     await _profileViewModel.addAddress(
-                        addressController.text.trim());
+                      addressController.text.trim(),
+                    );
                     if (context.mounted) {
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('Address added successfully!')),
+                          content: Text('Address added successfully!'),
+                        ),
                       );
                     }
                   } catch (e) {
@@ -143,7 +157,9 @@ class _ProfileViewState extends State<ProfileView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Address'),
-          content: Text('Are you sure you want to delete this address?\n\n$address'),
+          content: Text(
+            'Are you sure you want to delete this address?\n\n$address',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -169,9 +185,9 @@ class _ProfileViewState extends State<ProfileView> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('$e')));
         }
       }
     }
@@ -203,7 +219,7 @@ class _ProfileViewState extends State<ProfileView> {
           _buildBody(context),
           Positioned(
             right: 16,
-            bottom: 80, // CHANGED: Moved FAB up to avoid overlapping with items
+            bottom: 80, // moved button up to avoid overlapping with items
             child: FloatingActionButton(
               onPressed: _navigateToAddItem,
               child: const Icon(Icons.add),
@@ -268,25 +284,28 @@ class _ProfileViewState extends State<ProfileView> {
                   style: TextStyle(color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 16),
-                // ADD: Neighborhood selection dropdown widget
+                // neighborhood selection dropdown widget
                 NeighborhoodSelectionWidget(),
                 const SizedBox(height: 16),
                 _buildAddressSection(),
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
                   'My Listed Items',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 16),
-                if (_profileViewModel.userItems.isEmpty)
-                  Container(
+              ),
+              const SizedBox(height: 16),
+              if (_profileViewModel.userItems.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Container(
                     height: 200,
                     child: const Center(
                       child: Column(
@@ -301,28 +320,97 @@ class _ProfileViewState extends State<ProfileView> {
                         ],
                       ),
                     ),
-                  )
-                else
-                  Column(
-                    children: [
-                      ..._profileViewModel.userItems.map((item) {
-                        return _buildProfileItemTile(item);
-                      }).toList(),
-                    ],
                   ),
-              ],
-            ),
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.79,
+                    crossAxisSpacing: 0,
+                    mainAxisSpacing: 0,
+                  ),
+                  itemCount: _profileViewModel.userItems.length,
+                  itemBuilder: (context, index) {
+                    final item = _profileViewModel.userItems[index];
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              HomeView.buildItemTile(
+                                context,
+                                item,
+                                onTap: () {
+                                  context.push('/item_description', extra: item);
+                                },
+                              ),
+                              // ADD: Edit icon positioned in top-right corner of item tile
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.9),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: Colors.blue,
+                                      size: 18,
+                                    ),
+                                    onPressed: () => _navigateToEditItem(item),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                      minWidth: 36,
+                                      minHeight: 36,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Switch(
+                              value: item.isAvailable,
+                              onChanged: (bool value) {
+                                _toggleItemAvailability(item);
+                              },
+                              activeColor: Colors.green,
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                              onPressed: () => _deleteItem(item),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                ),
+            ],
           ),
-          // CHANGED: Added bottom padding to ensure space for FAB
+          // added bottom padding to ensure space for the button
           const SizedBox(height: 80),
         ],
       ),
     );
   }
 
-// Widget to build the UI for the user address section
+  // Widget to build the UI for the user address section
   Widget _buildAddressSection() {
     return Card(
+      margin: EdgeInsets.zero,
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -362,14 +450,17 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   const SizedBox(height: 8),
                   ...(_profileViewModel.addresses.map((address) {
-                    final isCurrent = address == _profileViewModel.currentAddress;
+                    final isCurrent =
+                        address == _profileViewModel.currentAddress;
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       color: isCurrent ? Colors.blue.shade50 : null,
                       child: ListTile(
                         dense: true,
                         leading: Icon(
-                          isCurrent ? Icons.location_on : Icons.location_on_outlined,
+                          isCurrent
+                              ? Icons.location_on
+                              : Icons.location_on_outlined,
                           size: 20,
                           color: isCurrent ? Colors.blue : Colors.grey,
                         ),
@@ -377,18 +468,28 @@ class _ProfileViewState extends State<ProfileView> {
                           address,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: isCurrent
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                            size: 20,
+                          ),
                           onPressed: () => _deleteAddress(address),
                         ),
                         onTap: () {
                           if (!isCurrent) {
                             _profileViewModel.setCurrentAddress(address);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Current address set to: $address')),
+                              SnackBar(
+                                content: Text(
+                                  'Current address set to: $address',
+                                ),
+                              ),
                             );
                           }
                         },
@@ -403,7 +504,7 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  // Widget to build new item tile for the user profile using the home page item tile
+  // updated widget to build new item tile for the user profile with edit button
   Widget _buildProfileItemTile(Item item) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -422,6 +523,12 @@ class _ProfileViewState extends State<ProfileView> {
             ),
             Column(
               children: [
+                // edit button
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                  onPressed: () => _navigateToEditItem(item),
+                ),
+                const SizedBox(height: 8),
                 // Toggle switch for availability
                 Switch(
                   value: item.isAvailable,
