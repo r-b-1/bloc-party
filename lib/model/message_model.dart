@@ -8,7 +8,7 @@ class Message {
 
   Message({
     required this.sender,
-    required this.message
+    required this.message,
   });
 
   /*factory Message.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {

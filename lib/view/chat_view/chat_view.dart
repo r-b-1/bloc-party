@@ -1,5 +1,6 @@
 import 'package:blocparty/model/chat_model.dart';
 import 'package:blocparty/model/message_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatView extends StatefulWidget {
@@ -42,12 +43,47 @@ class _chatViewState extends State<ChatView> {
     await _chatModel.addMessage(_messageText.text);
   }
 
-  @override
+
+
+
   Widget buildMessage(BuildContext context, Message mes) {
-    return ListTile(
-      title: Text(mes.sender),
-      subtitle: Text(mes.message),
+  final theme = Theme.of(context);
+  
+ 
+    return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+    children: [ 
+      Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey, width: 1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.blue.shade800,
+            ),
+            child: Text(
+              mes.sender,
+              style: theme.textTheme.bodyLarge,
+            ),
+          ),
+         const SizedBox(height: 4),
+         Text(mes.message),
+        ],
+      ),
+    ),
+    ],
     );
+
   }
 
   @override
