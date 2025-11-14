@@ -83,4 +83,50 @@ class MessagingModel extends ChangeNotifier {
     }
     fetchItems();
   }
+
+  // Method to create borrow request chat and navigate to it
+  Future<Chat?> createBorrowRequestChat({
+    required String itemName,
+    required String lenderUsername,
+    required String currentUsername,
+  }) async {
+    try {
+      notifyListeners();
+
+      // Creates chat name with format: "name of person requesting requests wants name of item"
+      final chatName = '$currentUsername requests $itemName';
+
+      // Create members list (current user and lender)
+      final chatters = [currentUsername, lenderUsername];
+
+      // Create initial message
+      final initialMessage = 'Hi! I would like to borrow your $itemName.';
+
+      // Create the chat with initial message
+      final newChat = Chat(
+        name: chatName,
+        members: chatters,
+        messagesText: [initialMessage],
+        messagesSender: [currentUsername],
+        messages: [Message(sender: currentUsername, message: initialMessage)]
+      );
+
+      // Save to Firestore
+      final docRef = FirebaseFirestore.instance.collection('chats').doc(chatName);
+      await docRef.set(newChat.toFirestore());
+
+      // Update local chats list
+      currentChats.add(newChat);
+
+      // Update UI
+      notifyListeners();
+      
+      return newChat;
+
+    } catch (e) {
+      print('Error creating borrow request chat: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
 }
