@@ -69,25 +69,28 @@ class _MessagesViewState extends State<MessagesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Messages')),
-      body: ListView(
-        children: [
-          ..._messagingModel.currentChats.map((item) => buildChatTile(context, item)),
-          const SizedBox(height: 16),
-          Positioned(
-            right: 16,
-            bottom: 16,
-            child: FloatingActionButton(
-              onPressed: _navigateToAddChat,
-              child: const Icon(Icons.add),
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: ListView(
+          children: [
+            ..._messagingModel.currentChats.map((item) => buildChatTile(context, item)),
+            const SizedBox(height: 16),
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: FloatingActionButton(
+                onPressed: _navigateToAddChat,
+                child: const Icon(Icons.add),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: _messagingModel.fetchItems,
-            child: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
+            const SizedBox(height: 16),
+            FloatingActionButton(
+              onPressed: _messagingModel.fetchItems,
+              child: const Icon(Icons.refresh),
+            ),
+          ],
+        ),
+      )  
     );
   }
 }
