@@ -45,6 +45,7 @@ class _chatViewState extends State<ChatView> {
 
   Future<void> _sendMessage() async {
     await _chatModel.addMessage(_messageText.text);
+    _messageText.text = '';
   }
 
   Widget buildMessage(BuildContext context, Message mes) {
@@ -151,7 +152,7 @@ class _chatViewState extends State<ChatView> {
               controller: _messageText
             ),
             const SizedBox(height: 16,),
-            ElevatedButton(onPressed: _sendMessage, child: Text("Send Message")),
+            ElevatedButton(onPressed: _sendMessage, child: Icon(Icons.send)),
           ],
         ),
       ),
