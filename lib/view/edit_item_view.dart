@@ -1,19 +1,24 @@
-import 'package:blocparty/view/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:blocparty/model/profile_model.dart';
 import 'package:blocparty/model/item_model.dart';
-import 'package:blocparty/model/add_item_model.dart';
+import 'package:blocparty/model/edit_item_model.dart';
+import 'package:blocparty/view/home_view.dart';
 
-class AddItemView extends StatefulWidget {
+class EditItemView extends StatefulWidget {
   final ProfileViewModel profileViewModel;
+  final Item item;
 
-  const AddItemView({super.key, required this.profileViewModel});
+  const EditItemView({
+    super.key,
+    required this.profileViewModel,
+    required this.item,
+  });
 
   @override
-  State<AddItemView> createState() => _AddItemViewState();
+  State<EditItemView> createState() => _EditItemViewState();
 }
 
-class _AddItemViewState extends State<AddItemView> {
+class _EditItemViewState extends State<EditItemView> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -38,14 +43,14 @@ class _AddItemViewState extends State<AddItemView> {
   // neighborhood selection state
   String? _selectedNeighborhood;
 
-  // Creates instance of AddItemViewModel
-  final AddItemViewModel _addItemViewModel = AddItemViewModel();
+  // Creates instance of EditItemViewModel
+  final EditItemViewModel _editItemViewModel = EditItemViewModel();
 
   @override
   void initState() {
     super.initState();
-    // sets initial neighborhood selection from profile view model
-    _setInitialNeighborhood();
+    // Initialize form fields with existing item data
+    _initializeFormWithItemData();
   }
 
   @override
@@ -56,15 +61,27 @@ class _AddItemViewState extends State<AddItemView> {
     super.dispose();
   }
 
-  // method to set initial neighborhood from profile view model
-  void _setInitialNeighborhood() {
-    final neighborhoods = widget.profileViewModel.currentUser?.neighborhoodId ?? [];
-    if (neighborhoods.isNotEmpty) {
-      _selectedNeighborhood = neighborhoods.first;
+  // Method to initialize form fields with existing item data
+  void _initializeFormWithItemData() {
+    _nameController.text = widget.item.name;
+    _descriptionController.text = widget.item.description;
+    _selectedPortability = widget.item.portability;
+    _tagsController.text = widget.item.tags.join(', ');
+    _selectedImagePath = widget.item.imagePath;
+    
+    // Set initial neighborhood from item data
+    if (widget.item.neighborhoodId.isNotEmpty) {
+      _selectedNeighborhood = widget.item.neighborhoodId.first;
+    } else {
+      // Fallback to user's first neighborhood if item has none
+      final neighborhoods = widget.profileViewModel.currentUser?.neighborhoodId ?? [];
+      if (neighborhoods.isNotEmpty) {
+        _selectedNeighborhood = neighborhoods.first;
+      }
     }
   }
 
-  Future<void> _submitItem() async {
+  Future<void> _updateItem() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -96,28 +113,28 @@ class _AddItemViewState extends State<AddItemView> {
       // use selected neighborhood instead of all user neighborhoods
       final neighborhoodIds = [_selectedNeighborhood!];
 
-      // Use AddItemViewModel to add the item
-      await _addItemViewModel.addItem(
+      // Use EditItemViewModel to update the item
+      await _editItemViewModel.updateItem(
+        itemId: widget.item.id,
         name: _nameController.text,
         description: _descriptionController.text,
         portability: _selectedPortability,
         tags: tags,
-        username: widget.profileViewModel.currentUser!.username,
-        imagePath: _selectedImagePath ?? 'assets/images/confused-person.jpg',
         neighborhoodId: neighborhoodIds,
+        imagePath: _selectedImagePath ?? 'assets/images/confused-person.jpg',
       );
 
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Item added successfully!')),
+          const SnackBar(content: Text('Item updated successfully!')),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to add item: $e')));
+        ).showSnackBar(SnackBar(content: Text('Failed to update item: $e')));
       }
     } finally {
       if (mounted) {
@@ -132,7 +149,7 @@ class _AddItemViewState extends State<AddItemView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Item'),
+        title: const Text('Edit Item'),
         actions: [
           if (_isLoading)
             const Padding(
@@ -180,7 +197,7 @@ class _AddItemViewState extends State<AddItemView> {
                 },
               ),
               const SizedBox(height: 16),
-              // neighborhood selection dropdown
+              // neighborhood selection dropdown using same implementation as add_item_view
               _buildNeighborhoodDropdown(),
               const SizedBox(height: 16),
               DropdownButtonFormField<ItemPortability>(
@@ -251,11 +268,11 @@ class _AddItemViewState extends State<AddItemView> {
               ),
               const SizedBox(height: 32),
               ElevatedButton(
-                onPressed: _isLoading ? null : _submitItem,
+                onPressed: _isLoading ? null : _updateItem,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('Add Item'),
+                child: const Text('Update Item'),
               ),
             ],
           ),
