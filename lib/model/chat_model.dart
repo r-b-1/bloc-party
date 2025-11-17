@@ -61,7 +61,6 @@ class Chat{
     List<Message> messagesToAdd = [];
     for(int i = 0; i < messageTextData.length; i++) {
       messagesToAdd.add(Message(sender: messageSenderData.elementAt(i), message: messageTextData.elementAt(i)));
-      print('message added');
     }
 
     // Builds the Chat from the firebase data
