@@ -77,7 +77,7 @@ class NeighborhoodViewModel extends ChangeNotifier {
       await docRef.set(newNeighborhood.toFirestore());
 
       //join the neighborhood that is created
-      joinNeighborhood(neighborhoodIdToJoin: neighborhoodIdToAdd);
+      //joinNeighborhood(neighborhoodIdToJoin: neighborhoodIdToAdd);
 
       // Adding item to local list and update UI
       notifyListeners();
@@ -106,13 +106,15 @@ class NeighborhoodViewModel extends ChangeNotifier {
       // Creating a new document in firestore
       final docRef = FirebaseFirestore.instance.collection('users').doc(_authViewModel.user!.uid);
 
-      final newNeighborhoodIDs = neighborhoods.firstWhere((doc) => doc.neighborhoodId == neighborhoodIdToJoin).neighborhoodId;
+      final newNeighborhoodID = neighborhoods.firstWhere((doc) => doc.neighborhoodId == neighborhoodIdToJoin).neighborhoodId;
 
-      //adds the current user to the list of users in a neighborhood
+      //adds the neighborhoods to the users list of neighborhoods
+      
       _profileViewModel.neighborhoods.add(neighborhoodIdToJoin);
 
-      // Saving to Firestore
-      await docRef.update({'neighborhood ID': newNeighborhoodIDs,});
+      // set the current neighborhood
+      await docRef.update({'neighborhood ID': newNeighborhoodID,});
+      await docRef.update({'neighborhoodId': _profileViewModel.neighborhoods,});
 
       fetchNeighborhoods();
 

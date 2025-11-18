@@ -17,6 +17,11 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
   late AuthViewModel authViewModel;
   late ProfileViewModel profileViewModel;
 
+  bool running_ = false;
+  FocusNode focusNode = FocusNode();
+  Color RED = Color.fromARGB(255, 255, 0, 0);
+  Color BLUE = Color.fromARGB(255, 0, 0, 255);
+
   @override
   void initState() {
     super.initState();
@@ -24,6 +29,10 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
     profileViewModel = ProfileViewModel();
     neighborhoodViewModel = NeighborhoodViewModel(authViewModel, profileViewModel);
     neighborhoodViewModel.addListener(_onNeighborhoodViewModelChanged);
+
+    focusNode.addListener(() {
+      setState(() => RED = focusNode.hasFocus ? Colors.red : Colors.red);
+    });
   }
 
   @override
@@ -44,31 +53,66 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
 // Method for the user to add a new address using the google API 
 void _showAddNeighborhoodDialog() {
     final TextEditingController neighborhoodController = TextEditingController();
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create New Neighborhood'),
+          title: const Text('Create New Neighborhood',
+            style:TextStyle(
+              color:Color.fromARGB(255, 255, 0, 0),
+              fontWeight: FontWeight.bold),
+              
+          ),
+          
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Address(
+              TextFormField(
+                controller: neighborhoodController,
+                focusNode: focusNode,
+                cursorColor: RED,
+                style: TextStyle(color: RED, fontWeight: FontWeight.bold),
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.home,
+                    color: RED,
+                  ),
+                  enabledBorder:
+                      OutlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 3)),
+                  focusedBorder:
+                      OutlineInputBorder(borderSide: BorderSide(color: Colors.green, width: 3)),
+                ),
+              ),
+              /*Address(
+                
                 controller: neighborhoodController,
                 labelName: 'Neighborhood Name',
-              ),
+                
+              ),*/
             ],
+            
           ),
+          
+          backgroundColor: Color.fromARGB(255, 0, 0, 255),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              
+              style: TextButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 255, 0, 0), // Set background color
+              ),
+
+              child: const Text('Cancel', style:TextStyle(
+                color:Color.fromARGB(255, 0, 0, 255),
+                fontWeight: FontWeight.bold)),
             ),
+            
             ElevatedButton(
               onPressed: () async {
-                if (neighborhoodController.text.trim().isNotEmpty) {
+                if (neighborhoodController.text.trim().isNotEmpty && !running_) {
                   try {
                     //should just add the current user to the neighborhood by default
+                    running_ = true;
 
                     //List<String> userToAdd = [profileViewModel.currentUser!.username];
                     List<String> userToAdd = [authViewModel.user!.uid];
@@ -84,6 +128,9 @@ void _showAddNeighborhoodDialog() {
                             content: Text('Neighborhood added successfully!')),
                       );
                     }
+
+                    running_ = false;
+
                   } catch (e) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,7 +140,14 @@ void _showAddNeighborhoodDialog() {
                   }
                 }
               },
-              child: const Text('Create Neighborhood'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 255, 0, 0), // Set background color
+              ),
+              child: 
+              const Text('Create Neighborhood', 
+                          style:TextStyle(
+                          color:Color.fromARGB(255, 0, 0, 255),
+                          fontWeight: FontWeight.bold)),
             ),
           ],
         );
