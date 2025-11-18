@@ -38,7 +38,6 @@ class _EditItemViewState extends State<EditItemView> {
     'assets/images/power-drill.jpg',
     'assets/images/electrician.jpg',
     'assets/images/bike-repair.jpg',
-    'assets/images/phone-repair.jpg',
   ];
   String? _selectedImagePath = 'images/confused-person.jpg';
   bool _isLoading = false;
