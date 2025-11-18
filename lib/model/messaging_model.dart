@@ -37,15 +37,14 @@ class MessagingModel extends ChangeNotifier {
       }
       _currentUser = AddUser.fromFirestore(userDoc);
 
+      // Gets all chats with the current user's username in the 'members' list
       final QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance.collection('chats').where('members', arrayContains: _currentUser.username).get();
-
       currentChats = snapshot.docs.map((doc) => Chat.fromFirestore(doc)).toList();
 
     } catch (e) {
       print('Error fetching items: $e');
-      // Keep empty list on error
     } finally {
-      notifyListeners(); // Update the UI
+      notifyListeners();
     }
   }
 
@@ -55,10 +54,7 @@ class MessagingModel extends ChangeNotifier {
     super.dispose();
   }
 
-    Future<void> addChat({
-    required String name,
-    required List<String> chatters,
-  }) async {
+    Future<void> addChat({required String name, required List<String> chatters}) async {
     try {
       notifyListeners();
 
@@ -79,11 +75,58 @@ class MessagingModel extends ChangeNotifier {
 
       // Update UI
       notifyListeners();
+
     } catch (e) {
       print('Error adding item: $e');
       notifyListeners();
       rethrow;
     }
     fetchItems();
+  }
+
+  // Method to create borrow request chat and navigate to it
+  Future<Chat?> createBorrowRequestChat({
+    required String itemName,
+    required String lenderUsername,
+    required String currentUsername,
+  }) async {
+    try {
+      notifyListeners();
+
+      // Creates chat name with format: "name of person requesting requests wants name of item"
+      final chatName = '$currentUsername requests $itemName';
+
+      // Create members list (current user and lender)
+      final chatters = [currentUsername, lenderUsername];
+
+      // Create initial message
+      final initialMessage = 'Hi! I would like to borrow your $itemName.';
+
+      // Create the chat with initial message
+      final newChat = Chat(
+        name: chatName,
+        members: chatters,
+        messagesText: [initialMessage],
+        messagesSender: [currentUsername],
+        messages: [Message(sender: currentUsername, message: initialMessage)]
+      );
+
+      // Save to Firestore
+      final docRef = FirebaseFirestore.instance.collection('chats').doc(chatName);
+      await docRef.set(newChat.toFirestore());
+
+      // Update local chats list
+      currentChats.add(newChat);
+
+      // Update UI
+      notifyListeners();
+      
+      return newChat;
+
+    } catch (e) {
+      print('Error creating borrow request chat: $e');
+      notifyListeners();
+      rethrow;
+    }
   }
 }

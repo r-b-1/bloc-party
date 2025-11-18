@@ -5,6 +5,8 @@ import 'package:blocparty/model/item_model.dart';
 import 'package:blocparty/view/widgets/item_search_filter_widget.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
 import 'package:blocparty/view/widgets/neighborhood_selection_widget.dart';
+import 'package:blocparty/model/messaging_model.dart';
+import 'package:blocparty/model/profile_model.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -16,71 +18,97 @@ class HomeView extends StatefulWidget {
     VoidCallback? onTap,
   }) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Image.asset(
-          item.imagePath,
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              'assets/images/confused-person.jpg',
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-            );
-          },
-        ),
-        title: Text(item.name),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(item.description),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: item.isAvailable ? Colors.green : Colors.red,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    item.isAvailable ? 'Available' : 'Unavailable',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  getPortabilityText(item.portability),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    'Listed by: ${item.userId}',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      margin: const EdgeInsets.all(2),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
         onTap:
             onTap ??
             () {
               context.push('/item_description', extra: item);
             },
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AspectRatio(
+                  aspectRatio: 1.2,
+                  child: Image.asset(
+                    item.imagePath,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/confused-person.jpg',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(9.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          text: item.name,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' - ${item.description}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            // Adding chat bubble icon for borrow requests
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.chat_bubble_outline,
+                    color: Colors.blue,
+                    size: 18,
+                  ),
+                  onPressed: () {
+                    // Cast context to access the State class methods
+                    final state = context.findAncestorStateOfType<_HomeViewState>();
+                    state?._showBorrowRequestDialog(context, item);
+                  },
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -103,19 +131,27 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   late ItemViewModel itemViewModel;
   late AuthViewModel authViewModel;
+  // using profile view model to get current user data
+  late ProfileViewModel _profileViewModel;
 
   @override
   void initState() {
     super.initState();
     authViewModel = AuthViewModel();
     itemViewModel = ItemViewModel(authViewModel);
-    // Listen to changes in the ItemViewModel
+    // Initializes profile view model
+    _profileViewModel = ProfileViewModel();
+    // Listens to changes in the ItemViewModel
     itemViewModel.addListener(_onItemViewModelChanged);
+    // Listens to changes in profile view model
+    _profileViewModel.addListener(_onProfileViewModelChanged);
   }
 
   @override
   void dispose() {
     itemViewModel.removeListener(_onItemViewModelChanged);
+    // Removes profile view model listener
+    _profileViewModel.removeListener(_onProfileViewModelChanged);
     itemViewModel.dispose();
     authViewModel.dispose();
     super.dispose();
@@ -127,75 +163,182 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  //  method to refresh items when neighborhood changes
+  // Listens to profile view model changes
+  void _onProfileViewModelChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  //  Method to refresh items when neighborhood changes
   void _refreshItems() {
     itemViewModel.fetchItems();
+  }
+
+  // Method to show borrow request confirmation dialog
+  Future<void> _showBorrowRequestDialog(BuildContext context, Item item) async {
+    final currentUsername = _profileViewModel.currentUser?.username;
+    if (currentUsername == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to send requests')),
+      );
+      return;
+    }
+
+    final shouldProceed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Request to Borrow'),
+          content: Text('Send a borrow request for "${item.name}" to the owner?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Send Request'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldProceed == true) {
+      await _createBorrowRequestChat(context, item, currentUsername);
+    }
+  }
+
+  // Method to create borrow request chat and navigate
+  Future<void> _createBorrowRequestChat(BuildContext context, Item item, String currentUsername) async {
+    try {
+      // Creates messaging model instance
+      final messagingModel = MessagingModel(authViewModel);
+      
+      // Creates the borrow request chat
+      final newChat = await messagingModel.createBorrowRequestChat(
+        itemName: item.name,
+        lenderUsername: item.userId,
+        currentUsername: currentUsername,
+      );
+
+      if (newChat != null) {
+        // Navigates directly to the new chat
+        context.push('/chat', extra: newChat);
+      }
+      
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to create chat: $e')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          Align(
-            alignment:
-                Alignment.topRight, // Positions the button at the bottom center
-            child: ElevatedButton(
-              onPressed: () {
-                context.go('/pick_neighborhood');
-              },
-              child: Text('  NEIGHBORHOOD SELECTION  '),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // neighborhood selection dropdown widget
-          NeighborhoodSelectionWidget(onNeighborhoodChanged: _refreshItems),
-          const SizedBox(height: 16),
-          
-          _buildInfoCard('Notification Request', '0'),
-          _buildInfoCard('Messages', '3 new'),
-          const SizedBox(height: 20),
-          ItemSearchFilterWidget(
-            availableTags: itemViewModel.getAvailableTags(),
-            onSearchChanged: (searchText) {
-              itemViewModel.updateSearchText(searchText);
-            },
-            onTagsChanged: (tags) {
-              itemViewModel.updateSelectedTags(tags);
-            },
-            initialSearchText: itemViewModel.searchText,
-            initialSelectedTags: itemViewModel.selectedTags,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'List of Items (${itemViewModel.filteredItems.length})',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          // Show loading indicator if items are being fetched
-          if (itemViewModel.isLoading)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: CircularProgressIndicator(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      context.go('/pick_neighborhood');
+                    },
+                    child: Text('  NEIGHBORHOOD SELECTION  '),
+                  ),
+                ),
               ),
-            )
-          else
-            // Using the static method
-            ...itemViewModel.filteredItems.map(
-              (item) => HomeView.buildItemTile(context, item),
-            ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              itemViewModel.fetchItems();
-            },
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: NeighborhoodSelectionWidget(
+                  onNeighborhoodChanged: _refreshItems,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: _buildInfoCard('Notification Request', '0'),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: _buildInfoCard('Messages', '3 new'),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: ItemSearchFilterWidget(
+                  availableTags: itemViewModel.getAvailableTags(),
+                  onSearchChanged: (searchText) {
+                    itemViewModel.updateSearchText(searchText);
+                  },
+                  onTagsChanged: (tags) {
+                    itemViewModel.updateSelectedTags(tags);
+                  },
+                  initialSearchText: itemViewModel.searchText,
+                  initialSelectedTags: itemViewModel.selectedTags,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: Text(
+                  'List of Items (${itemViewModel.filteredItems.length})',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (itemViewModel.isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1,
+                    crossAxisSpacing: 0,
+                    mainAxisSpacing: 0,
+                  ),
+                  itemCount: itemViewModel.filteredItems.length,
+                  itemBuilder: (context, index) {
+                    return HomeView.buildItemTile(
+                      context,
+                      itemViewModel.filteredItems[index],
+                    );
+                  },
+                ),
+              SizedBox(
+                width: double.infinity,
+                child: Center(
+                  child: IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () {
+                      itemViewModel.fetchItems();
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
