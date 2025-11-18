@@ -2,17 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Neighborhood {
   final String neighborhoodId;
-  final List<String> neighborhoodUsers;
 
   Neighborhood({
     required this.neighborhoodId,
-    required this.neighborhoodUsers,
   });
 
   Map<String, dynamic> toFirestore() {
     return {
       'neighborhood ID': neighborhoodId,
-      'user ID': neighborhoodUsers,
     };
   }
 
@@ -35,7 +32,6 @@ class Neighborhood {
 
     return Neighborhood(
       neighborhoodId: data['neighborhood ID'] ?? '',
-      neighborhoodUsers: users,
     );
   }
 }

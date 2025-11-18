@@ -36,7 +36,7 @@ class NeighborhoodViewModel extends ChangeNotifier {
 
       neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
       //removes all neighborhoods that has the current user in them
-      neighborhoods.removeWhere(((x) => x.neighborhoodUsers.contains(currentUser)));
+      neighborhoods.removeWhere(((x) => x.neighborhoodId == _profileViewModel.neighborhoods.first));
 
     } catch (e) {
       print('Error fetching neighborhoods: $e');
@@ -48,9 +48,10 @@ class NeighborhoodViewModel extends ChangeNotifier {
   }
 
   // Add this method to create new items
-  Future<void> addNeighborhood({required String neighborhoodIdToAdd, required List<String> neighborhoodUsersToAdd,}) async {
+  Future<void> addNeighborhood({required String neighborhoodIdToAdd,}) async {
     try {
       _error = null;
+      isLoading = true;
       notifyListeners();
 
       /*if (_currentUser == null) {
@@ -60,14 +61,23 @@ class NeighborhoodViewModel extends ChangeNotifier {
       // Creating a new document in firestore
       final docRef = FirebaseFirestore.instance.collection('neighborhood').doc();
 
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('neighborhood').get();
+
+      neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
+
       // Creating the item
       final newNeighborhood = Neighborhood(
         neighborhoodId: neighborhoodIdToAdd,
-        neighborhoodUsers: neighborhoodUsersToAdd,
       );
+      
+
 
       // Saving to Firestore
       await docRef.set(newNeighborhood.toFirestore());
+
+      //join the neighborhood that is created
+      joinNeighborhood(neighborhoodIdToJoin: neighborhoodIdToAdd);
 
       // Adding item to local list and update UI
       notifyListeners();
@@ -85,29 +95,29 @@ class NeighborhoodViewModel extends ChangeNotifier {
   Future<void> joinNeighborhood({required String neighborhoodIdToJoin,}) async {
     try {
       _error = null;
-      notifyListeners();
 
+      isLoading = true;
+      notifyListeners();
       /*if (_currentUser == null) {
         throw Exception('No user logged in');
       }*/
 
-
-      final QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('neighborhood').get();
       
-      neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
-
       // Creating a new document in firestore
-      final docRef = FirebaseFirestore.instance.collection('neighborhood').doc();
+      final docRef = FirebaseFirestore.instance.collection('users').doc(_authViewModel.user!.uid);
 
-      final neighborhoodBeingJoined = neighborhoods.firstWhere((doc) => doc.neighborhoodId == neighborhoodIdToJoin);
+      final newNeighborhoodIDs = neighborhoods.firstWhere((doc) => doc.neighborhoodId == neighborhoodIdToJoin).neighborhoodId;
 
       //adds the current user to the list of users in a neighborhood
-      neighborhoodBeingJoined.neighborhoodUsers.add(_authViewModel.user!.uid);
+      _profileViewModel.neighborhoods.add(neighborhoodIdToJoin);
 
       // Saving to Firestore
-      await docRef.update(neighborhoodBeingJoined.toFirestore());
+      await docRef.update({'neighborhood ID': newNeighborhoodIDs,});
+
+      fetchNeighborhoods();
+
       // Adding item to local list and update UI
+      isLoading = false;
       notifyListeners();
     } catch (e) {
       _error = 'Failed to add item: $e';

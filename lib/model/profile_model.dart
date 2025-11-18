@@ -1,3 +1,4 @@
+import 'package:blocparty/model/neighborhood_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
@@ -10,6 +11,7 @@ class ProfileViewModel extends ChangeNotifier {
   AddUser? _currentUser;
   List<Item> _userItems = [];
   List<String> _addresses = [];
+  List<String> _neighborhoods = [];
   String? _currentAddress;
   bool _isLoading = true;
   String? _error;
@@ -17,6 +19,7 @@ class ProfileViewModel extends ChangeNotifier {
   AddUser? get currentUser => _currentUser;
   List<Item> get userItems => _userItems;
   List<String> get addresses => _addresses;
+  List<String> get neighborhoods => _neighborhoods;
   String? get currentAddress => _currentAddress;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -25,6 +28,40 @@ class ProfileViewModel extends ChangeNotifier {
     // Use Future.microtask to defer initialization until after build
     Future.microtask(() => _fetchUserDataAndItems());
   }
+
+
+
+
+  Future<void> addNeighborhood({required String neighborhoodIdToAdd,}) async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      if (_currentUser == null) {
+        throw Exception('No user logged in');
+      }
+
+
+      // Creating a new document in firestore
+      final docRef = FirebaseFirestore.instance.collection('users').doc(auth.FirebaseAuth.instance.currentUser!.uid);
+
+      if(!neighborhoods.contains(neighborhoodIdToAdd)){
+        neighborhoods.add(neighborhoodIdToAdd);
+      }
+      // Saving to Firestore
+      await docRef.update({"neighborhoodId": neighborhoods});
+
+      // Adding item to local list and update UI
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to add item: $e';
+      print('Error adding item: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+
 
   Future<void> _fetchUserDataAndItems() async {
     try {
@@ -60,6 +97,12 @@ class ProfileViewModel extends ChangeNotifier {
         _currentAddress = _addresses[0];
       }
 
+
+
+      _neighborhoods = _currentUser!.neighborhoodId;
+      
+
+
       // Fetch items from 'items' collection where userId matches username
       final itemsSnapshot = await FirebaseFirestore.instance
           .collection('items')
@@ -69,6 +112,7 @@ class ProfileViewModel extends ChangeNotifier {
       _userItems = itemsSnapshot.docs
           .map((doc) => Item.fromFirestore(doc))
           .toList();
+
     } catch (e) {
       _error = 'Failed to load profile: $e';
       print('Error in ProfileViewModel: $e');

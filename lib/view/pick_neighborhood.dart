@@ -5,13 +5,6 @@ import 'package:blocparty/model/login_model/auth_model.dart';
 
 import 'package:blocparty/model/neighborhoodview_model.dart';
 
-//temp
-final List<String> available_neighborhoods = List<String>.generate(
-  10,
-  (i) => '$i',
-);
-//temp
-
 class PickNeighborhoodView extends StatefulWidget {
   const PickNeighborhoodView({super.key});
 
@@ -79,8 +72,11 @@ void _showAddNeighborhoodDialog() {
 
                     //List<String> userToAdd = [profileViewModel.currentUser!.username];
                     List<String> userToAdd = [authViewModel.user!.uid];
-                    
-                    await neighborhoodViewModel.addNeighborhood(neighborhoodIdToAdd: neighborhoodController.text.trim(), neighborhoodUsersToAdd: userToAdd);
+
+                    await profileViewModel.addNeighborhood(neighborhoodIdToAdd: neighborhoodController.text.trim(),);
+
+                    await neighborhoodViewModel.addNeighborhood(neighborhoodIdToAdd: neighborhoodController.text.trim(),);
+
                     if (context.mounted) {
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -104,6 +100,15 @@ void _showAddNeighborhoodDialog() {
       },
     );
   }
+
+
+
+
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
