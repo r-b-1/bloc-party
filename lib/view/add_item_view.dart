@@ -31,6 +31,9 @@ class _AddItemViewState extends State<AddItemView> {
     'assets/images/bike.jpg',
     'assets/images/wood-bookshelf.jpg',
     'assets/images/power-drill.jpg',
+    'assets/images/electrician.jpg',
+    'assets/images/bike-repair.jpg',
+    'assets/images/phone-repair.jpg',
   ];
   String? _selectedImagePath = 'assets/images/confused-person.jpg';
   bool _isLoading = false;
