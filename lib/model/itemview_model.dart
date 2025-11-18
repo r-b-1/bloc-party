@@ -9,6 +9,7 @@ class ItemViewModel extends ChangeNotifier {
   List<Item> items = [];
   bool isLoading = false;
   final AuthViewModel _authViewModel;
+  bool showOnlyAvaliable = false;
 
   // Filter state properties
   String _searchText = '';
@@ -48,6 +49,9 @@ class ItemViewModel extends ChangeNotifier {
       filtered = filtered.where((item) {
         return _selectedTags.every((tag) => item.tags.contains(tag));
       }).toList();
+    }
+    if (showOnlyAvaliable) {
+      filtered = filtered.where((item) => item.isAvailable).toList();
     }
 
     return filtered;
@@ -152,6 +156,11 @@ class ItemViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners(); // Update the UI
     }
+  }
+
+  void updateShowOnlyAvaliable(bool value) {
+    showOnlyAvaliable = value;
+    notifyListeners();
   }
 
   @override

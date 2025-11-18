@@ -276,6 +276,34 @@ class _HomeViewState extends State<HomeView> {
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(14.0),
+                child: 
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Switch(
+                      value: itemViewModel.showOnlyAvaliable,
+                      onChanged: (bool value) {
+                        itemViewModel.updateShowOnlyAvaliable(value);
+                      },
+                      activeColor: Colors.green,
+                      inactiveThumbColor: Colors.red,
+                    ),
+                    const SizedBox(width: 12),
+                    Text (
+                      itemViewModel.showOnlyAvaliable
+                      ? 'Showing Avaliable'
+                      : 'Showing All',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                  ],
+                ),
+              
+              ),
+              Padding(
+                padding: const EdgeInsets.all(14.0),
                 child: ItemSearchFilterWidget(
                   availableTags: itemViewModel.getAvailableTags(),
                   onSearchChanged: (searchText) {
