@@ -57,10 +57,10 @@ class HomeView extends StatefulWidget {
                         overflow: TextOverflow.ellipsis,
                         text: TextSpan(
                           text: item.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                           children: [
                             TextSpan(
@@ -68,7 +68,7 @@ class HomeView extends StatefulWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.normal,
-                                color: Colors.grey[700],
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                               ),
                             ),
                           ],
@@ -85,7 +85,7 @@ class HomeView extends StatefulWidget {
               right: 8,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
