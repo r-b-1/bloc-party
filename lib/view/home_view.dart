@@ -137,13 +137,17 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+
     authViewModel = AuthViewModel();
-    itemViewModel = ItemViewModel(authViewModel);
-    // Initializes profile view model
+
+    // Initialize profile view model FIRST
     _profileViewModel = ProfileViewModel();
-    // Listens to changes in the ItemViewModel
+
+    // Pass username into item view model
+    itemViewModel = ItemViewModel(authViewModel);
+
+    // Add listeners
     itemViewModel.addListener(_onItemViewModelChanged);
-    // Listens to changes in profile view model
     _profileViewModel.addListener(_onProfileViewModelChanged);
   }
 
