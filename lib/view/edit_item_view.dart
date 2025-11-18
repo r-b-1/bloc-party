@@ -26,18 +26,21 @@ class _EditItemViewState extends State<EditItemView> {
 
   ItemPortability _selectedPortability = ItemPortability.portable;
   final List<String> _imagePaths = [
-    'assets/images/confused-person.jpg',
-    'assets/images/garden-tools.jpg',
-    'assets/images/coffee-table.jpg',
-    'assets/images/dining-table.jpg',
-    'assets/images/dawg.jpg',
-    'assets/images/lawn-mower.jpg',
-    'assets/images/trapped_dog.jpg',
-    'assets/images/bike.jpg',
-    'assets/images/wood-bookshelf.jpg',
-    'assets/images/power-drill.jpg',
+    'images/confused-person.jpg',
+    'images/garden-tools.jpg',
+    'images/coffee-table.jpg',
+    'images/dining-table.jpg',
+    'images/dawg.jpg',
+    'images/lawn-mower.jpg',
+    'images/trapped_dog.jpg',
+    'images/bike.jpg',
+    'images/wood-bookshelf.jpg',
+    'images/power-drill.jpg',
+    'images/electrician.jpg',
+    'images/bike-repair.jpg',
+    'images/phone-repair.jpg',
   ];
-  String? _selectedImagePath = 'assets/images/confused-person.jpg';
+  String? _selectedImagePath = 'images/confused-person.jpg';
   bool _isLoading = false;
 
   // neighborhood selection state
