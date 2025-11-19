@@ -260,7 +260,7 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(14.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Align(
                   alignment: Alignment.topRight,
                   child: ElevatedButton(
@@ -271,25 +271,14 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: NeighborhoodSelectionWidget(
                   onNeighborhoodChanged: _refreshItems,
                 ),
               ),
-              const SizedBox(height: 16),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                child: _buildInfoCard('Notification Request', '0'),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                child: _buildInfoCard('Messages', '3 new'),
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(14.0),
+                padding: const EdgeInsets.all(8.0),
                 child: 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
