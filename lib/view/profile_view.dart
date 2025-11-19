@@ -374,11 +374,9 @@ class _ProfileViewState extends State<ProfileView> {
                         Expanded(
                           child: Stack(
                             children: [
-                              // MODIFIED: Pass current username to prevent showing request button on own items
                               HomeView.buildItemTile(
                                 context,
                                 item,
-                                currentUsername: _profileViewModel.currentUser?.username,
                                 onTap: () {
                                   context.push(
                                     '/item_description',
@@ -572,7 +570,6 @@ class _ProfileViewState extends State<ProfileView> {
               child: HomeView.buildItemTile(
                 context,
                 item,
-                currentUsername: _profileViewModel.currentUser?.username, // ADD: Pass current username
                 onTap: () {
                   context.push('/item_description', extra: item);
                 },
