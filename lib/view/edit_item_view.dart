@@ -38,6 +38,7 @@ class _EditItemViewState extends State<EditItemView> {
     'assets/images/power-drill.jpg',
     'assets/images/electrician.jpg',
     'assets/images/bike-repair.jpg',
+    'assets/images/phone-repair.jpg',
     'assets/images/chainsaw.jpg',
     'assets/images/long_chainsaw.jpg',
     'assets/images/leaf_blower.jpg',
