@@ -2,19 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:blocparty/model/calander_model.dart';
 
-final List<CalendarView> _views = [
-  CalendarView.month,
-  CalendarView.week,
-  CalendarView.day,
-];
-
-final Map<CalendarView, String> _viewNames = {
-  CalendarView.month: "Month",
-  CalendarView.week: "Week",
-  CalendarView.day: "Day",
-};
-
-
 class ScheduleView extends StatefulWidget {
   const ScheduleView({super.key});
 
@@ -23,14 +10,28 @@ class ScheduleView extends StatefulWidget {
 }
 
 class _ScheduleViewState extends State<ScheduleView> {
-  // ADD THIS — the selected view
-  CalendarView _currentView = CalendarView.month;
+  @override
+  void initState() {
+    super.initState();
+    scheduleController.addListener(_onViewChange);
+  }
+
+  @override
+  void dispose() {
+    scheduleController.removeListener(_onViewChange);
+    super.dispose();
+  }
+
+  void _onViewChange() {
+    setState(() {}); // UI refresh when model changes
+  }
 
   @override
   Widget build(BuildContext context) {
     final dataSource = DateScheduled(
-      makeAppointments(2, 0, "Test Appointment", "This is a sample note"),
+      makeAppointments(6, 0, "Test Appointment", "notes"),
     );
+    final TextEditingController controller;
 
     return Scaffold(
       appBar: AppBar(
@@ -38,44 +39,102 @@ class _ScheduleViewState extends State<ScheduleView> {
       ),
       body: Column(
         children: [
-          // Dropdown
           Padding(
             padding: const EdgeInsets.all(12),
-            child: _calendarSelection(),
-          ),
-          // Calendar
-          Expanded(
-            child: SfCalendar(
-              view: _currentView,
-              dataSource: dataSource,
+            child: DropdownButtonFormField<CalendarView>(
+              value: scheduleController.currentView,
+              decoration: const InputDecoration(
+                labelText: 'Calendar View',
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+              items: calendarViews.map((view) {
+                return DropdownMenuItem(
+                  value: view,
+                  child: Text(calendarViewNames[view]!),
+                );
+              }).toList(),
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  scheduleController.setView(newValue);
+                }
+              },
+              isExpanded: true,
             ),
           ),
+          Expanded(
+            child: SfCalendar(
+              key: ValueKey(scheduleController.currentView), 
+  view: scheduleController.currentView,
+  dataSource: dataSource,
+   appointmentBuilder: (context, details) {
+    final Appointment appt = details.appointments.first;
+    return Container(
+      padding: const EdgeInsets.all(4),
+      color: appt.color,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(appt.subject, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          Text(appt.notes ?? '', style: const TextStyle(color: Colors.white70, fontSize: 12)),
         ],
       ),
     );
-  }
-
-  Widget _calendarSelection() {
-    return DropdownButtonFormField<CalendarView>(
-     // value: _currentView,
+  },
+  onTap: (CalendarTapDetails details) {
+    if (details.targetElement == CalendarElement.appointment) {
+      final Appointment appt = details.appointments!.first;
+      final TextEditingController controller = TextEditingController(text: appt.notes);
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text(appt.subject),
+          content: TextField(      
+      controller: controller,
+      maxLines: null, // allows multiline editing
       decoration: const InputDecoration(
-        labelText: 'Calendar View',
-        border: OutlineInputBorder(),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        hintText: 'Enter notes',
       ),
-      items: _views.map((view) {
-        return DropdownMenuItem(
-          value: view,
-          child: Text(_viewNames[view]!),
-        );
-      }).toList(),
-      onChanged: (CalendarView? newValue) {
-        if (newValue != null) {
-            newValue = CalendarView.week;
-            _currentView = newValue ?? _currentView;
-        }
-      },
-      isExpanded: true,
+    ),
+          actions: [
+            //--------------------------------
+            // this was to allow users to update the notes they put in the calendar
+            //--------------------------------
+          //  TextButton(
+          //   onPressed: () {
+
+          //     // Create a new Appointment with updated notes
+          //     final updatedAppt = Appointment(
+          //       startTime: appt.startTime,
+          //       endTime: appt.endTime,
+          //       subject: appt.subject,
+          //       color: appt.color,
+          //       notes: controller.text, // updated notes
+          //     );
+
+          //     // Replace the old appointment in the data source
+          //     final dataSource = DateScheduled(makeAppointments(6, 0, "Test Appointment", ""));
+          //     final index = dataSource.appointments!.indexOf(appt);
+          //     dataSource.appointments![index] = updatedAppt;
+          //     dataSource.notifyListeners(CalendarDataSourceAction.reset, dataSource.appointments!);
+          //     controller.dispose();
+          //     Navigator.pop(context);
+          //   },
+          //   child: const Text('Save'),
+          // ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        ),
+      );
+    }
+  },
+)
+          ),
+        ],
+      ),
     );
   }
 }
