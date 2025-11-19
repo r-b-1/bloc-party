@@ -16,6 +16,7 @@ class HomeView extends StatefulWidget {
     BuildContext context,
     Item item, {
     VoidCallback? onTap,
+    required String? currentUsername,
   }) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -79,34 +80,35 @@ class HomeView extends StatefulWidget {
                 ),
               ],
             ),
-            // Adding chat bubble icon for borrow requests
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.chat_bubble_outline,
-                    color: Colors.blue,
-                    size: 18,
+            // Adding chat bubble icon for borrow requests (only shows icon for other users items)
+             if (currentUsername != null && currentUsername != item.userId)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+                    shape: BoxShape.circle,
                   ),
-                  onPressed: () {
-                    // Cast context to access the State class methods
-                    final state = context.findAncestorStateOfType<_HomeViewState>();
-                    state?._showBorrowRequestDialog(context, item);
-                  },
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.chat_bubble_outline,
+                      color: Colors.blue,
+                      size: 18,
+                    ),
+                    onPressed: () {
+                      // Cast context to access the State class methods
+                      final state = context.findAncestorStateOfType<_HomeViewState>();
+                      state?._showBorrowRequestDialog(context, item);
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 36,
+                      minHeight: 36,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -185,6 +187,14 @@ class _HomeViewState extends State<HomeView> {
     if (currentUsername == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please log in to send requests')),
+      );
+      return;
+    }
+
+    // check if user is trying to request their own item
+    if (currentUsername == item.userId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You cannot request your own item')),
       );
       return;
     }
@@ -343,6 +353,7 @@ class _HomeViewState extends State<HomeView> {
                     return HomeView.buildItemTile(
                       context,
                       itemViewModel.filteredItems[index],
+                      currentUsername: _profileViewModel.currentUser?.username,
                     );
                   },
                 ),
