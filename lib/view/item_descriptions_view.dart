@@ -33,7 +33,7 @@ class ItemDescriptionView extends StatelessWidget {
               'Status: ${item.isAvailable ? 'Available' : 'Unavailable'}',
               style: const TextStyle(fontSize: 18),
             ),
-             const SizedBox(height: 8),
+            const SizedBox(height: 8),
             // display neighborhood information
             Text(
               'Neighborhood: ${item.neighborhoodId.join(', ')}',
@@ -42,7 +42,6 @@ class ItemDescriptionView extends StatelessWidget {
             const SizedBox(height: 8),
             Text('Description: ${item.description}'),
             const SizedBox(height: 8),
-            const Text('Instructions: Instructions for use.'),
             const Spacer(),
             ElevatedButton(
               child: const Text('Schedule'),
