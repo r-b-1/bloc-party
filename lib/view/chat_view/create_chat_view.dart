@@ -2,7 +2,6 @@ import 'package:blocparty/model/messaging_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
-import 'package:blocparty/model/chat_model.dart';
 import 'package:blocparty/model/login_model/user_model.dart';
 
 class CreateChatView extends StatefulWidget {
@@ -80,10 +79,6 @@ class _CreateChatViewState extends State<CreateChatView> {
         });
       }
     }
-  }
-
-  void _save() {
-    print("Chat created");
   }
 
   @override

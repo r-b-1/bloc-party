@@ -42,7 +42,6 @@ class _MessagesViewState extends State<MessagesView> {
     ).push(MaterialPageRoute(builder: (context) => CreateChatView(messagingModel: _messagingModel,)));
   }
 
-  @override
   Widget buildChatTile(BuildContext context, Chat chat) {
     if(chat.messagesText.isEmpty || chat.messagesSender.isEmpty) {
       return ListTile(

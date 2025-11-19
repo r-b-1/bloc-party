@@ -1,9 +1,6 @@
 import 'package:blocparty/model/chat_model.dart';
-import 'package:blocparty/model/login_model/user_model.dart';
 import 'package:blocparty/model/message_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 
 class ChatView extends StatefulWidget {
@@ -49,7 +46,6 @@ class _chatViewState extends State<ChatView> {
   }
 
   Widget buildMessage(BuildContext context, Message mes) {
-    final theme = Theme.of(context);
     if(_chatModel.currentUser?.username == mes.sender) {
       return Column(
         mainAxisSize: MainAxisSize.min,
