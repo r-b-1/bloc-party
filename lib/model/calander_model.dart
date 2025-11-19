@@ -25,14 +25,12 @@ List<Appointment> makeAppointments(
   ];
 }
 
-
 ///  Calendar DataSource
 class DateScheduled extends CalendarDataSource {
   DateScheduled(List<Appointment> source) {
     appointments = source;
   }
 }
-
 
 ///  Global calendar view options
 final List<CalendarView> calendarViews = [
@@ -60,3 +58,36 @@ class ScheduleController extends ChangeNotifier {
 
 /// Global instance used everywhere
 final ScheduleController scheduleController = ScheduleController();
+
+SfCalendar makeCalendar({
+  required CalendarView view,
+  required CalendarDataSource dataSource,
+  required void Function(CalendarTapDetails) onTap,
+}) {
+  return SfCalendar(
+    key: ValueKey(view),
+    view: view,
+    dataSource: dataSource,
+    appointmentBuilder: (context, details) {
+      final Appointment appt = details.appointments.first;
+      return Container(
+        padding: const EdgeInsets.all(4),
+        color: appt.color,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              appt.subject,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              appt.notes ?? '',
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+          ],
+        ),
+      );
+    },
+    onTap: onTap,
+  );
+}
