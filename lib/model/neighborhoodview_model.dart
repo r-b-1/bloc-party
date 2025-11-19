@@ -36,7 +36,9 @@ class NeighborhoodViewModel extends ChangeNotifier {
 
       neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
       //removes all neighborhoods that has the current user in them
-      neighborhoods.removeWhere(((x) => x.neighborhoodId == _profileViewModel.neighborhoods.first));
+      for(String userNeighborhood in _profileViewModel.neighborhoods){
+        neighborhoods.removeWhere(((x) => x.neighborhoodId == userNeighborhood));
+      }
 
     } catch (e) {
       print('Error fetching neighborhoods: $e');
@@ -77,7 +79,7 @@ class NeighborhoodViewModel extends ChangeNotifier {
       await docRef.set(newNeighborhood.toFirestore());
 
       //join the neighborhood that is created
-      //joinNeighborhood(neighborhoodIdToJoin: neighborhoodIdToAdd);
+      joinNeighborhood(neighborhoodIdToJoin: neighborhoodIdToAdd);
 
       // Adding item to local list and update UI
       notifyListeners();
@@ -102,24 +104,20 @@ class NeighborhoodViewModel extends ChangeNotifier {
         throw Exception('No user logged in');
       }*/
 
-      
-      // Creating a new document in firestore
-      final docRef = FirebaseFirestore.instance.collection('users').doc(_authViewModel.user!.uid);
+      if(!_profileViewModel.neighborhoods.contains(neighborhoodIdToJoin)){
+        // Creating a new document in firestore
+        final docRef = FirebaseFirestore.instance.collection('users').doc(_authViewModel.user!.uid);
 
-      final newNeighborhoodID = neighborhoods.firstWhere((doc) => doc.neighborhoodId == neighborhoodIdToJoin).neighborhoodId;
+        //adds the neighborhoods to the users list of neighborhoods
+        
+        _profileViewModel.neighborhoods.add(neighborhoodIdToJoin);
 
-      //adds the neighborhoods to the users list of neighborhoods
-      
-      _profileViewModel.neighborhoods.add(neighborhoodIdToJoin);
+        // set the current neighborhood
+        await docRef.update({'neighborhoodId': _profileViewModel.neighborhoods,});
 
-      // set the current neighborhood
-      await docRef.update({'neighborhood ID': newNeighborhoodID,});
-      await docRef.update({'neighborhoodId': _profileViewModel.neighborhoods,});
-
-      fetchNeighborhoods();
-
-      // Adding item to local list and update UI
-      isLoading = false;
+        // Adding item to local list and update UI
+        isLoading = false;
+      }
       notifyListeners();
     } catch (e) {
       _error = 'Failed to add item: $e';

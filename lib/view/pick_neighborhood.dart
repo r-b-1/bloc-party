@@ -21,6 +21,7 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
   FocusNode focusNode = FocusNode();
   Color RED = Color.fromARGB(255, 255, 0, 0);
   Color BLUE = Color.fromARGB(255, 0, 0, 255);
+  Color GREEN = Color.fromARGB(255, 0, 255, 0);
 
   @override
   void initState() {
@@ -57,11 +58,29 @@ void _showAddNeighborhoodDialog() {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create New Neighborhood',
-            style:TextStyle(
-              color:Color.fromARGB(255, 255, 0, 0),
-              fontWeight: FontWeight.bold),
-              
+          title: 
+          Stack(
+            children: <Widget>[
+              // Stroked text as border.
+              Text(
+                'Create Neighborhood',
+                style: TextStyle(
+                  fontSize: 40,
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 5
+                    ..color = GREEN,
+                ),
+              ),
+              // Solid text as fill.
+              Text(
+                'Create Neighborhood',
+                style: TextStyle(
+                  fontSize: 40,
+                  color: RED,
+                ),
+              ),
+            ],
           ),
           
           content: Column(
@@ -70,17 +89,18 @@ void _showAddNeighborhoodDialog() {
               TextFormField(
                 controller: neighborhoodController,
                 focusNode: focusNode,
-                cursorColor: RED,
-                style: TextStyle(color: RED, fontWeight: FontWeight.bold),
+                cursorColor: GREEN,
+                style: TextStyle(color: GREEN, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
+                  
+                  enabledBorder:
+                      OutlineInputBorder(borderSide: BorderSide(color: RED, width: 3)),
+                  focusedBorder:
+                      OutlineInputBorder(borderSide: BorderSide(color: GREEN, width: 3)),
                   prefixIcon: Icon(
                     Icons.home,
-                    color: RED,
+                    color: GREEN,
                   ),
-                  enabledBorder:
-                      OutlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 3)),
-                  focusedBorder:
-                      OutlineInputBorder(borderSide: BorderSide(color: Colors.green, width: 3)),
                 ),
               ),
               /*Address(
@@ -102,8 +122,8 @@ void _showAddNeighborhoodDialog() {
                 backgroundColor: Color.fromARGB(255, 255, 0, 0), // Set background color
               ),
 
-              child: const Text('Cancel', style:TextStyle(
-                color:Color.fromARGB(255, 0, 0, 255),
+              child: Text('Cancel', style:TextStyle(
+                color: GREEN,
                 fontWeight: FontWeight.bold)),
             ),
             
@@ -144,9 +164,9 @@ void _showAddNeighborhoodDialog() {
                 backgroundColor: Color.fromARGB(255, 255, 0, 0), // Set background color
               ),
               child: 
-              const Text('Create Neighborhood', 
+              Text('Create Neighborhood', 
                           style:TextStyle(
-                          color:Color.fromARGB(255, 0, 0, 255),
+                          color: GREEN,
                           fontWeight: FontWeight.bold)),
             ),
           ],
@@ -198,9 +218,16 @@ void _showAddNeighborhoodDialog() {
             title: Text('Neighborhood: ${neighborhoodViewModel.neighborhoods[index].neighborhoodId}'),
             subtitle: Text('Description'),
             trailing: IconButton(
-              onPressed: () {
+              onPressed: () async{
                 //do neighborhood change/join logic here
-                neighborhoodViewModel.joinNeighborhood(neighborhoodIdToJoin: neighborhoodViewModel.neighborhoods[index].neighborhoodId);
+                if(!running_){
+                  running_ = true;
+
+                  await neighborhoodViewModel.joinNeighborhood(neighborhoodIdToJoin: neighborhoodViewModel.neighborhoods[index].neighborhoodId);
+                  neighborhoodViewModel.fetchNeighborhoods();
+
+                  running_ = false;
+                }
               },
               icon: Icon(Icons.add_home_work),
             ),
