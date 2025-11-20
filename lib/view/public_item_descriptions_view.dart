@@ -138,7 +138,6 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
             const SizedBox(height: 8),
             Text('Owner: ${widget.item.userId}'),
             const SizedBox(height: 8),
-            const Text('Instructions: Instructions for use.'),
             const Spacer(),
             // Request button - only show if the item is not owned by current user
             if (_profileViewModel.currentUser?.username != widget.item.userId)
