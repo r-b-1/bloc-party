@@ -88,4 +88,3 @@ class ThemeProvider extends ChangeNotifier {
     }
   }
 }
-

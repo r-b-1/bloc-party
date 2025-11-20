@@ -67,7 +67,9 @@ class HomeView extends StatefulWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.normal,
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.7),
                               ),
                             ),
                           ],
@@ -180,8 +182,7 @@ class _HomeViewState extends State<HomeView> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: 
-                Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Switch(
@@ -193,18 +194,17 @@ class _HomeViewState extends State<HomeView> {
                       inactiveThumbColor: Colors.red,
                     ),
                     const SizedBox(width: 12),
-                    Text (
+                    Text(
                       itemViewModel.showOnlyAvaliable
-                      ? 'Showing Avaliable'
-                      : 'Showing All',
+                          ? 'Showing Avaliable'
+                          : 'Showing All',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        ),
                       ),
+                    ),
                   ],
                 ),
-              
               ),
               Padding(
                 padding: const EdgeInsets.all(14.0),

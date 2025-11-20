@@ -4,19 +4,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 
-class Chat{
+class Chat {
   final String name; // Stores the chat name
   final List<String> members; // Stores the list of members by username
   List<String> messagesText = []; // Stores the message's text
   List<String> messagesSender = []; // Stores the message's sender in a list
-  List<Message> messages = []; // Stores the messages as a message object for displaying them easier
+  List<Message> messages =
+      []; // Stores the messages as a message object for displaying them easier
 
   Chat({
     required this.name,
     required this.members,
     required this.messagesText,
     required this.messagesSender,
-    required this.messages
+    required this.messages,
   });
 
   // Builds the chat from firebase
@@ -57,10 +58,15 @@ class Chat{
       messageSenderData = [];
     }
 
-    // Builds the Message class list  
+    // Builds the Message class list
     List<Message> messagesToAdd = [];
-    for(int i = 0; i < messageTextData.length; i++) {
-      messagesToAdd.add(Message(sender: messageSenderData.elementAt(i), message: messageTextData.elementAt(i)));
+    for (int i = 0; i < messageTextData.length; i++) {
+      messagesToAdd.add(
+        Message(
+          sender: messageSenderData.elementAt(i),
+          message: messageTextData.elementAt(i),
+        ),
+      );
     }
 
     // Builds the Chat from the firebase data
@@ -69,7 +75,7 @@ class Chat{
       members: memberDataList,
       messagesText: messageTextData,
       messagesSender: messageSenderData,
-      messages: messagesToAdd
+      messages: messagesToAdd,
     );
   }
 
@@ -79,28 +85,29 @@ class Chat{
       'name': name,
       'members': members,
       'messagetext': messagesText,
-      'messagesender': messagesSender
+      'messagesender': messagesSender,
     };
   }
 }
 
 // Handles functions of a single chat
-class ChatModel extends ChangeNotifier{
-  Chat ?currentChat;
+class ChatModel extends ChangeNotifier {
+  Chat? currentChat;
   bool isLoading = false;
   late DocumentReference<Map<String, dynamic>> docRef;
-  AddUser ?currentUser;
+  AddUser? currentUser;
 
   // Initializes with a specific chat
   ChatModel(Chat curChat) {
     getCurrentChatUser();
     currentChat = curChat;
-    docRef = FirebaseFirestore.instance.collection('chats').doc(currentChat?.name);
+    docRef = FirebaseFirestore.instance
+        .collection('chats')
+        .doc(currentChat?.name);
   }
 
   // Updates the chat with new data from firebase
   Future<void> updateChat() async {
-    
     isLoading = true;
 
     // Gets the chat from firebase and sets the currentChat to that
@@ -115,7 +122,10 @@ class ChatModel extends ChangeNotifier{
     if (authUser == null) {
       throw Exception('No user logged in');
     }
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(authUser.uid).get();
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(authUser.uid)
+        .get();
     if (!userDoc.exists) {
       throw Exception('User document not found');
     }
@@ -125,7 +135,6 @@ class ChatModel extends ChangeNotifier{
 
   // Sends a message
   Future<void> addMessage(String messageText) async {
-    
     isLoading = true;
 
     // Gets Current User
@@ -134,12 +143,15 @@ class ChatModel extends ChangeNotifier{
     if (authUser == null) {
       throw Exception('No user logged in');
     }
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(authUser.uid).get();
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(authUser.uid)
+        .get();
     if (!userDoc.exists) {
       throw Exception('User document not found');
     }
     _currentUser = AddUser.fromFirestore(userDoc);
-    
+
     // Updates the currentChat with the latest data from firebase
     await updateChat();
 
@@ -155,6 +167,4 @@ class ChatModel extends ChangeNotifier{
     await updateChat();
     isLoading = false;
   }
-
-
 }

@@ -37,15 +37,17 @@ class _MessagesViewState extends State<MessagesView> {
   }
 
   void _navigateToAddChat() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => CreateChatView(messagingModel: _messagingModel,)));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateChatView(messagingModel: _messagingModel),
+      ),
+    );
   }
 
   Widget buildChatTile(BuildContext context, Chat chat) {
-    if(chat.messagesText.isEmpty || chat.messagesSender.isEmpty) {
+    if (chat.messagesText.isEmpty || chat.messagesSender.isEmpty) {
       return ListTile(
-        leading: CircleAvatar(child: Text(chat.name.characters.first),),
+        leading: CircleAvatar(child: Text(chat.name.characters.first)),
         title: Text(chat.name),
         subtitle: Text("No messages yet..."),
         onTap: () {
@@ -54,9 +56,11 @@ class _MessagesViewState extends State<MessagesView> {
       );
     } else {
       return ListTile(
-        leading: CircleAvatar(child: Text(chat.name.characters.first),),
+        leading: CircleAvatar(child: Text(chat.name.characters.first)),
         title: Text(chat.name),
-        subtitle: Text(chat.messagesSender.last + ": " + chat.messagesText.last),
+        subtitle: Text(
+          chat.messagesSender.last + ": " + chat.messagesText.last,
+        ),
         onTap: () {
           context.push('/chat', extra: chat);
         },
@@ -72,7 +76,9 @@ class _MessagesViewState extends State<MessagesView> {
         padding: EdgeInsets.all(16),
         child: ListView(
           children: [
-            ..._messagingModel.currentChats.map((item) => buildChatTile(context, item)),
+            ..._messagingModel.currentChats.map(
+              (item) => buildChatTile(context, item),
+            ),
             const SizedBox(height: 16),
             Positioned(
               right: 16,
@@ -89,7 +95,7 @@ class _MessagesViewState extends State<MessagesView> {
             ),
           ],
         ),
-      )  
+      ),
     );
   }
 }

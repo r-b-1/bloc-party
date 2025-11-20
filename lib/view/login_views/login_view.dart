@@ -8,9 +8,7 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SignInScreen(
-      providers: [
-        EmailAuthProvider(),
-      ],
+      providers: [EmailAuthProvider()],
       headerBuilder: (context, constraints, shrinkOffset) {
         return Padding(
           padding: EdgeInsets.all(1),
@@ -79,10 +77,9 @@ class LoginView extends StatelessWidget {
         // }),
         AuthStateChangeAction<SignedIn>((context, state) {
           // GoRouter will handle navigation automatically
-          if (state.user?.emailVerified == true){
-          context.go('/home');
-          }
-          else {
+          if (state.user?.emailVerified == true) {
+            context.go('/home');
+          } else {
             context.go('/verify-email');
           }
         }),

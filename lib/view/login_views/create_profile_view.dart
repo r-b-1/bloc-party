@@ -41,19 +41,23 @@ class _CreateProfileViewState extends State<CreateProfileView> {
         return;
       }
 
-          final usernameQuery = await FirebaseFirestore.instance
-        .collection('users')
-        .where('username', isEqualTo: _usernameController.text.trim())
-        .limit(1)
-        .get();
+      final usernameQuery = await FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isEqualTo: _usernameController.text.trim())
+          .limit(1)
+          .get();
 
-    if (usernameQuery.docs.isNotEmpty) {
-      // username is already taken
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Username already taken. Please use another Username')),
-      );
-      return; // stop here
-    }
+      if (usernameQuery.docs.isNotEmpty) {
+        // username is already taken
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Username already taken. Please use another Username',
+            ),
+          ),
+        );
+        return; // stop here
+      }
 
       final uid = user.uid;
 
@@ -61,8 +65,8 @@ class _CreateProfileViewState extends State<CreateProfileView> {
         username: _usernameController.text.trim(),
         name: _fullNameController.text.trim(),
         email: user.email ?? '',
-        addresses: [_addressController.text.trim()], 
-        currentAddress: _addressController.text.trim()
+        addresses: [_addressController.text.trim()],
+        currentAddress: _addressController.text.trim(),
       );
 
       await FirebaseFirestore.instance
@@ -108,21 +112,23 @@ class _CreateProfileViewState extends State<CreateProfileView> {
           child: Column(
             children: [
               const SizedBox(height: 16),
-              Name(controller: _usernameController,labelName: 'Username' ),
+              Name(controller: _usernameController, labelName: 'Username'),
               const SizedBox(height: 16),
-              Name(controller:_fullNameController, labelName: 'Full Name',),
+              Name(controller: _fullNameController, labelName: 'Full Name'),
               const SizedBox(height: 16),
-              Address(controller: _addressController, labelName: 'Main Address',),
+              Address(
+                controller: _addressController,
+                labelName: 'Main Address',
+              ),
               const SizedBox(height: 32),
 
               // Show a loading indicator or the button
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
-                      onPressed:
-                      _saveProfile,
+                      onPressed: _saveProfile,
                       child: const Text('Save and Continue'),
-              ),
+                    ),
             ],
           ),
         ),

@@ -13,7 +13,7 @@ class ChatView extends StatefulWidget {
 
 class _chatViewState extends State<ChatView> {
   late ChatModel _chatModel;
-  Chat ?currChat;
+  Chat? currChat;
   final _messageText = TextEditingController();
 
   _chatViewState(Chat curChat) {
@@ -25,7 +25,9 @@ class _chatViewState extends State<ChatView> {
     super.initState();
     _chatModel = ChatModel(currChat!);
     _chatModel.addListener(_onViewModelChanged);
-    _chatModel.docRef.snapshots().listen((DocumentSnapshot snapshot) {_chatModel.updateChat();});
+    _chatModel.docRef.snapshots().listen((DocumentSnapshot snapshot) {
+      _chatModel.updateChat();
+    });
   }
 
   void _onViewModelChanged() {
@@ -46,11 +48,11 @@ class _chatViewState extends State<ChatView> {
   }
 
   Widget buildMessage(BuildContext context, Message mes) {
-    if(_chatModel.currentUser?.username == mes.sender) {
+    if (_chatModel.currentUser?.username == mes.sender) {
       return Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
-        children: [ 
+        children: [
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: Colors.blue.shade600, width: 3),
@@ -68,16 +70,13 @@ class _chatViewState extends State<ChatView> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   mes.message,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.white),
                 ),
               ],
             ),
@@ -88,7 +87,7 @@ class _chatViewState extends State<ChatView> {
       return Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [ 
+        children: [
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade600, width: 3),
@@ -106,16 +105,13 @@ class _chatViewState extends State<ChatView> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   mes.message,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.white),
                 ),
               ],
             ),
@@ -134,20 +130,22 @@ class _chatViewState extends State<ChatView> {
         child: ListView(
           children: [
             if (_chatModel.isLoading)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: CircularProgressIndicator(),
-              ),
-            )
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(),
+                ),
+              )
             else
-            ..._chatModel.currentChat!.messages.map((mes) => buildMessage(context, mes)),
-            const SizedBox(height: 16,),
+              ..._chatModel.currentChat!.messages.map(
+                (mes) => buildMessage(context, mes),
+              ),
+            const SizedBox(height: 16),
             TextField(
               decoration: const InputDecoration(labelText: "Message"),
-              controller: _messageText
+              controller: _messageText,
             ),
-            const SizedBox(height: 16,),
+            const SizedBox(height: 16),
             ElevatedButton(onPressed: _sendMessage, child: Icon(Icons.send)),
           ],
         ),

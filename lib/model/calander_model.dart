@@ -1,28 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-
+final uid = FirebaseAuth.instance.currentUser!.uid;
 
 ///  Appointment creation logic
-List<Appointment> makeAppointments(
-  int hours,
-  int days,
-  String sub,
-  String notes,
+List<Appointment> convertToCalendarAppointments(
+  List<UserAppointment> userAppts,
 ) {
-  final DateTime now = DateTime.now();
-  final DateTime startTime = DateTime(now.year, now.month, now.day, 9, 0, 0);
-  final DateTime endTime = startTime.add(Duration(days: days, hours: hours));
+  return userAppts
+      .map(
+        (u) => Appointment(
+          startTime: u.startTime!,
+          endTime: u.endTime!,
+          subject: u.subject ?? '',
+          color: u.color ?? Colors.blue,
+        ),
+      )
+      .toList();
+}
 
-  return [
-    Appointment(
-      startTime: startTime,
-      endTime: endTime,
-      subject: sub,
-      color: Colors.blue,
-      notes: 'this is a test',
-    ),
-  ];
+class UserAppointment {
+  DateTime? startTime;
+  DateTime? endTime;
+  String? subject;
+  Color? color;
+  String? notes;
+  String? userId;
+
+  UserAppointment({
+    this.startTime,
+    this.endTime,
+    this.subject,
+    this.color,
+    this.notes,
+    this.userId,
+  });
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'startTime': startTime,
+      'endTime': endTime,
+      'subject': subject,
+      'color': color?.value,
+      'notes': notes,
+      'userId': userId,
+    };
+  }
+
+  factory UserAppointment.fromFirestore(Map<String, dynamic> data) {
+    return UserAppointment(
+      startTime: (data['startTime'] as DateTime),
+      endTime: (data['endTime'] as DateTime),
+      subject: data['subject'] ?? '',
+      color: data['color'] != null ? Color(data['color'] as int) : null,
+      notes: data['notes'] ?? '',
+      userId: data['userId'] ?? '',
+    );
+  }
+}
+
+Future<List<UserAppointment>> fetchUserAppointments() async {
+  // 1. Use the 'await' keyword inside the 'async' function
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final snapshot = await FirebaseFirestore.instance
+      .collection('user_appointment')
+      .where('userId', isEqualTo: uid)
+      .get();
+  return snapshot.docs
+      .map((doc) => UserAppointment.fromFirestore(doc.data()))
+      .toList();
 }
 
 ///  Calendar DataSource
@@ -45,7 +93,6 @@ final Map<CalendarView, String> calendarViewNames = {
   CalendarView.day: "Day",
 };
 
-
 ///  Global controller (used by the UI)
 class ScheduleController extends ChangeNotifier {
   CalendarView currentView = CalendarView.week;
@@ -58,6 +105,7 @@ class ScheduleController extends ChangeNotifier {
 
 /// Global instance used everywhere
 final ScheduleController scheduleController = ScheduleController();
+
 
 SfCalendar makeCalendar({
   required CalendarView view,

@@ -31,7 +31,11 @@ class _CreateChatViewState extends State<CreateChatView> {
 
     try {
       // Parse tags from comma-separated string
-      List<String> chatters = _chatRecipeients.text.split(',').map((tag) => tag.trim()).where((tag) => tag.isNotEmpty).toList();
+      List<String> chatters = _chatRecipeients.text
+          .split(',')
+          .map((tag) => tag.trim())
+          .where((tag) => tag.isNotEmpty)
+          .toList();
 
       final authUser = auth.FirebaseAuth.instance.currentUser;
       if (authUser == null) {
@@ -50,14 +54,18 @@ class _CreateChatViewState extends State<CreateChatView> {
       _currentUser = AddUser.fromFirestore(userDoc);
       chatters.add(_currentUser!.username);
 
-      final QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance.collection('chats').where('name', isEqualTo: _chatName.text).get();
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance
+              .collection('chats')
+              .where('name', isEqualTo: _chatName.text)
+              .get();
       if (snapshot.docs.isNotEmpty) {
         throw Exception('Same name as another chat');
       }
 
       await widget.messagingModel.addChat(
         name: _chatName.text,
-        chatters: chatters
+        chatters: chatters,
       );
 
       if (mounted) {
@@ -93,14 +101,16 @@ class _CreateChatViewState extends State<CreateChatView> {
             children: [
               TextFormField(
                 controller: _chatName,
-                decoration: const InputDecoration(labelText: "Chat name (must be unique across the platform)"),
+                decoration: const InputDecoration(
+                  labelText: "Chat name (must be unique across the platform)",
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a chat name';
-                 }
+                  }
                   return null;
                 },
-              ) ,
+              ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _chatRecipeients,
@@ -113,11 +123,14 @@ class _CreateChatViewState extends State<CreateChatView> {
                 },
               ),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: _submitItem, child: Text("Create Chat")),
+              ElevatedButton(
+                onPressed: _submitItem,
+                child: Text("Create Chat"),
+              ),
             ],
           ),
         ),
-      )
+      ),
     );
   }
 }
