@@ -21,9 +21,7 @@ GoRouter goRouts() {
       FirebaseAuth.instance.authStateChanges(),
     ),
     routes: [
-      GoRoute(
-       path: '/auth',
-       builder: (context, state) => LoginView()),
+      GoRoute(path: '/auth', builder: (context, state) => LoginView()),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterView(),
@@ -31,7 +29,7 @@ GoRouter goRouts() {
       GoRoute(
         path: '/verify-email',
         builder: (context, state) => const VerifyEmailView(),
-       ),
+      ),
       GoRoute(
         path: '/create-profile',
         builder: (context, state) => const CreateProfileView(),
@@ -52,11 +50,11 @@ GoRouter goRouts() {
         builder: (context, state) => const ScheduleView(),
       ),
       GoRoute(
-        path: '/chat', 
+        path: '/chat',
         builder: (context, state) {
           final chat = state.extra as Chat;
           return ChatView(curChat: chat);
-        }
+        },
       ),
       GoRoute(
         path: '/pick_neighborhood',

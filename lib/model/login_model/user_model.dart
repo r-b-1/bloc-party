@@ -73,10 +73,10 @@ class AddUser {
     );
   }
 
-    //   Future<bool> isUsernameTaken(String username) async {
-    //   final doc = await FirebaseFirestore.instance.collection('usernames').doc(username).get();
-    //   return doc.exists;
-    // }
+  //   Future<bool> isUsernameTaken(String username) async {
+  //   final doc = await FirebaseFirestore.instance.collection('usernames').doc(username).get();
+  //   return doc.exists;
+  // }
 
   Map<String, dynamic> toFirestore() {
     return {

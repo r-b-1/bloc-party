@@ -56,7 +56,6 @@ class NeighborhoodSelectionModel extends ChangeNotifier {
       } else {
         _userNeighborhoods = [];
       }
-
     } catch (e) {
       _error = 'Failed to load neighborhoods: $e';
       print('Error in NeighborhoodSelectionModel: $e');
@@ -102,9 +101,7 @@ class NeighborhoodSelectionModel extends ChangeNotifier {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(authUser.uid)
-          .update({
-            'neighborhoodId': _userNeighborhoods,
-          });
+          .update({'neighborhoodId': _userNeighborhoods});
 
       // ADD: Call the callback to notify about neighborhood change
       _onNeighborhoodChanged?.call();

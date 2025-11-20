@@ -69,7 +69,9 @@ class HomeView extends StatefulWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.normal,
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.7),
                               ),
                             ),
                           ],
@@ -81,13 +83,15 @@ class HomeView extends StatefulWidget {
               ],
             ),
             // Adding chat bubble icon for borrow requests (only shows icon for other users items)
-             if (currentUsername != null && currentUsername != item.userId)
+            if (currentUsername != null && currentUsername != item.userId)
               Positioned(
                 top: 8,
                 right: 8,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surface.withOpacity(0.9),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -98,7 +102,8 @@ class HomeView extends StatefulWidget {
                     ),
                     onPressed: () {
                       // Cast context to access the State class methods
-                      final state = context.findAncestorStateOfType<_HomeViewState>();
+                      final state = context
+                          .findAncestorStateOfType<_HomeViewState>();
                       state?._showBorrowRequestDialog(context, item);
                     },
                     padding: EdgeInsets.zero,
@@ -204,7 +209,9 @@ class _HomeViewState extends State<HomeView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Request to Borrow'),
-          content: Text('Send a borrow request for "${item.name}" to the owner?'),
+          content: Text(
+            'Send a borrow request for "${item.name}" to the owner?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -225,11 +232,15 @@ class _HomeViewState extends State<HomeView> {
   }
 
   // Method to create borrow request chat and navigate
-  Future<void> _createBorrowRequestChat(BuildContext context, Item item, String currentUsername) async {
+  Future<void> _createBorrowRequestChat(
+    BuildContext context,
+    Item item,
+    String currentUsername,
+  ) async {
     try {
       // Creates messaging model instance
       final messagingModel = MessagingModel(authViewModel);
-      
+
       // Creates the borrow request chat
       final newChat = await messagingModel.createBorrowRequestChat(
         itemName: item.name,
@@ -241,11 +252,10 @@ class _HomeViewState extends State<HomeView> {
         // Navigates directly to the new chat
         context.push('/chat', extra: newChat);
       }
-      
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to create chat: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to create chat: $e')));
     }
   }
 
@@ -279,8 +289,7 @@ class _HomeViewState extends State<HomeView> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: 
-                Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Switch(
@@ -292,18 +301,17 @@ class _HomeViewState extends State<HomeView> {
                       inactiveThumbColor: Colors.red,
                     ),
                     const SizedBox(width: 12),
-                    Text (
+                    Text(
                       itemViewModel.showOnlyAvaliable
-                      ? 'Showing Avaliable'
-                      : 'Showing All',
+                          ? 'Showing Avaliable'
+                          : 'Showing All',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        ),
                       ),
+                    ),
                   ],
                 ),
-              
               ),
               Padding(
                 padding: const EdgeInsets.all(14.0),

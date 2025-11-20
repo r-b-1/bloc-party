@@ -39,7 +39,7 @@ class Item {
   }
 
   factory Item.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    if (!doc.exists )  {
+    if (!doc.exists) {
       throw Exception('Document does not exist');
     }
     final data = doc.data();

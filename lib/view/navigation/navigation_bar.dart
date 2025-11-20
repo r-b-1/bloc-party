@@ -19,7 +19,6 @@ class _MainNavigationState extends State<MainNavigation> {
     MessagesView(),
     ScheduleView(),
     ProfileView(),
-
   ];
 
   void _onItemTapped(int index) {
@@ -36,14 +35,17 @@ class _MainNavigationState extends State<MainNavigation> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today),label: 'schedule'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'schedule',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
         onTap: _onItemTapped,
         //needed .fixed if we are using more then three navigations on the bar
-        type:BottomNavigationBarType.fixed
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }

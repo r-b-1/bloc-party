@@ -378,7 +378,8 @@ class _ProfileViewState extends State<ProfileView> {
                               HomeView.buildItemTile(
                                 context,
                                 item,
-                                currentUsername: _profileViewModel.currentUser?.username,
+                                currentUsername:
+                                    _profileViewModel.currentUser?.username,
                                 onTap: () {
                                   context.push(
                                     '/item_description',
@@ -572,7 +573,9 @@ class _ProfileViewState extends State<ProfileView> {
               child: HomeView.buildItemTile(
                 context,
                 item,
-                currentUsername: _profileViewModel.currentUser?.username, // ADD: Pass current username
+                currentUsername: _profileViewModel
+                    .currentUser
+                    ?.username, // ADD: Pass current username
                 onTap: () {
                   context.push('/item_description', extra: item);
                 },
