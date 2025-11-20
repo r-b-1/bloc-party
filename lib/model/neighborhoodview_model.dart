@@ -35,10 +35,12 @@ class NeighborhoodViewModel extends ChangeNotifier {
         await FirebaseFirestore.instance.collection('neighborhood').get();
 
       neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
+
       //removes all neighborhoods that has the current user in them
-      for(String userNeighborhood in _profileViewModel.neighborhoods){
+
+      /*for(String userNeighborhood in _profileViewModel.neighborhoods){
         neighborhoods.removeWhere(((x) => x.neighborhoodId == userNeighborhood));
-      }
+      }*/
 
     } catch (e) {
       print('Error fetching neighborhoods: $e');
@@ -118,6 +120,47 @@ class NeighborhoodViewModel extends ChangeNotifier {
         // Adding item to local list and update UI
         isLoading = false;
       }
+
+
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to add item: $e';
+      print('Error adding item: $e');
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+
+
+
+  // Add this method to create new items
+  Future<void> leaveNeighborhood({required String neighborhoodIdToLeave,}) async {
+    try {
+      _error = null;
+
+      isLoading = true;
+      notifyListeners();
+      /*if (_currentUser == null) {
+        throw Exception('No user logged in');
+      }*/
+
+      if(_profileViewModel.neighborhoods.contains(neighborhoodIdToLeave)){
+        // Creating a new document in firestore
+        final docRef = FirebaseFirestore.instance.collection('users').doc(_authViewModel.user!.uid);
+
+        //adds the neighborhoods to the users list of neighborhoods
+        
+        _profileViewModel.neighborhoods.remove(neighborhoodIdToLeave);
+
+        // set the current neighborhood
+        await docRef.update({'neighborhoodId': _profileViewModel.neighborhoods,});
+
+        // Adding item to local list and update UI
+        isLoading = false;
+      }
+
+
       notifyListeners();
     } catch (e) {
       _error = 'Failed to add item: $e';

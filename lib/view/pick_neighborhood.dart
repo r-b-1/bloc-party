@@ -204,35 +204,40 @@ void _showAddNeighborhoodDialog() {
           ),
         ],
       ),
-      
       body: ListView.builder(
         itemCount: neighborhoodViewModel.neighborhoods.length,
         
         itemBuilder: (context, index) {
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Color.fromARGB(255, 240 * (index % 2), 0, 240 * ((index-1) % 2)),
-              child: Icon(Icons.home, color: Color.fromARGB(255, 240 * ((index-1) % 2), 0, 240 * (index % 2))),
-            ),
 
-            title: Text('Neighborhood: ${neighborhoodViewModel.neighborhoods[index].neighborhoodId}'),
-            subtitle: Text('Description'),
-            trailing: IconButton(
-              onPressed: () async{
-                //do neighborhood change/join logic here
-                if(!running_){
-                  running_ = true;
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Color.fromARGB(255, 240 * (index % 2), 0, 240 * ((index-1) % 2)),
+                child: Icon(Icons.home, color: Color.fromARGB(255, 240 * ((index-1) % 2), 0, 240 * (index % 2))),
+              ),
 
-                  await neighborhoodViewModel.joinNeighborhood(neighborhoodIdToJoin: neighborhoodViewModel.neighborhoods[index].neighborhoodId);
-                  neighborhoodViewModel.fetchNeighborhoods();
+              title: Text('Neighborhood: ${neighborhoodViewModel.neighborhoods[index].neighborhoodId}'),
+              subtitle: Text('Description'),
+              trailing: IconButton(
+                onPressed: () async{
+                  //do neighborhood change/join logic here
+                  if(!running_){
+                    running_ = true;
 
-                  running_ = false;
-                }
-              },
-              icon: Icon(Icons.add_home_work),
-            ),
-            
-          );
+                    if(profileViewModel.neighborhoods.contains(neighborhoodViewModel.neighborhoods[index].neighborhoodId)){
+                      await neighborhoodViewModel.leaveNeighborhood(neighborhoodIdToLeave: neighborhoodViewModel.neighborhoods[index].neighborhoodId);
+                    }
+                    else{
+                      await neighborhoodViewModel.joinNeighborhood(neighborhoodIdToJoin: neighborhoodViewModel.neighborhoods[index].neighborhoodId);
+                    }
+                    neighborhoodViewModel.fetchNeighborhoods();
+
+                    running_ = false;
+                  }
+                },
+                icon: Icon(profileViewModel.neighborhoods.contains(neighborhoodViewModel.neighborhoods[index].neighborhoodId) ? Icons.remove : Icons.add_home_work),
+              ),
+              
+            );
         },
       ),
     );

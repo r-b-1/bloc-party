@@ -253,7 +253,7 @@ class _HomeViewState extends State<HomeView> {
                     onPressed: () {
                       context.go('/pick_neighborhood');
                     },
-                    child: Text('  NEIGHBORHOOD SELECTION  '),
+                    child: Text('NEIGHBORHOOD SELECTION'),
                   ),
                 ),
               ),
