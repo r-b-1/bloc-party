@@ -5,15 +5,15 @@ import 'package:blocparty/model/messaging_model.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
 import 'package:blocparty/model/profile_model.dart';
 
-class ItemDescriptionView extends StatefulWidget {
+class PrivateItemDescriptionView extends StatefulWidget {
   final Item item;
-  const ItemDescriptionView({super.key, required this.item});
+  const PrivateItemDescriptionView({super.key, required this.item});
 
   @override
-  State<ItemDescriptionView> createState() => _ItemDescriptionViewState();
+  State<PrivateItemDescriptionView> createState() => _PrivateItemDescriptionViewState();
 }
 
-class _ItemDescriptionViewState extends State<ItemDescriptionView> {
+class _PrivateItemDescriptionViewState extends State<PrivateItemDescriptionView> {
   late ProfileViewModel _profileViewModel;
   late AuthViewModel _authViewModel;
 
@@ -143,7 +143,7 @@ class _ItemDescriptionViewState extends State<ItemDescriptionView> {
             // Request button - only show if the item is not owned by current user
             if (_profileViewModel.currentUser?.username != widget.item.userId)
               ElevatedButton(
-                child: const Text('Request'),
+                child: const Text('Schedule'),
                 onPressed: () {
                   _showBorrowRequestDialog(context);
                 },

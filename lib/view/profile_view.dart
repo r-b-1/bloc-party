@@ -379,7 +379,7 @@ class _ProfileViewState extends State<ProfileView> {
                                 item,
                                 onTap: () {
                                   context.push(
-                                    '/item_description',
+                                    '/private_item_description',
                                     extra: item,
                                   );
                                 },
