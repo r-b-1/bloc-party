@@ -46,7 +46,6 @@ class _ScheduleViewState extends State<ScheduleView> {
 
   @override
   Widget build(BuildContext context) {
-    final dataSource = DateScheduled(getTestAppointments());
     final TextEditingController controller;
 
     return Scaffold(
@@ -80,7 +79,21 @@ class _ScheduleViewState extends State<ScheduleView> {
             ),
           ),
           Expanded(
-            child: SfCalendar(
+            child: FutureBuilder(
+              future: fetchUserAppointments(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+
+      // Convert Firestore → Syncfusion Appointments
+      final appts = convertToCalendarAppointments(snapshot.data!);
+      final dataSource = DateScheduled(appts);
+            return SfCalendar(
               key: ValueKey(scheduleController.currentView),
               view: scheduleController.currentView,
               dataSource: dataSource,
@@ -141,6 +154,8 @@ class _ScheduleViewState extends State<ScheduleView> {
                   );
                 }
               },
+            );
+            },
             ),
           ),
         ],
