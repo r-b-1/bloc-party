@@ -36,8 +36,18 @@ class _EditItemViewState extends State<EditItemView> {
     'assets/images/bike.jpg',
     'assets/images/wood-bookshelf.jpg',
     'assets/images/power-drill.jpg',
+    'assets/images/electrician.jpg',
+    'assets/images/bike-repair.jpg',
+    'assets/images/phone-repair.jpg',
+    'assets/images/chainsaw.jpg',
+    'assets/images/long_chainsaw.jpg',
+    'assets/images/leaf_blower.jpg',
+    'assets/images/pink_car.jpg',
+    'assets/images/sly_dog.jpg',
+    'assets/images/snow_blower.jpg',
+    'assets/images/table_saw.jpg',
   ];
-  String? _selectedImagePath = 'assets/images/confused-person.jpg';
+  String? _selectedImagePath = 'images/confused-person.jpg';
   bool _isLoading = false;
 
   // neighborhood selection state
@@ -68,13 +78,14 @@ class _EditItemViewState extends State<EditItemView> {
     _selectedPortability = widget.item.portability;
     _tagsController.text = widget.item.tags.join(', ');
     _selectedImagePath = widget.item.imagePath;
-    
+
     // Set initial neighborhood from item data
     if (widget.item.neighborhoodId.isNotEmpty) {
       _selectedNeighborhood = widget.item.neighborhoodId.first;
     } else {
       // Fallback to user's first neighborhood if item has none
-      final neighborhoods = widget.profileViewModel.currentUser?.neighborhoodId ?? [];
+      final neighborhoods =
+          widget.profileViewModel.currentUser?.neighborhoodId ?? [];
       if (neighborhoods.isNotEmpty) {
         _selectedNeighborhood = neighborhoods.first;
       }
@@ -283,7 +294,8 @@ class _EditItemViewState extends State<EditItemView> {
 
   // widget to build neighborhood dropdown using profile view model data
   Widget _buildNeighborhoodDropdown() {
-    final neighborhoods = widget.profileViewModel.currentUser?.neighborhoodId ?? [];
+    final neighborhoods =
+        widget.profileViewModel.currentUser?.neighborhoodId ?? [];
 
     if (neighborhoods.isEmpty) {
       return const Text(
@@ -300,10 +312,7 @@ class _EditItemViewState extends State<EditItemView> {
         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       items: neighborhoods.map((neighborhood) {
-        return DropdownMenuItem(
-          value: neighborhood,
-          child: Text(neighborhood),
-        );
+        return DropdownMenuItem(value: neighborhood, child: Text(neighborhood));
       }).toList(),
       onChanged: (String? newValue) {
         if (newValue != null) {

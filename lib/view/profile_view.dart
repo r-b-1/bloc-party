@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:blocparty/model/profile_model.dart';
+import 'package:blocparty/model/theme_provider.dart';
 import 'package:blocparty/view/home_view.dart';
 import 'package:blocparty/view/add_item_view.dart';
 import 'package:blocparty/view/edit_item_view.dart';
@@ -205,6 +207,19 @@ class _ProfileViewState extends State<ProfileView> {
                 ? null
                 : () => _profileViewModel.refresh(),
           ),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return IconButton(
+                icon: Icon(
+                  themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                ),
+                onPressed: () => themeProvider.toggleTheme(),
+                tooltip: themeProvider.isDarkMode
+                    ? 'Switch to light mode'
+                    : 'Switch to dark mode',
+              );
+            },
+          ),
           ElevatedButton(
             onPressed: () async {
               await _profileViewModel.signOutUser();
@@ -276,12 +291,20 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
                 Text(
                   _profileViewModel.currentUser?.email ?? '',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   '${_profileViewModel.userItems.length} items listed',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 // neighborhood selection dropdown widget
@@ -307,15 +330,26 @@ class _ProfileViewState extends State<ProfileView> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Container(
                     height: 200,
-                    child: const Center(
+                    child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.inventory_2, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
+                          Icon(
+                            Icons.inventory_2,
+                            size: 64,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withOpacity(0.5),
+                          ),
+                          const SizedBox(height: 16),
                           Text(
                             'No items listed yet',
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.7),
+                              fontSize: 16,
+                            ),
                           ),
                         ],
                       ),
@@ -344,7 +378,10 @@ class _ProfileViewState extends State<ProfileView> {
                                 context,
                                 item,
                                 onTap: () {
-                                  context.push('/item_description', extra: item);
+                                  context.push(
+                                    '/private_item_description',
+                                    extra: item,
+                                  );
                                 },
                               ),
                               // ADD: Edit icon positioned in top-right corner of item tile
@@ -353,7 +390,9 @@ class _ProfileViewState extends State<ProfileView> {
                                 right: 8,
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.surface.withOpacity(0.9),
                                     shape: BoxShape.circle,
                                   ),
                                   child: IconButton(
@@ -433,19 +472,25 @@ class _ProfileViewState extends State<ProfileView> {
             ),
             const SizedBox(height: 8),
             if (_profileViewModel.addresses.isEmpty)
-              const Text(
+              Text(
                 'No addresses found. Add your first address!',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                ),
               )
             else
               Column(
                 children: [
-                  const Text(
+                  Text(
                     'Tap an address to set it as your current address:',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -454,7 +499,11 @@ class _ProfileViewState extends State<ProfileView> {
                         address == _profileViewModel.currentAddress;
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
-                      color: isCurrent ? Colors.blue.shade50 : null,
+                      color: isCurrent
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.1)
+                          : null,
                       child: ListTile(
                         dense: true,
                         leading: Icon(
@@ -462,7 +511,11 @@ class _ProfileViewState extends State<ProfileView> {
                               ? Icons.location_on
                               : Icons.location_on_outlined,
                           size: 20,
-                          color: isCurrent ? Colors.blue : Colors.grey,
+                          color: isCurrent
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.6),
                         ),
                         title: Text(
                           address,
@@ -471,6 +524,7 @@ class _ProfileViewState extends State<ProfileView> {
                             fontWeight: isCurrent
                                 ? FontWeight.bold
                                 : FontWeight.normal,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         trailing: IconButton(

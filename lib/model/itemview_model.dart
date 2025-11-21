@@ -9,6 +9,8 @@ class ItemViewModel extends ChangeNotifier {
   List<Item> items = [];
   bool isLoading = false;
   final AuthViewModel _authViewModel;
+  bool showOnlyAvaliable = false;
+  String? currentUsername;
 
   // Filter state properties
   String _searchText = '';
@@ -38,6 +40,13 @@ class ItemViewModel extends ChangeNotifier {
   List<Item> get filteredItems {
     List<Item> filtered = items;
 
+    // Filter out current user's items upfront
+    if (currentUsername != null && currentUsername!.isNotEmpty) {
+      filtered = filtered.where((item) {
+        return item.userId != currentUsername;
+      }).toList();
+    }
+
     if (_searchText.isNotEmpty) {
       filtered = filtered.where((item) {
         return item.name.toLowerCase().contains(_searchText.toLowerCase());
@@ -49,13 +58,28 @@ class ItemViewModel extends ChangeNotifier {
         return _selectedTags.every((tag) => item.tags.contains(tag));
       }).toList();
     }
+    if (showOnlyAvaliable) {
+      filtered = filtered.where((item) => item.isAvailable).toList();
+    }
 
     return filtered;
   }
 
   List<String> getAvailableTags() {
     Set<String> uniqueTags = {};
-    for (var item in items) {
+    // Use filteredItems to exclude user's own items, but we need to get tags
+    // from items that would be visible (excluding user's items) without
+    // applying search/tag/availability filters to keep the tag list stable
+    List<Item> itemsForTags = items;
+
+    // Filter out current user's items (same logic as filteredItems)
+    if (currentUsername != null && currentUsername!.isNotEmpty) {
+      itemsForTags = itemsForTags.where((item) {
+        return item.userId != currentUsername;
+      }).toList();
+    }
+
+    for (var item in itemsForTags) {
       uniqueTags.addAll(item.tags);
     }
     return uniqueTags.toList();
@@ -113,6 +137,7 @@ class ItemViewModel extends ChangeNotifier {
           .get();
 
       final neighborhoodData = userDoc.data()?['neighborhoodId'];
+      this.currentUsername = userDoc.data()?['username'] ?? '';
       List<String> neighborhoodIds = [];
       if (neighborhoodData is List) {
         neighborhoodIds = neighborhoodData
@@ -152,6 +177,11 @@ class ItemViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners(); // Update the UI
     }
+  }
+
+  void updateShowOnlyAvaliable(bool value) {
+    showOnlyAvaliable = value;
+    notifyListeners();
   }
 
   @override

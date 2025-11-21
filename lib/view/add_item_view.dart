@@ -31,6 +31,16 @@ class _AddItemViewState extends State<AddItemView> {
     'assets/images/bike.jpg',
     'assets/images/wood-bookshelf.jpg',
     'assets/images/power-drill.jpg',
+    'assets/images/electrician.jpg',
+    'assets/images/bike-repair.jpg',
+    'assets/images/phone-repair.jpg',
+    'assets/images/chainsaw.jpg',
+    'assets/images/long_chainsaw.jpg',
+    'assets/images/leaf_blower.jpg',
+    'assets/images/pink_car.jpg',
+    'assets/images/sly_dog.jpg',
+    'assets/images/snow_blower.jpg',
+    'assets/images/table_saw.jpg',
   ];
   String? _selectedImagePath = 'assets/images/confused-person.jpg';
   bool _isLoading = false;
@@ -58,7 +68,8 @@ class _AddItemViewState extends State<AddItemView> {
 
   // method to set initial neighborhood from profile view model
   void _setInitialNeighborhood() {
-    final neighborhoods = widget.profileViewModel.currentUser?.neighborhoodId ?? [];
+    final neighborhoods =
+        widget.profileViewModel.currentUser?.neighborhoodId ?? [];
     if (neighborhoods.isNotEmpty) {
       _selectedNeighborhood = neighborhoods.first;
     }
@@ -266,7 +277,8 @@ class _AddItemViewState extends State<AddItemView> {
 
   // widget to build neighborhood dropdown using profile view model data
   Widget _buildNeighborhoodDropdown() {
-    final neighborhoods = widget.profileViewModel.currentUser?.neighborhoodId ?? [];
+    final neighborhoods =
+        widget.profileViewModel.currentUser?.neighborhoodId ?? [];
 
     if (neighborhoods.isEmpty) {
       return const Text(
@@ -283,10 +295,7 @@ class _AddItemViewState extends State<AddItemView> {
         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       items: neighborhoods.map((neighborhood) {
-        return DropdownMenuItem(
-          value: neighborhood,
-          child: Text(neighborhood),
-        );
+        return DropdownMenuItem(value: neighborhood, child: Text(neighborhood));
       }).toList(),
       onChanged: (String? newValue) {
         if (newValue != null) {

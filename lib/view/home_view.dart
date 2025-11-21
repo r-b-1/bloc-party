@@ -5,7 +5,6 @@ import 'package:blocparty/model/item_model.dart';
 import 'package:blocparty/view/widgets/item_search_filter_widget.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
 import 'package:blocparty/view/widgets/neighborhood_selection_widget.dart';
-import 'package:blocparty/model/messaging_model.dart';
 import 'package:blocparty/model/profile_model.dart';
 
 class HomeView extends StatefulWidget {
@@ -25,7 +24,7 @@ class HomeView extends StatefulWidget {
         onTap:
             onTap ??
             () {
-              context.push('/item_description', extra: item);
+              context.push('/public_item_description', extra: item);
             },
         child: Stack(
           children: [
@@ -57,10 +56,10 @@ class HomeView extends StatefulWidget {
                         overflow: TextOverflow.ellipsis,
                         text: TextSpan(
                           text: item.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                           children: [
                             TextSpan(
@@ -68,7 +67,9 @@ class HomeView extends StatefulWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.normal,
-                                color: Colors.grey[700],
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withOpacity(0.7),
                               ),
                             ),
                           ],
@@ -78,34 +79,6 @@ class HomeView extends StatefulWidget {
                   ),
                 ),
               ],
-            ),
-            // Adding chat bubble icon for borrow requests
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.chat_bubble_outline,
-                    color: Colors.blue,
-                    size: 18,
-                  ),
-                  onPressed: () {
-                    // Cast context to access the State class methods
-                    final state = context.findAncestorStateOfType<_HomeViewState>();
-                    state?._showBorrowRequestDialog(context, item);
-                  },
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
-                  ),
-                ),
-              ),
             ),
           ],
         ),
@@ -137,13 +110,17 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+
     authViewModel = AuthViewModel();
-    itemViewModel = ItemViewModel(authViewModel);
-    // Initializes profile view model
+
+    // Initialize profile view model FIRST
     _profileViewModel = ProfileViewModel();
-    // Listens to changes in the ItemViewModel
+
+    // Pass username into item view model
+    itemViewModel = ItemViewModel(authViewModel);
+
+    // Add listeners
     itemViewModel.addListener(_onItemViewModelChanged);
-    // Listens to changes in profile view model
     _profileViewModel.addListener(_onProfileViewModelChanged);
   }
 
@@ -175,66 +152,6 @@ class _HomeViewState extends State<HomeView> {
     itemViewModel.fetchItems();
   }
 
-  // Method to show borrow request confirmation dialog
-  Future<void> _showBorrowRequestDialog(BuildContext context, Item item) async {
-    final currentUsername = _profileViewModel.currentUser?.username;
-    if (currentUsername == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to send requests')),
-      );
-      return;
-    }
-
-    final shouldProceed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Request to Borrow'),
-          content: Text('Send a borrow request for "${item.name}" to the owner?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Send Request'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldProceed == true) {
-      await _createBorrowRequestChat(context, item, currentUsername);
-    }
-  }
-
-  // Method to create borrow request chat and navigate
-  Future<void> _createBorrowRequestChat(BuildContext context, Item item, String currentUsername) async {
-    try {
-      // Creates messaging model instance
-      final messagingModel = MessagingModel(authViewModel);
-      
-      // Creates the borrow request chat
-      final newChat = await messagingModel.createBorrowRequestChat(
-        itemName: item.name,
-        lenderUsername: item.userId,
-        currentUsername: currentUsername,
-      );
-
-      if (newChat != null) {
-        // Navigates directly to the new chat
-        context.push('/chat', extra: newChat);
-      }
-      
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to create chat: $e')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -246,7 +163,7 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(14.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Align(
                   alignment: Alignment.topRight,
                   child: ElevatedButton(
@@ -257,23 +174,38 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: NeighborhoodSelectionWidget(
                   onNeighborhoodChanged: _refreshItems,
                 ),
               ),
-              const SizedBox(height: 16),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                child: _buildInfoCard('Notification Request', '0'),
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Switch(
+                      value: itemViewModel.showOnlyAvaliable,
+                      onChanged: (bool value) {
+                        itemViewModel.updateShowOnlyAvaliable(value);
+                      },
+                      activeColor: Colors.green,
+                      inactiveThumbColor: Colors.red,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      itemViewModel.showOnlyAvaliable
+                          ? 'Showing Avaliable'
+                          : 'Showing All',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                child: _buildInfoCard('Messages', '3 new'),
-              ),
-              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(14.0),
                 child: ItemSearchFilterWidget(

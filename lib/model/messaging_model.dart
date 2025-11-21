@@ -24,23 +24,30 @@ class MessagingModel extends ChangeNotifier {
   void fetchItems() async {
     notifyListeners();
     try {
-
       // Gets Current User
       AddUser _currentUser;
       final authUser = auth.FirebaseAuth.instance.currentUser;
       if (authUser == null) {
         throw Exception('No user logged in');
       }
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(authUser.uid).get();
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(authUser.uid)
+          .get();
       if (!userDoc.exists) {
         throw Exception('User document not found');
       }
       _currentUser = AddUser.fromFirestore(userDoc);
 
       // Gets all chats with the current user's username in the 'members' list
-      final QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance.collection('chats').where('members', arrayContains: _currentUser.username).get();
-      currentChats = snapshot.docs.map((doc) => Chat.fromFirestore(doc)).toList();
-
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance
+              .collection('chats')
+              .where('members', arrayContains: _currentUser.username)
+              .get();
+      currentChats = snapshot.docs
+          .map((doc) => Chat.fromFirestore(doc))
+          .toList();
     } catch (e) {
       print('Error fetching items: $e');
     } finally {
@@ -54,7 +61,10 @@ class MessagingModel extends ChangeNotifier {
     super.dispose();
   }
 
-    Future<void> addChat({required String name, required List<String> chatters}) async {
+  Future<void> addChat({
+    required String name,
+    required List<String> chatters,
+  }) async {
     try {
       notifyListeners();
 
@@ -67,7 +77,7 @@ class MessagingModel extends ChangeNotifier {
         members: chatters,
         messagesText: [],
         messagesSender: [],
-        messages: []
+        messages: [],
       );
 
       // Saving to Firestore
@@ -75,7 +85,6 @@ class MessagingModel extends ChangeNotifier {
 
       // Update UI
       notifyListeners();
-
     } catch (e) {
       print('Error adding item: $e');
       notifyListeners();
@@ -108,11 +117,13 @@ class MessagingModel extends ChangeNotifier {
         members: chatters,
         messagesText: [initialMessage],
         messagesSender: [currentUsername],
-        messages: [Message(sender: currentUsername, message: initialMessage)]
+        messages: [Message(sender: currentUsername, message: initialMessage)],
       );
 
       // Save to Firestore
-      final docRef = FirebaseFirestore.instance.collection('chats').doc(chatName);
+      final docRef = FirebaseFirestore.instance
+          .collection('chats')
+          .doc(chatName);
       await docRef.set(newChat.toFirestore());
 
       // Update local chats list
@@ -120,9 +131,8 @@ class MessagingModel extends ChangeNotifier {
 
       // Update UI
       notifyListeners();
-      
-      return newChat;
 
+      return newChat;
     } catch (e) {
       print('Error creating borrow request chat: $e');
       notifyListeners();

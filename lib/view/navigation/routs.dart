@@ -4,7 +4,7 @@ import 'package:blocparty/flutter_backend/go_router.dart'; // main function to g
 
 import 'package:blocparty/view/navigation/navigation_bar.dart'; //Navigation
 import 'package:blocparty/view/chat_view/chat_view.dart'; //chat view
-import 'package:blocparty/view/item_descriptions_view.dart'; //Item dicription
+import 'package:blocparty/view/private_item_descriptions_view.dart'; //Item dicription
 import 'package:blocparty/view/login_views/login_view.dart'; //Login
 import 'package:blocparty/view/schedule_view.dart'; //schedule
 import 'package:blocparty/view/login_views/register_view.dart'; //register
@@ -13,6 +13,8 @@ import 'package:firebase_auth/firebase_auth.dart'; //Fire_auth
 import 'package:blocparty/view/pick_neighborhood.dart'; //Pick Neighborhood
 import 'package:blocparty/model/item_model.dart'; //Item Model
 import 'package:blocparty/view/login_views/verify_email_view.dart'; //Verify that there email is real
+import 'package:blocparty/view/public_item_descriptions_view.dart'; //Public Item Description
+import 'package:blocparty/view/private_item_descriptions_view.dart'; //Private Item Description
 
 GoRouter goRouts() {
   final GoRouter router = GoRouter(
@@ -21,9 +23,7 @@ GoRouter goRouts() {
       FirebaseAuth.instance.authStateChanges(),
     ),
     routes: [
-      GoRoute(
-       path: '/auth',
-       builder: (context, state) => LoginView()),
+      GoRoute(path: '/auth', builder: (context, state) => LoginView()),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterView(),
@@ -31,7 +31,7 @@ GoRouter goRouts() {
       GoRoute(
         path: '/verify-email',
         builder: (context, state) => const VerifyEmailView(),
-       ),
+      ),
       GoRoute(
         path: '/create-profile',
         builder: (context, state) => const CreateProfileView(),
@@ -41,10 +41,17 @@ GoRouter goRouts() {
         builder: (context, state) => const MainNavigation(),
       ),
       GoRoute(
-        path: '/item_description',
+        path: '/public_item_description',
         builder: (context, state) {
           final item = state.extra as Item;
-          return ItemDescriptionView(item: item);
+          return PublicItemDescriptionView(item: item);
+        },
+      ),
+      GoRoute(
+        path: '/private_item_description',
+        builder: (context, state) {
+          final item = state.extra as Item;
+          return PrivateItemDescriptionView(item: item);
         },
       ),
       GoRoute(
@@ -52,11 +59,11 @@ GoRouter goRouts() {
         builder: (context, state) => const ScheduleView(),
       ),
       GoRoute(
-        path: '/chat', 
+        path: '/chat',
         builder: (context, state) {
           final chat = state.extra as Chat;
           return ChatView(curChat: chat);
-        }
+        },
       ),
       GoRoute(
         path: '/pick_neighborhood',

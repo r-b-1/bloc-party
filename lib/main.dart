@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'package:blocparty/view/navigation/routs.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:blocparty/model/theme_provider.dart';
 
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
@@ -14,27 +16,29 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Change file name here to change themes
-  final themeData = await loadThemeFromJson('blue_appainter_theme.json');
-
-  runApp(MyApp(clientId: clientId, theme: themeData));
+  runApp(MyApp(clientId: clientId));
 }
 
 class MyApp extends StatelessWidget {
   final String clientId;
-  final ThemeData theme;
 
-  const MyApp({super.key, required this.clientId, required this.theme});
+  const MyApp({super.key, required this.clientId});
 
   @override
   Widget build(BuildContext context) {
     GoRouter router = goRouts();
 
-    return MaterialApp.router(
-      title: 'BlocParty',
-      theme: theme,
-
-      routerConfig: router,
+    return ChangeNotifierProvider<ThemeProvider>(
+      create: (context) => ThemeProvider(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp.router(
+            title: 'BlocParty',
+            theme: themeProvider.themeData,
+            routerConfig: router,
+          );
+        },
+      ),
     );
   }
 }

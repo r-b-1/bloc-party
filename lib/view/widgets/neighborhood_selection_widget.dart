@@ -5,14 +5,16 @@ import 'package:blocparty/model/neighborhood_selection_model.dart';
 class NeighborhoodSelectionWidget extends StatefulWidget {
   // callback for when neighborhood selection changes
   final VoidCallback? onNeighborhoodChanged;
-  
+
   const NeighborhoodSelectionWidget({super.key, this.onNeighborhoodChanged});
 
   @override
-  State<NeighborhoodSelectionWidget> createState() => _NeighborhoodSelectionWidgetState();
+  State<NeighborhoodSelectionWidget> createState() =>
+      _NeighborhoodSelectionWidgetState();
 }
 
-class _NeighborhoodSelectionWidgetState extends State<NeighborhoodSelectionWidget> {
+class _NeighborhoodSelectionWidgetState
+    extends State<NeighborhoodSelectionWidget> {
   late NeighborhoodSelectionModel _neighborhoodModel;
 
   @override
@@ -48,10 +50,7 @@ class _NeighborhoodSelectionWidgetState extends State<NeighborhoodSelectionWidge
           children: [
             const Text(
               'Neighborhood Selection',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             _buildNeighborhoodDropdown(),
@@ -110,13 +109,11 @@ class _NeighborhoodSelectionWidgetState extends State<NeighborhoodSelectionWidge
         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
       items: _neighborhoodModel.userNeighborhoods.map((neighborhood) {
-        return DropdownMenuItem(
-          value: neighborhood,
-          child: Text(neighborhood),
-        );
+        return DropdownMenuItem(value: neighborhood, child: Text(neighborhood));
       }).toList(),
       onChanged: (String? newValue) {
-        if (newValue != null && newValue != _neighborhoodModel.currentNeighborhood) {
+        if (newValue != null &&
+            newValue != _neighborhoodModel.currentNeighborhood) {
           _neighborhoodModel.setCurrentNeighborhood(newValue);
         }
       },
