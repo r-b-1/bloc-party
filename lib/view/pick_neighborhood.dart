@@ -28,7 +28,10 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
     super.initState();
     authViewModel = AuthViewModel();
     profileViewModel = ProfileViewModel();
-    neighborhoodViewModel = NeighborhoodViewModel(authViewModel, profileViewModel);
+    neighborhoodViewModel = NeighborhoodViewModel(
+      authViewModel,
+      profileViewModel,
+    );
     neighborhoodViewModel.addListener(_onNeighborhoodViewModelChanged);
 
     focusNode.addListener(() {
@@ -50,16 +53,16 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
       setState(() {});
     }
   }
-  
-// Method for the user to add a new address using the google API 
-void _showAddNeighborhoodDialog() {
-    final TextEditingController neighborhoodController = TextEditingController();
+
+  // Method for the user to add a new address using the google API
+  void _showAddNeighborhoodDialog() {
+    final TextEditingController neighborhoodController =
+        TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: 
-          Stack(
+          title: Stack(
             children: <Widget>[
               // Stroked text as border.
               Text(
@@ -75,14 +78,11 @@ void _showAddNeighborhoodDialog() {
               // Solid text as fill.
               Text(
                 'Create Neighborhood',
-                style: TextStyle(
-                  fontSize: 40,
-                  color: RED,
-                ),
+                style: TextStyle(fontSize: 40, color: RED),
               ),
             ],
           ),
-          
+
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -92,15 +92,13 @@ void _showAddNeighborhoodDialog() {
                 cursorColor: GREEN,
                 style: TextStyle(color: GREEN, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
-                  
-                  enabledBorder:
-                      OutlineInputBorder(borderSide: BorderSide(color: RED, width: 3)),
-                  focusedBorder:
-                      OutlineInputBorder(borderSide: BorderSide(color: GREEN, width: 3)),
-                  prefixIcon: Icon(
-                    Icons.home,
-                    color: GREEN,
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: RED, width: 3),
                   ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: GREEN, width: 3),
+                  ),
+                  prefixIcon: Icon(Icons.home, color: GREEN),
                 ),
               ),
               /*Address(
@@ -110,26 +108,32 @@ void _showAddNeighborhoodDialog() {
                 
               ),*/
             ],
-            
           ),
-          
+
           backgroundColor: Color.fromARGB(255, 0, 0, 255),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              
+
               style: TextButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 255, 0, 0), // Set background color
+                backgroundColor: Color.fromARGB(
+                  255,
+                  255,
+                  0,
+                  0,
+                ), // Set background color
               ),
 
-              child: Text('Cancel', style:TextStyle(
-                color: GREEN,
-                fontWeight: FontWeight.bold)),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: GREEN, fontWeight: FontWeight.bold),
+              ),
             ),
-            
+
             ElevatedButton(
               onPressed: () async {
-                if (neighborhoodController.text.trim().isNotEmpty && !running_) {
+                if (neighborhoodController.text.trim().isNotEmpty &&
+                    !running_) {
                   try {
                     //should just add the current user to the neighborhood by default
                     running_ = true;
@@ -137,46 +141,53 @@ void _showAddNeighborhoodDialog() {
                     //List<String> userToAdd = [profileViewModel.currentUser!.username];
                     List<String> userToAdd = [authViewModel.user!.uid];
 
-                    await profileViewModel.addNeighborhood(neighborhoodIdToAdd: neighborhoodController.text.trim(),);
+                    await profileViewModel.addNeighborhood(
+                      neighborhoodIdToAdd: neighborhoodController.text.trim(),
+                    );
 
-                    await neighborhoodViewModel.addNeighborhood(neighborhoodIdToAdd: neighborhoodController.text.trim(),);
+                    await neighborhoodViewModel.addNeighborhood(
+                      neighborhoodIdToAdd: neighborhoodController.text.trim(),
+                    );
 
                     if (context.mounted) {
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('Neighborhood added successfully!')),
+                          content: Text('Neighborhood added successfully!'),
+                        ),
                       );
                     }
 
                     running_ = false;
-
                   } catch (e) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to add neighborhood: $e')),
+                        SnackBar(
+                          content: Text('Failed to add neighborhood: $e'),
+                        ),
                       );
                     }
                   }
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 255, 0, 0), // Set background color
+                backgroundColor: Color.fromARGB(
+                  255,
+                  255,
+                  0,
+                  0,
+                ), // Set background color
               ),
-              child: 
-              Text('Create Neighborhood', 
-                          style:TextStyle(
-                          color: GREEN,
-                          fontWeight: FontWeight.bold)),
+              child: Text(
+                'Create Neighborhood',
+                style: TextStyle(color: GREEN, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         );
       },
     );
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -200,38 +211,60 @@ void _showAddNeighborhoodDialog() {
       ),
       body: ListView.builder(
         itemCount: neighborhoodViewModel.neighborhoods.length,
-        
+
         itemBuilder: (context, index) {
-            String currentNeighborhoodID = neighborhoodViewModel.neighborhoods[index].neighborhoodId;
-            return ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Color.fromARGB(255, 240 * (index % 2), 0, 240 * ((index-1) % 2)),
-                child: Icon(Icons.home, color: Color.fromARGB(255, 240 * ((index-1) % 2), 0, 240 * (index % 2))),
+          String currentNeighborhoodID =
+              neighborhoodViewModel.neighborhoods[index].neighborhoodId;
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Color.fromARGB(
+                255,
+                240 * (index % 2),
+                0,
+                240 * ((index - 1) % 2),
               ),
-              
-              title: Text('Neighborhood: $currentNeighborhoodID'),
-              subtitle: Text('Description'),
-              trailing: IconButton(
-                onPressed: () async{
-                  //do neighborhood change/join logic here
-                  if(!running_){
-                    running_ = true;
+              child: Icon(
+                Icons.home,
+                color: Color.fromARGB(
+                  255,
+                  240 * ((index - 1) % 2),
+                  0,
+                  240 * (index % 2),
+                ),
+              ),
+            ),
 
-                    if(profileViewModel.neighborhoods.contains(currentNeighborhoodID)){
-                      await neighborhoodViewModel.leaveNeighborhood(neighborhoodIdToLeave: currentNeighborhoodID);
-                    }
-                    else{
-                      await neighborhoodViewModel.joinNeighborhood(neighborhoodIdToJoin: currentNeighborhoodID);
-                    }
-                    neighborhoodViewModel.fetchNeighborhoods();
+            title: Text('Neighborhood: $currentNeighborhoodID'),
+            subtitle: Text('Description'),
+            trailing: IconButton(
+              onPressed: () async {
+                //do neighborhood change/join logic here
+                if (!running_) {
+                  running_ = true;
 
-                    running_ = false;
+                  if (profileViewModel.neighborhoods.contains(
+                    currentNeighborhoodID,
+                  )) {
+                    await neighborhoodViewModel.leaveNeighborhood(
+                      neighborhoodIdToLeave: currentNeighborhoodID,
+                    );
+                  } else {
+                    await neighborhoodViewModel.joinNeighborhood(
+                      neighborhoodIdToJoin: currentNeighborhoodID,
+                    );
                   }
-                },
-                icon: Icon(profileViewModel.neighborhoods.contains(currentNeighborhoodID) ? Icons.remove : Icons.add_home_work),
+                  neighborhoodViewModel.fetchNeighborhoods();
+
+                  running_ = false;
+                }
+              },
+              icon: Icon(
+                profileViewModel.neighborhoods.contains(currentNeighborhoodID)
+                    ? Icons.remove
+                    : Icons.add_home_work,
               ),
-              
-            );
+            ),
+          );
         },
       ),
     );

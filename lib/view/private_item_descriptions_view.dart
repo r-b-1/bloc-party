@@ -10,10 +10,12 @@ class PrivateItemDescriptionView extends StatefulWidget {
   const PrivateItemDescriptionView({super.key, required this.item});
 
   @override
-  State<PrivateItemDescriptionView> createState() => _PrivateItemDescriptionViewState();
+  State<PrivateItemDescriptionView> createState() =>
+      _PrivateItemDescriptionViewState();
 }
 
-class _PrivateItemDescriptionViewState extends State<PrivateItemDescriptionView> {
+class _PrivateItemDescriptionViewState
+    extends State<PrivateItemDescriptionView> {
   late ProfileViewModel _profileViewModel;
   late AuthViewModel _authViewModel;
 
@@ -47,7 +49,9 @@ class _PrivateItemDescriptionViewState extends State<PrivateItemDescriptionView>
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Request to Borrow'),
-          content: Text('Send a borrow request for "${widget.item.name}" to the owner?'),
+          content: Text(
+            'Send a borrow request for "${widget.item.name}" to the owner?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -68,11 +72,14 @@ class _PrivateItemDescriptionViewState extends State<PrivateItemDescriptionView>
   }
 
   // Method to create borrow request chat and navigate
-  Future<void> _createBorrowRequestChat(BuildContext context, String currentUsername) async {
+  Future<void> _createBorrowRequestChat(
+    BuildContext context,
+    String currentUsername,
+  ) async {
     try {
       // Creates messaging model instance
       final messagingModel = MessagingModel(_authViewModel);
-      
+
       // Creates the borrow request chat
       final newChat = await messagingModel.createBorrowRequestChat(
         itemName: widget.item.name,
@@ -81,7 +88,7 @@ class _PrivateItemDescriptionViewState extends State<PrivateItemDescriptionView>
       );
 
       if (newChat != null) {
-        // Navigates directly to the new chat 
+        // Navigates directly to the new chat
         if (context.mounted) {
           context.push('/chat', extra: newChat);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -89,12 +96,11 @@ class _PrivateItemDescriptionViewState extends State<PrivateItemDescriptionView>
           );
         }
       }
-      
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create chat: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to create chat: $e')));
       }
     }
   }
@@ -127,7 +133,7 @@ class _PrivateItemDescriptionViewState extends State<PrivateItemDescriptionView>
               'Status: ${widget.item.isAvailable ? 'Available' : 'Unavailable'}',
               style: const TextStyle(fontSize: 18),
             ),
-             const SizedBox(height: 8),
+            const SizedBox(height: 8),
             // display neighborhood information
             Text(
               'Neighborhood: ${widget.item.neighborhoodId.join(', ')}',

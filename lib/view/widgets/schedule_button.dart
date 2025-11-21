@@ -50,9 +50,11 @@ class ScheduleButton extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ListTile(
-                      title: Text(selectedDate == null
-                          ? 'Pick a Date'
-                          : 'Date: ${selectedDate!.toLocal()}'.split(' ')[0]),
+                      title: Text(
+                        selectedDate == null
+                            ? 'Pick a Date'
+                            : 'Date: ${selectedDate!.toLocal()}'.split(' ')[0],
+                      ),
                       trailing: const Icon(Icons.calendar_today),
                       onTap: () async {
                         await pickDate();
@@ -60,9 +62,11 @@ class ScheduleButton extends StatelessWidget {
                       },
                     ),
                     ListTile(
-                      title: Text(selectedTime == null
-                          ? 'Pick a Time'
-                          : 'Time: ${selectedTime!.format(context)}'),
+                      title: Text(
+                        selectedTime == null
+                            ? 'Pick a Time'
+                            : 'Time: ${selectedTime!.format(context)}',
+                      ),
                       trailing: const Icon(Icons.access_time),
                       onTap: () async {
                         await pickTime();
@@ -116,7 +120,9 @@ class ScheduleButton extends StatelessWidget {
                   onPressed: () async {
                     if (selectedDate == null || selectedTime == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please pick date and time')),
+                        const SnackBar(
+                          content: Text('Please pick date and time'),
+                        ),
                       );
                       return;
                     }

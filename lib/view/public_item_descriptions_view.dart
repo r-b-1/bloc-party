@@ -11,7 +11,8 @@ class PublicItemDescriptionView extends StatefulWidget {
   const PublicItemDescriptionView({super.key, required this.item});
 
   @override
-  State<PublicItemDescriptionView> createState() => _PublicItemDescriptionViewState();
+  State<PublicItemDescriptionView> createState() =>
+      _PublicItemDescriptionViewState();
 }
 
 class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
@@ -48,7 +49,9 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Request to Borrow'),
-          content: Text('Send a borrow request for "${widget.item.name}" to the owner?'),
+          content: Text(
+            'Send a borrow request for "${widget.item.name}" to the owner?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -69,11 +72,14 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
   }
 
   // Method to create borrow request chat and navigate
-  Future<void> _createBorrowRequestChat(BuildContext context, String currentUsername) async {
+  Future<void> _createBorrowRequestChat(
+    BuildContext context,
+    String currentUsername,
+  ) async {
     try {
       // Creates messaging model instance
       final messagingModel = MessagingModel(_authViewModel);
-      
+
       // Creates the borrow request chat
       final newChat = await messagingModel.createBorrowRequestChat(
         itemName: widget.item.name,
@@ -82,7 +88,7 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
       );
 
       if (newChat != null) {
-        // Navigates directly to the new chat 
+        // Navigates directly to the new chat
         if (context.mounted) {
           context.push('/chat', extra: newChat);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -90,12 +96,11 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
           );
         }
       }
-      
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create chat: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to create chat: $e')));
       }
     }
   }
@@ -128,7 +133,7 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
               'Status: ${widget.item.isAvailable ? 'Available' : 'Unavailable'}',
               style: const TextStyle(fontSize: 18),
             ),
-             const SizedBox(height: 8),
+            const SizedBox(height: 8),
             // display neighborhood information
             Text(
               'Neighborhood: ${widget.item.neighborhoodId.join(', ')}',
@@ -140,21 +145,21 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
             Text('Owner: ${widget.item.userId}'),
             const SizedBox(height: 8),
             const Spacer(),
-            // Request button - only show if the item is not owned by current user 
-          if (_profileViewModel.currentUser?.username != widget.item.userId)
-            Column(
-              children: [
-                ElevatedButton(
-                  child: const Text('Request'),
-                  onPressed: () => _showBorrowRequestDialog(context),
-                ),
-                const SizedBox(height: 8),
-                // Add Schedule button here
-                ScheduleButton(),
-              ],
-            )
-          else
-            const SizedBox(),// Empty widget if user owns the item
+            // Request button - only show if the item is not owned by current user
+            if (_profileViewModel.currentUser?.username != widget.item.userId)
+              Column(
+                children: [
+                  ElevatedButton(
+                    child: const Text('Request'),
+                    onPressed: () => _showBorrowRequestDialog(context),
+                  ),
+                  const SizedBox(height: 8),
+                  // Add Schedule button here
+                  ScheduleButton(),
+                ],
+              )
+            else
+              const SizedBox(), // Empty widget if user owns the item
           ],
         ),
       ),

@@ -49,16 +49,16 @@ class UserAppointment {
     };
   }
 
-factory UserAppointment.fromFirestore(Map<String, dynamic> data) {
-  return UserAppointment(
-    startTime: (data['startTime'] as Timestamp).toDate(),
-    endTime: (data['endTime'] as Timestamp).toDate(),
-    subject: data['subject'] ?? '',
-    color: data['color'] != null ? Color(data['color'] as int) : null,
-    notes: data['notes'] ?? '',
-    userId: data['userId'] ?? '',
-  );
-}
+  factory UserAppointment.fromFirestore(Map<String, dynamic> data) {
+    return UserAppointment(
+      startTime: (data['startTime'] as Timestamp).toDate(),
+      endTime: (data['endTime'] as Timestamp).toDate(),
+      subject: data['subject'] ?? '',
+      color: data['color'] != null ? Color(data['color'] as int) : null,
+      notes: data['notes'] ?? '',
+      userId: data['userId'] ?? '',
+    );
+  }
 }
 
 Future<List<UserAppointment>> fetchUserAppointments() async {
@@ -106,7 +106,6 @@ class ScheduleController extends ChangeNotifier {
 /// Global instance used everywhere
 final ScheduleController scheduleController = ScheduleController();
 
-
 SfCalendar makeCalendar({
   required CalendarView view,
   required CalendarDataSource dataSource,
@@ -126,7 +125,10 @@ SfCalendar makeCalendar({
           children: [
             Text(
               appt.subject,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               appt.notes ?? '',
@@ -139,6 +141,3 @@ SfCalendar makeCalendar({
     onTap: onTap,
   );
 }
-
-
-

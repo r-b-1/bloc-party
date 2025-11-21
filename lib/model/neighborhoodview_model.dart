@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class NeighborhoodViewModel extends ChangeNotifier {
   List<Neighborhood> neighborhoods = [];
   bool isLoading = false;
-  String ?_error;
+  String? _error;
   final AuthViewModel _authViewModel;
   final ProfileViewModel _profileViewModel;
 
@@ -32,16 +32,17 @@ class NeighborhoodViewModel extends ChangeNotifier {
 
     try {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('neighborhood').get();
+          await FirebaseFirestore.instance.collection('neighborhood').get();
 
-      neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
+      neighborhoods = snapshot.docs
+          .map((doc) => Neighborhood.fromFirestore(doc))
+          .toList();
 
       //removes all neighborhoods that has the current user in them
 
       /*for(String userNeighborhood in _profileViewModel.neighborhoods){
         neighborhoods.removeWhere(((x) => x.neighborhoodId == userNeighborhood));
       }*/
-
     } catch (e) {
       print('Error fetching neighborhoods: $e');
       // Keep empty list on error
@@ -52,7 +53,7 @@ class NeighborhoodViewModel extends ChangeNotifier {
   }
 
   // Add this method to create new items
-  Future<void> addNeighborhood({required String neighborhoodIdToAdd,}) async {
+  Future<void> addNeighborhood({required String neighborhoodIdToAdd}) async {
     try {
       _error = null;
       isLoading = true;
@@ -63,19 +64,19 @@ class NeighborhoodViewModel extends ChangeNotifier {
       }*/
 
       // Creating a new document in firestore
-      final docRef = FirebaseFirestore.instance.collection('neighborhood').doc();
+      final docRef = FirebaseFirestore.instance
+          .collection('neighborhood')
+          .doc();
 
       final QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('neighborhood').get();
+          await FirebaseFirestore.instance.collection('neighborhood').get();
 
-      neighborhoods = snapshot.docs.map((doc) => Neighborhood.fromFirestore(doc)).toList();
+      neighborhoods = snapshot.docs
+          .map((doc) => Neighborhood.fromFirestore(doc))
+          .toList();
 
       // Creating the item
-      final newNeighborhood = Neighborhood(
-        neighborhoodId: neighborhoodIdToAdd,
-      );
-      
-
+      final newNeighborhood = Neighborhood(neighborhoodId: neighborhoodIdToAdd);
 
       // Saving to Firestore
       await docRef.set(newNeighborhood.toFirestore());
@@ -93,10 +94,8 @@ class NeighborhoodViewModel extends ChangeNotifier {
     }
   }
 
-
-
   // Add this method to create new items
-  Future<void> joinNeighborhood({required String neighborhoodIdToJoin,}) async {
+  Future<void> joinNeighborhood({required String neighborhoodIdToJoin}) async {
     try {
       _error = null;
 
@@ -106,21 +105,24 @@ class NeighborhoodViewModel extends ChangeNotifier {
         throw Exception('No user logged in');
       }*/
 
-      if(!_profileViewModel.neighborhoods.contains(neighborhoodIdToJoin)){
+      if (!_profileViewModel.neighborhoods.contains(neighborhoodIdToJoin)) {
         // Creating a new document in firestore
-        final docRef = FirebaseFirestore.instance.collection('users').doc(_authViewModel.user!.uid);
+        final docRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(_authViewModel.user!.uid);
 
         //adds the neighborhoods to the users list of neighborhoods
-        
+
         _profileViewModel.neighborhoods.add(neighborhoodIdToJoin);
 
         // set the current neighborhood
-        await docRef.update({'neighborhoodId': _profileViewModel.neighborhoods,});
+        await docRef.update({
+          'neighborhoodId': _profileViewModel.neighborhoods,
+        });
 
         // Adding item to local list and update UI
         isLoading = false;
       }
-
 
       notifyListeners();
     } catch (e) {
@@ -131,11 +133,10 @@ class NeighborhoodViewModel extends ChangeNotifier {
     }
   }
 
-
-
-
   // Add this method to create new items
-  Future<void> leaveNeighborhood({required String neighborhoodIdToLeave,}) async {
+  Future<void> leaveNeighborhood({
+    required String neighborhoodIdToLeave,
+  }) async {
     try {
       _error = null;
 
@@ -145,21 +146,24 @@ class NeighborhoodViewModel extends ChangeNotifier {
         throw Exception('No user logged in');
       }*/
 
-      if(_profileViewModel.neighborhoods.contains(neighborhoodIdToLeave)){
+      if (_profileViewModel.neighborhoods.contains(neighborhoodIdToLeave)) {
         // Creating a new document in firestore
-        final docRef = FirebaseFirestore.instance.collection('users').doc(_authViewModel.user!.uid);
+        final docRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(_authViewModel.user!.uid);
 
         //adds the neighborhoods to the users list of neighborhoods
-        
+
         _profileViewModel.neighborhoods.remove(neighborhoodIdToLeave);
 
         // set the current neighborhood
-        await docRef.update({'neighborhoodId': _profileViewModel.neighborhoods,});
+        await docRef.update({
+          'neighborhoodId': _profileViewModel.neighborhoods,
+        });
 
         // Adding item to local list and update UI
         isLoading = false;
       }
-
 
       notifyListeners();
     } catch (e) {
@@ -169,8 +173,6 @@ class NeighborhoodViewModel extends ChangeNotifier {
       rethrow;
     }
   }
-
-
 
   @override
   void dispose() {

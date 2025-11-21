@@ -90,72 +90,72 @@ class _ScheduleViewState extends State<ScheduleView> {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
 
-      // Convert Firestore → Syncfusion Appointments
-      final appts = convertToCalendarAppointments(snapshot.data!);
-      final dataSource = DateScheduled(appts);
-            return SfCalendar(
-              key: ValueKey(scheduleController.currentView),
-              view: scheduleController.currentView,
-              dataSource: dataSource,
-              //----------------------
-              appointmentBuilder: (context, details) {
-                final Appointment appt = details.appointments!.first;
-                return buildApptTile(appt);
-              },
-              //----------------------
-              onTap: (CalendarTapDetails details) {
-                if (details.targetElement == CalendarElement.appointment) {
-                  final Appointment appt = details.appointments!.first;
-                  final TextEditingController controller =
-                      TextEditingController(text: appt.notes);
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: Text(appt.subject),
-                      content: TextField(
-                        controller: controller,
-                        maxLines: null, // allows multiline editing
-                        decoration: const InputDecoration(
-                          hintText: 'Enter notes',
-                        ),
-                      ),
-                      actions: [
-                        //--------------------------------
-                        // this was to allow users to update the notes they put in the calendar
-                        //--------------------------------
-                        //  TextButton(
-                        //   onPressed: () {
+                // Convert Firestore → Syncfusion Appointments
+                final appts = convertToCalendarAppointments(snapshot.data!);
+                final dataSource = DateScheduled(appts);
+                return SfCalendar(
+                  key: ValueKey(scheduleController.currentView),
+                  view: scheduleController.currentView,
+                  dataSource: dataSource,
+                  //----------------------
+                  appointmentBuilder: (context, details) {
+                    final Appointment appt = details.appointments!.first;
+                    return buildApptTile(appt);
+                  },
+                  //----------------------
+                  onTap: (CalendarTapDetails details) {
+                    if (details.targetElement == CalendarElement.appointment) {
+                      final Appointment appt = details.appointments!.first;
+                      final TextEditingController controller =
+                          TextEditingController(text: appt.notes);
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Text(appt.subject),
+                          content: TextField(
+                            controller: controller,
+                            maxLines: null, // allows multiline editing
+                            decoration: const InputDecoration(
+                              hintText: 'Enter notes',
+                            ),
+                          ),
+                          actions: [
+                            //--------------------------------
+                            // this was to allow users to update the notes they put in the calendar
+                            //--------------------------------
+                            //  TextButton(
+                            //   onPressed: () {
 
-                        //     // Create a new Appointment with updated notes
-                        //     final updatedAppt = Appointment(
-                        //       startTime: appt.startTime,
-                        //       endTime: appt.endTime,
-                        //       subject: appt.subject,
-                        //       color: appt.color,
-                        //       notes: controller.text, // updated notes
-                        //     );
+                            //     // Create a new Appointment with updated notes
+                            //     final updatedAppt = Appointment(
+                            //       startTime: appt.startTime,
+                            //       endTime: appt.endTime,
+                            //       subject: appt.subject,
+                            //       color: appt.color,
+                            //       notes: controller.text, // updated notes
+                            //     );
 
-                        //     // Replace the old appointment in the data source
-                        //     final dataSource = DateScheduled(makeAppointments(6, 0, "Test Appointment", ""));
-                        //     final index = dataSource.appointments!.indexOf(appt);
-                        //     dataSource.appointments![index] = updatedAppt;
-                        //     dataSource.notifyListeners(CalendarDataSourceAction.reset, dataSource.appointments!);
-                        //     controller.dispose();
-                        //     Navigator.pop(context);
-                        //   },
-                        //   child: const Text('Save'),
-                        // ),
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Close'),
+                            //     // Replace the old appointment in the data source
+                            //     final dataSource = DateScheduled(makeAppointments(6, 0, "Test Appointment", ""));
+                            //     final index = dataSource.appointments!.indexOf(appt);
+                            //     dataSource.appointments![index] = updatedAppt;
+                            //     dataSource.notifyListeners(CalendarDataSourceAction.reset, dataSource.appointments!);
+                            //     controller.dispose();
+                            //     Navigator.pop(context);
+                            //   },
+                            //   child: const Text('Save'),
+                            // ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Close'),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                }
+                      );
+                    }
+                  },
+                );
               },
-            );
-            },
             ),
           ),
         ],
@@ -163,12 +163,6 @@ class _ScheduleViewState extends State<ScheduleView> {
     );
   }
 }
-
-
-
-
-
-
 
 Widget buildApptTile(Appointment appt) {
   return Container(

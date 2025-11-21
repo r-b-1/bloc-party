@@ -3,17 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Neighborhood {
   final String neighborhoodId;
 
-  Neighborhood({
-    required this.neighborhoodId,
-  });
+  Neighborhood({required this.neighborhoodId});
 
   Map<String, dynamic> toFirestore() {
-    return {
-      'neighborhood ID': neighborhoodId,
-    };
+    return {'neighborhood ID': neighborhoodId};
   }
 
-  factory Neighborhood.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory Neighborhood.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     if (!doc.exists) {
       throw Exception('Document does not exist');
     }
@@ -30,8 +28,6 @@ class Neighborhood {
       users = [];
     }
 
-    return Neighborhood(
-      neighborhoodId: data['neighborhood ID'] ?? '',
-    );
+    return Neighborhood(neighborhoodId: data['neighborhood ID'] ?? '');
   }
 }

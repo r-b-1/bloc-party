@@ -27,10 +27,7 @@ class ProfileViewModel extends ChangeNotifier {
     Future.microtask(() => _fetchUserDataAndItems());
   }
 
-
-
-
-  Future<void> addNeighborhood({required String neighborhoodIdToAdd,}) async {
+  Future<void> addNeighborhood({required String neighborhoodIdToAdd}) async {
     try {
       _error = null;
       notifyListeners();
@@ -39,11 +36,12 @@ class ProfileViewModel extends ChangeNotifier {
         throw Exception('No user logged in');
       }
 
-
       // Creating a new document in firestore
-      final docRef = FirebaseFirestore.instance.collection('users').doc(auth.FirebaseAuth.instance.currentUser!.uid);
+      final docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(auth.FirebaseAuth.instance.currentUser!.uid);
 
-      if(!neighborhoods.contains(neighborhoodIdToAdd)){
+      if (!neighborhoods.contains(neighborhoodIdToAdd)) {
         neighborhoods.add(neighborhoodIdToAdd);
       }
       // Saving to Firestore
@@ -58,8 +56,6 @@ class ProfileViewModel extends ChangeNotifier {
       rethrow;
     }
   }
-
-
 
   Future<void> _fetchUserDataAndItems() async {
     try {
@@ -95,11 +91,7 @@ class ProfileViewModel extends ChangeNotifier {
         _currentAddress = _addresses[0];
       }
 
-
-
       _neighborhoods = _currentUser!.neighborhoodId;
-      
-
 
       // Fetch items from 'items' collection where userId matches username
       final itemsSnapshot = await FirebaseFirestore.instance
@@ -110,7 +102,6 @@ class ProfileViewModel extends ChangeNotifier {
       _userItems = itemsSnapshot.docs
           .map((doc) => Item.fromFirestore(doc))
           .toList();
-
     } catch (e) {
       _error = 'Failed to load profile: $e';
       print('Error in ProfileViewModel: $e');
