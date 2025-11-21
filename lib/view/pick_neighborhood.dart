@@ -178,12 +178,6 @@ void _showAddNeighborhoodDialog() {
 
 
 
-
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -208,14 +202,14 @@ void _showAddNeighborhoodDialog() {
         itemCount: neighborhoodViewModel.neighborhoods.length,
         
         itemBuilder: (context, index) {
-
+            String currentNeighborhoodID = neighborhoodViewModel.neighborhoods[index].neighborhoodId;
             return ListTile(
               leading: CircleAvatar(
                 backgroundColor: Color.fromARGB(255, 240 * (index % 2), 0, 240 * ((index-1) % 2)),
                 child: Icon(Icons.home, color: Color.fromARGB(255, 240 * ((index-1) % 2), 0, 240 * (index % 2))),
               ),
-
-              title: Text('Neighborhood: ${neighborhoodViewModel.neighborhoods[index].neighborhoodId}'),
+              
+              title: Text('Neighborhood: $currentNeighborhoodID'),
               subtitle: Text('Description'),
               trailing: IconButton(
                 onPressed: () async{
@@ -223,18 +217,18 @@ void _showAddNeighborhoodDialog() {
                   if(!running_){
                     running_ = true;
 
-                    if(profileViewModel.neighborhoods.contains(neighborhoodViewModel.neighborhoods[index].neighborhoodId)){
-                      await neighborhoodViewModel.leaveNeighborhood(neighborhoodIdToLeave: neighborhoodViewModel.neighborhoods[index].neighborhoodId);
+                    if(profileViewModel.neighborhoods.contains(currentNeighborhoodID)){
+                      await neighborhoodViewModel.leaveNeighborhood(neighborhoodIdToLeave: currentNeighborhoodID);
                     }
                     else{
-                      await neighborhoodViewModel.joinNeighborhood(neighborhoodIdToJoin: neighborhoodViewModel.neighborhoods[index].neighborhoodId);
+                      await neighborhoodViewModel.joinNeighborhood(neighborhoodIdToJoin: currentNeighborhoodID);
                     }
                     neighborhoodViewModel.fetchNeighborhoods();
 
                     running_ = false;
                   }
                 },
-                icon: Icon(profileViewModel.neighborhoods.contains(neighborhoodViewModel.neighborhoods[index].neighborhoodId) ? Icons.remove : Icons.add_home_work),
+                icon: Icon(profileViewModel.neighborhoods.contains(currentNeighborhoodID) ? Icons.remove : Icons.add_home_work),
               ),
               
             );
