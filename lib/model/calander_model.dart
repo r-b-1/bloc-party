@@ -49,16 +49,16 @@ class UserAppointment {
     };
   }
 
-  factory UserAppointment.fromFirestore(Map<String, dynamic> data) {
-    return UserAppointment(
-      startTime: (data['startTime'] as DateTime),
-      endTime: (data['endTime'] as DateTime),
-      subject: data['subject'] ?? '',
-      color: data['color'] != null ? Color(data['color'] as int) : null,
-      notes: data['notes'] ?? '',
-      userId: data['userId'] ?? '',
-    );
-  }
+factory UserAppointment.fromFirestore(Map<String, dynamic> data) {
+  return UserAppointment(
+    startTime: (data['startTime'] as Timestamp).toDate(),
+    endTime: (data['endTime'] as Timestamp).toDate(),
+    subject: data['subject'] ?? '',
+    color: data['color'] != null ? Color(data['color'] as int) : null,
+    notes: data['notes'] ?? '',
+    userId: data['userId'] ?? '',
+  );
+}
 }
 
 Future<List<UserAppointment>> fetchUserAppointments() async {
@@ -139,3 +139,6 @@ SfCalendar makeCalendar({
     onTap: onTap,
   );
 }
+
+
+
