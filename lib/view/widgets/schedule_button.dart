@@ -8,34 +8,30 @@ class ScheduleButton extends StatelessWidget {
   const ScheduleButton({super.key});
 
   Future<void> _showScheduleDialog(BuildContext context) async {
-    DateTime? selectedDate;
-    TimeOfDay? selectedTime;
+    DateTime? selectedStartDate;
+    DateTime? selectedEndDate;
+    TimeOfDay? selectedStartTime;
+    TimeOfDay? selectedEndTime;
     Color selectedColor = Colors.blue;
     TextEditingController descriptionController = TextEditingController();
 
     // Pick date
-    Future<void> pickDate() async {
+    Future<DateTime?> pickDate() async {
       final now = DateTime.now();
-      final picked = await showDatePicker(
+      return await showDatePicker(
         context: context,
         initialDate: now,
         firstDate: now,
         lastDate: DateTime(now.year + 5),
       );
-      if (picked != null) {
-        selectedDate = picked;
-      }
     }
 
     // Pick time
-    Future<void> pickTime() async {
-      final picked = await showTimePicker(
+    Future<TimeOfDay?> pickTime() async {
+      return await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
       );
-      if (picked != null) {
-        selectedTime = picked;
-      }
     }
 
     await showDialog(
@@ -51,26 +47,69 @@ class ScheduleButton extends StatelessWidget {
                   children: [
                     ListTile(
                       title: Text(
-                        selectedDate == null
-                            ? 'Pick a Date'
-                            : 'Date: ${selectedDate!.toLocal()}'.split(' ')[0],
+                        selectedStartDate == null
+                            ? 'Pick start Date'
+                            : '${selectedStartDate!.toLocal()}'.split(' ')[0],
                       ),
                       trailing: const Icon(Icons.calendar_today),
                       onTap: () async {
-                        await pickDate();
-                        setState(() {});
+                        final picked = await pickDate();
+                        if (picked!=null){
+                        setState(() {
+                          selectedStartDate = picked;
+                        });
+                       }
                       },
                     ),
                     ListTile(
                       title: Text(
-                        selectedTime == null
-                            ? 'Pick a Time'
-                            : 'Time: ${selectedTime!.format(context)}',
+                        selectedStartTime == null
+                            ? 'Pick start Time'
+                            : '${selectedStartTime!.format(context)}',
                       ),
                       trailing: const Icon(Icons.access_time),
                       onTap: () async {
-                        await pickTime();
-                        setState(() {});
+                        final picked = await pickTime();
+                        if (picked!=null){
+                        setState(() {
+                          selectedStartTime = picked;
+                        });
+                      
+                        }
+                      },
+                    ),
+                       ListTile(
+                      title: Text(
+                        selectedEndDate == null
+                            ? 'Pick end Date'
+                            : '${selectedStartDate!.toLocal()}'.split(' ')[0],
+                      ),
+                      trailing: const Icon(Icons.calendar_today),
+                      onTap: () async {
+                        final picked = await pickDate();
+                        if (picked!=null){
+                        setState(() {
+                          selectedEndDate = picked;
+                        });
+                        
+                        }
+                      },
+                    ),
+                    ListTile(
+                       title: Text(
+                        selectedEndTime == null
+                            ? 'Pick end Time'
+                            : '${selectedEndTime!.format(context)}',
+                      ),
+                      trailing: const Icon(Icons.access_time),
+                      onTap: () async {
+                        final picked = await pickTime();
+                        if (picked!=null){
+                        setState(() {
+                          selectedEndTime = picked;
+                        });
+                        
+                        }
                       },
                     ),
                     const SizedBox(height: 8),
@@ -118,7 +157,7 @@ class ScheduleButton extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    if (selectedDate == null || selectedTime == null) {
+                    if (selectedStartDate == null || selectedStartTime == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Please pick date and time'),
@@ -128,16 +167,25 @@ class ScheduleButton extends StatelessWidget {
                     }
 
                     final startDateTime = DateTime(
-                      selectedDate!.year,
-                      selectedDate!.month,
-                      selectedDate!.day,
-                      selectedTime!.hour,
-                      selectedTime!.minute,
+                      selectedStartDate!.year,
+                      selectedStartDate!.month,
+                      selectedStartDate!.day,
+                      selectedStartTime!.hour,
+                      selectedStartTime!.minute,
                     );
+
+                    final endDateTime = DateTime(
+                      selectedEndDate!.year,
+                      selectedEndDate!.month,
+                      selectedEndDate!.day,
+                      selectedEndTime!.hour,
+                      selectedEndTime!.minute,
+                    );
+
 
                     final newAppointment = UserAppointment(
                       startTime: startDateTime,
-                      endTime: startDateTime.add(const Duration(hours: 1)),
+                      endTime: endDateTime,
                       subject: descriptionController.text.trim(),
                       color: selectedColor,
                       notes: descriptionController.text.trim(),
@@ -168,7 +216,9 @@ class ScheduleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       child: const Text('Schedule'),
-      onPressed: () => _showScheduleDialog(context),
+      onPressed: ()  {
+        _showScheduleDialog(context);
+      } 
     );
   }
 }
