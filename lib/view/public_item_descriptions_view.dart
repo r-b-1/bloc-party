@@ -155,7 +155,8 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
                   ),
                   const SizedBox(height: 8),
                   // Add Schedule button here
-                  ScheduleButton(),
+                  //ScheduleButton(),
+                  //we talked about not having a schedule button on there listing
                 ],
               )
             else
