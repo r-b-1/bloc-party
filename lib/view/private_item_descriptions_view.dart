@@ -4,6 +4,7 @@ import 'package:blocparty/model/item_model.dart';
 import 'package:blocparty/model/messaging_model.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
 import 'package:blocparty/model/profile_model.dart';
+import 'package:blocparty/view/widgets/schedule_button.dart';
 
 class PrivateItemDescriptionView extends StatefulWidget {
   final Item item;
@@ -145,16 +146,9 @@ class _PrivateItemDescriptionViewState
             Text('Owner: ${widget.item.userId}'),
             const SizedBox(height: 8),
             const Spacer(),
-            // Request button - only show if the item is not owned by current user
-            if (_profileViewModel.currentUser?.username != widget.item.userId)
-              ElevatedButton(
-                child: const Text('Schedule'),
-                onPressed: () {
-                  _showBorrowRequestDialog(context);
-                },
-              )
-            else
-              const SizedBox(), // Empty widget if user owns the item
+            const SizedBox(height: 8),
+             // Add Schedule button here
+            ScheduleButton(), 
           ],
         ),
       ),
