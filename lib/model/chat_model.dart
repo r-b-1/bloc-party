@@ -167,4 +167,38 @@ class ChatModel extends ChangeNotifier {
     await updateChat();
     isLoading = false;
   }
+
+  // Allows the user to leave the chat
+  // If all users in a chat leave, the chat is deleted
+  Future<void> leaveChat() async {
+    isLoading = true;
+
+    // Gets Current User
+    AddUser _currentUser;
+    final authUser = auth.FirebaseAuth.instance.currentUser;
+    if (authUser == null) {
+      throw Exception('No user logged in');
+    }
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(authUser.uid)
+        .get();
+    if (!userDoc.exists) {
+      throw Exception('User document not found');
+    }
+    _currentUser = AddUser.fromFirestore(userDoc);
+
+    // Removes the user from the chat
+    currentChat!.members.remove(_currentUser.username);
+    if (currentChat!.members.isEmpty) {
+      print('deleting chat!');
+      await docRef.delete();
+    } else {
+      print('leaving chat');
+      await docRef.set(currentChat!.toFirestore());
+    }
+    
+    notifyListeners();
+    isLoading = false;
+  }
 }

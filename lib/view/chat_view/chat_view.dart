@@ -1,5 +1,6 @@
 import 'package:blocparty/model/chat_model.dart';
 import 'package:blocparty/model/message_model.dart';
+import 'package:blocparty/view/navigation/routs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -129,6 +130,10 @@ class _chatViewState extends State<ChatView> {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: [
+            FloatingActionButton(
+              onPressed: _chatModel.leaveChat,
+              child: const Text("Permanently Leave Chat"),
+            ),
             if (_chatModel.isLoading)
               const Center(
                 child: Padding(
