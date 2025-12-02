@@ -122,14 +122,6 @@ class _chatViewState extends State<ChatView> {
     }
   }
 
-  Future<void> exitChat() async {
-    await _chatModel.leaveChat();
-    Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Chat left!')),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,7 +132,7 @@ class _chatViewState extends State<ChatView> {
           children: [
             FloatingActionButton(
               onPressed: _chatModel.leaveChat,
-              child: Icon(Icons.delete),
+              child: const Text("Permanently Leave Chat"),
             ),
             if (_chatModel.isLoading)
               const Center(
