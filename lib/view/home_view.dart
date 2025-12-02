@@ -32,7 +32,7 @@ class HomeView extends StatefulWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AspectRatio(
-                  aspectRatio: 1.2,
+                  aspectRatio: 1.23, //this number can not be changed or there will be a pixel overflow
                   child: Image.asset(
                     item.imagePath,
                     fit: BoxFit.cover,

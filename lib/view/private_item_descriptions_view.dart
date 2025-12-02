@@ -147,8 +147,8 @@ class _PrivateItemDescriptionViewState
             const SizedBox(height: 8),
             const Spacer(),
             const SizedBox(height: 8),
-             // Add Schedule button here
-            ScheduleButton(), 
+            // Add Schedule button here
+            ScheduleButton(),
           ],
         ),
       ),

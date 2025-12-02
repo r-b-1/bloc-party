@@ -54,11 +54,11 @@ class ScheduleButton extends StatelessWidget {
                       trailing: const Icon(Icons.calendar_today),
                       onTap: () async {
                         final picked = await pickDate();
-                        if (picked!=null){
-                        setState(() {
-                          selectedStartDate = picked;
-                        });
-                       }
+                        if (picked != null) {
+                          setState(() {
+                            selectedStartDate = picked;
+                          });
+                        }
                       },
                     ),
                     ListTile(
@@ -70,15 +70,14 @@ class ScheduleButton extends StatelessWidget {
                       trailing: const Icon(Icons.access_time),
                       onTap: () async {
                         final picked = await pickTime();
-                        if (picked!=null){
-                        setState(() {
-                          selectedStartTime = picked;
-                        });
-                      
+                        if (picked != null) {
+                          setState(() {
+                            selectedStartTime = picked;
+                          });
                         }
                       },
                     ),
-                       ListTile(
+                    ListTile(
                       title: Text(
                         selectedEndDate == null
                             ? 'Pick end Date'
@@ -87,16 +86,15 @@ class ScheduleButton extends StatelessWidget {
                       trailing: const Icon(Icons.calendar_today),
                       onTap: () async {
                         final picked = await pickDate();
-                        if (picked!=null){
-                        setState(() {
-                          selectedEndDate = picked;
-                        });
-                        
+                        if (picked != null) {
+                          setState(() {
+                            selectedEndDate = picked;
+                          });
                         }
                       },
                     ),
                     ListTile(
-                       title: Text(
+                      title: Text(
                         selectedEndTime == null
                             ? 'Pick end Time'
                             : '${selectedEndTime!.format(context)}',
@@ -104,11 +102,10 @@ class ScheduleButton extends StatelessWidget {
                       trailing: const Icon(Icons.access_time),
                       onTap: () async {
                         final picked = await pickTime();
-                        if (picked!=null){
-                        setState(() {
-                          selectedEndTime = picked;
-                        });
-                        
+                        if (picked != null) {
+                          setState(() {
+                            selectedEndTime = picked;
+                          });
                         }
                       },
                     ),
@@ -157,7 +154,8 @@ class ScheduleButton extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    if (selectedStartDate == null || selectedStartTime == null) {
+                    if (selectedStartDate == null ||
+                        selectedStartTime == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Please pick date and time'),
@@ -181,7 +179,6 @@ class ScheduleButton extends StatelessWidget {
                       selectedEndTime!.hour,
                       selectedEndTime!.minute,
                     );
-
 
                     final newAppointment = UserAppointment(
                       startTime: startDateTime,
@@ -216,9 +213,9 @@ class ScheduleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       child: const Text('Schedule'),
-      onPressed: ()  {
+      onPressed: () {
         _showScheduleDialog(context);
-      } 
+      },
     );
   }
 }
