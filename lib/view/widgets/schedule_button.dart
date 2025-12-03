@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '/model/calander_model.dart'; // your UserAppointment model
 
 class ScheduleButton extends StatelessWidget {
@@ -180,19 +181,19 @@ class ScheduleButton extends StatelessWidget {
                       selectedEndTime!.minute,
                     );
 
-                    final newAppointment = UserAppointment(
+                    final newAppointment = Appointment(
                       startTime: startDateTime,
                       endTime: endDateTime,
                       subject: descriptionController.text.trim(),
                       color: selectedColor,
                       notes: descriptionController.text.trim(),
-                      userId: FirebaseAuth.instance.currentUser!.uid,
+                      id: null,
                     );
 
                     // Save to Firebase
                     await FirebaseFirestore.instance
                         .collection('user_appointment')
-                        .add(newAppointment.toFirestore());
+                        .add(appointmentToFirestore(newAppointment));
 
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(

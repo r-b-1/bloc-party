@@ -80,7 +80,7 @@ class _ScheduleViewState extends State<ScheduleView> {
           ),
           Expanded(
             child: FutureBuilder(
-              future: fetchUserAppointments(),
+              future: fetchAppointments(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -91,7 +91,7 @@ class _ScheduleViewState extends State<ScheduleView> {
                 }
 
                 // Convert Firestore → Syncfusion Appointments
-                final appts = convertToCalendarAppointments(snapshot.data!);
+                final appts = snapshot.data!; 
                 final dataSource = DateScheduled(appts);
                 return SfCalendar(
                   key: ValueKey(scheduleController.currentView),
@@ -99,30 +99,36 @@ class _ScheduleViewState extends State<ScheduleView> {
                   dataSource: dataSource,
                   //----------------------
                   appointmentBuilder: (context, details) {
-                    final Appointment appt = details.appointments!.first;
+                    final Appointment appt = details.appointments.first;
                     return buildApptTile(appt);
                   },
                   //----------------------
                   onTap: (CalendarTapDetails details) {
                     if (details.targetElement == CalendarElement.appointment) {
                       final Appointment appt = details.appointments!.first;
-                      final TextEditingController controller =
+    //                  final TextEditingController controller =.       ## uncomment if you add in changing notes on the schedule
                           TextEditingController(text: appt.notes);
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
                           title: Text(appt.subject),
-                          content: TextField(
-                            controller: controller,
-                            maxLines: null, // allows multiline editing
-                            decoration: const InputDecoration(
-                              hintText: 'Enter notes',
-                            ),
-                          ),
+
+                          // #### Can be uncommented if you want to be able to change the notes in the schedule
+                          // content: TextField(
+                          //   controller: controller,
+                          //   maxLines: null, // allows multiline editing
+                          //   decoration: const InputDecoration(
+                          //     hintText: 'Enter notes',
+                          //   ),
+                          // ),
+
+                          //####
+                          
                           actions: [
-                            //--------------------------------
+                            
+                            //#################################
                             // this was to allow users to update the notes they put in the calendar
-                            //--------------------------------
+                            //#################################
                             //  TextButton(
                             //   onPressed: () {
 
@@ -144,12 +150,22 @@ class _ScheduleViewState extends State<ScheduleView> {
                             //     Navigator.pop(context);
                             //   },
                             //   child: const Text('Save'),
-                            // ),
+                            // ),      
+                            IconButton(
+                               onPressed: () async { 
+                                 await deleteAppointment(appt);
+                                 dataSource.appointments!.remove(appt);
+                                 Navigator.pop(context);
+                                 setState(() {});
+                               },
+                              icon: const Icon(Icons.delete, color: Colors.red,)
+                            ),
                             TextButton(
                               onPressed: () => Navigator.pop(context),
                               child: const Text('Close'),
                             ),
                           ],
+                      
                         ),
                       );
                     }
