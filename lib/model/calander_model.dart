@@ -5,82 +5,56 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 final uid = FirebaseAuth.instance.currentUser!.uid;
 
-///  Appointment creation logic
-List<Appointment> convertToCalendarAppointments(
-  List<UserAppointment> userAppts,
-) {
-  return userAppts
-      .map(
-        (u) => Appointment(
-          startTime: u.startTime!,
-          endTime: u.endTime!,
-          subject: u.subject ?? '',
-          color: u.color ?? Colors.blue,
-        ),
-      )
-      .toList();
-}
-
-class UserAppointment {
-  DateTime? startTime;
-  DateTime? endTime;
-  String? subject;
-  Color? color;
-  String? notes;
-  String? userId;
-
-  UserAppointment({
-    this.startTime,
-    this.endTime,
-    this.subject,
-    this.color,
-    this.notes,
-    this.userId,
-  });
-
-  Map<String, dynamic> toFirestore() {
-    return {
-      'startTime': startTime,
-      'endTime': endTime,
-      'subject': subject,
-      'color': color?.value,
-      'notes': notes,
-      'userId': userId,
-    };
-  }
-
-  factory UserAppointment.fromFirestore(Map<String, dynamic> data) {
-    return UserAppointment(
-      startTime: (data['startTime'] as Timestamp).toDate(),
-      endTime: (data['endTime'] as Timestamp).toDate(),
-      subject: data['subject'] ?? '',
-      color: data['color'] != null ? Color(data['color'] as int) : null,
-      notes: data['notes'] ?? '',
-      userId: data['userId'] ?? '',
-    );
-  }
-}
-
-Future<List<UserAppointment>> fetchUserAppointments() async {
-  // 1. Use the 'await' keyword inside the 'async' function
-  final uid = FirebaseAuth.instance.currentUser!.uid;
+/// Fetch appointments from Firestore
+Future<List<Appointment>> fetchAppointments() async {
   final snapshot = await FirebaseFirestore.instance
       .collection('user_appointment')
       .where('userId', isEqualTo: uid)
       .get();
-  return snapshot.docs
-      .map((doc) => UserAppointment.fromFirestore(doc.data()))
-      .toList();
+
+  return snapshot.docs.map((doc) {
+    final data = doc.data();
+    return Appointment(
+      startTime: (data['startTime'] as Timestamp).toDate(),
+      endTime: (data['endTime'] as Timestamp).toDate(),
+      subject: data['subject'] ?? '',
+      color: data['color'] != null ? Color(data['color'] as int) : Colors.blue,
+      notes: data['notes'] ?? '',
+      id: doc.id, // Store Firestore docId
+    );
+  }).toList();
 }
 
-///  Calendar DataSource
+/// Delete appointment from Firestore
+Future<void> deleteAppointment(Appointment appt) async {
+  final docId = appt.id as String?;
+  if (docId != null) {
+    await FirebaseFirestore.instance
+        .collection('user_appointment')
+        .doc(docId)
+        .delete();
+  }
+}
+
+Map<String, dynamic> appointmentToFirestore(Appointment appt) {
+  return {
+    'startTime': appt.startTime,
+    'endTime': appt.endTime,
+    'subject': appt.subject,
+    'color': appt.color?.value,
+    'notes': appt.notes,
+    'userId': FirebaseAuth.instance.currentUser!.uid,
+  };
+}
+
+/// Calendar DataSource
 class DateScheduled extends CalendarDataSource {
   DateScheduled(List<Appointment> source) {
     appointments = source;
   }
 }
 
-///  Global calendar view options
+/// Global calendar views
 final List<CalendarView> calendarViews = [
   CalendarView.month,
   CalendarView.week,
@@ -93,7 +67,7 @@ final Map<CalendarView, String> calendarViewNames = {
   CalendarView.day: "Day",
 };
 
-///  Global controller (used by the UI)
+/// Calendar controller
 class ScheduleController extends ChangeNotifier {
   CalendarView currentView = CalendarView.week;
 
@@ -103,9 +77,9 @@ class ScheduleController extends ChangeNotifier {
   }
 }
 
-/// Global instance used everywhere
 final ScheduleController scheduleController = ScheduleController();
 
+/// Build the calendar
 SfCalendar makeCalendar({
   required CalendarView view,
   required CalendarDataSource dataSource,
@@ -117,22 +91,46 @@ SfCalendar makeCalendar({
     dataSource: dataSource,
     appointmentBuilder: (context, details) {
       final Appointment appt = details.appointments.first;
+
       return Container(
         padding: const EdgeInsets.all(4),
         color: appt.color,
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              appt.subject,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+            // Appointment info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    appt.subject,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    appt.notes ?? '',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
             ),
-            Text(
-              appt.notes ?? '',
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            // Delete button
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+              onPressed: () async {
+                await deleteAppointment(appt);
+                dataSource.appointments!.remove(appt);
+                dataSource.notifyListeners(
+                  CalendarDataSourceAction.remove,
+                  [appt],
+                );
+              },
             ),
           ],
         ),
@@ -140,4 +138,5 @@ SfCalendar makeCalendar({
     },
     onTap: onTap,
   );
+  
 }
