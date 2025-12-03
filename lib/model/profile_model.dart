@@ -137,6 +137,64 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
+   // Method to delete user account
+  Future<void> deleteAccount() async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final authUser = auth.FirebaseAuth.instance.currentUser;
+      if (authUser == null) {
+        throw Exception('No user logged in');
+      }
+
+      final userId = authUser.uid;
+      final username = _currentUser?.username;
+
+      // Deletes all items owned by this user
+      if (username != null && username.isNotEmpty) {
+        final itemsSnapshot = await FirebaseFirestore.instance
+            .collection('items')
+            .where('userId', isEqualTo: username)
+            .get();
+
+        // Delete each item document
+        final batch = FirebaseFirestore.instance.batch();
+        for (final doc in itemsSnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      }
+
+      // Deletes user document from Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+
+      // Deletes the user from Firebase Authentication
+      await authUser.delete();
+
+      // Sign out locally
+      await auth.FirebaseAuth.instance.signOut();
+
+      // Clear local data
+      _currentUser = null;
+      _userItems.clear();
+      _addresses.clear();
+      _neighborhoods.clear();
+      _currentAddress = null;
+
+      notifyListeners();
+    } catch (e) {
+      _error = 'Failed to delete account: $e';
+      print('Error deleting account: $e');
+      notifyListeners();
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   // Adding method to toggle the users item availability
   Future<void> toggleItemAvailability(
     String itemId,
