@@ -209,6 +209,43 @@ class _ProfileViewState extends State<ProfileView> {
           ),
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: DropdownButton<String>(
+                  value: themeProvider.currentThemeColor,
+                  items: ['blue', 'green', 'red', 'yellow']
+                      .map(
+                        (color) => DropdownMenuItem<String>(
+                          value: color,
+                          child: Text(
+                            color[0].toUpperCase() + color.substring(1),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (String? newColor) {
+                    if (newColor != null) {
+                      themeProvider.setThemeColor(
+                        newColor,
+                        themeProvider.isDarkMode,
+                      );
+                    }
+                  },
+                  dropdownColor: Theme.of(context).colorScheme.surface,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  underline: Container(),
+                  icon: Icon(
+                    Icons.palette,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              );
+            },
+          ),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
               return IconButton(
                 icon: Icon(
                   themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,

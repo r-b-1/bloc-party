@@ -5,10 +5,12 @@ import 'package:blocparty/main.dart';
 class ThemeProvider extends ChangeNotifier {
   ThemeData _themeData = ThemeData();
   bool _isDarkMode = false;
+  String _currentThemeColor = 'blue';
   SharedPreferences? _prefs;
 
   ThemeData get themeData => _themeData;
   bool get isDarkMode => _isDarkMode;
+  String get currentThemeColor => _currentThemeColor;
 
   ThemeProvider() {
     // Initialize with default light theme
@@ -26,8 +28,8 @@ class ThemeProvider extends ChangeNotifier {
 
       // Determine theme file name based on preference
       final themeFileName = _isDarkMode
-          ? 'dark_blue_appainter_theme.json'
-          : 'blue_appainter_theme.json';
+          ? 'dark_${_currentThemeColor}_appainter_theme.json'
+          : '${_currentThemeColor}_appainter_theme.json';
 
       // Load theme using the existing loadThemeFromJson function
       _themeData = await loadThemeFromJson(themeFileName);
@@ -37,7 +39,9 @@ class ThemeProvider extends ChangeNotifier {
     } catch (e) {
       // If loading fails, use default light theme
       _isDarkMode = false;
-      _themeData = await loadThemeFromJson('blue_appainter_theme.json');
+      _themeData = await loadThemeFromJson(
+        '${_currentThemeColor}_appainter_theme.json',
+      );
       notifyListeners();
     }
   }
@@ -49,8 +53,8 @@ class ThemeProvider extends ChangeNotifier {
 
       // Determine new theme file name based on toggled value
       final themeFileName = _isDarkMode
-          ? 'dark_blue_appainter_theme.json'
-          : 'blue_appainter_theme.json';
+          ? 'dark_${_currentThemeColor}_appainter_theme.json'
+          : '${_currentThemeColor}_appainter_theme.json';
 
       // Load new theme using loadThemeFromJson
       _themeData = await loadThemeFromJson(themeFileName);
@@ -72,8 +76,8 @@ class ThemeProvider extends ChangeNotifier {
 
       // Determine theme file name based on provided value
       final themeFileName = _isDarkMode
-          ? 'dark_blue_appainter_theme.json'
-          : 'blue_appainter_theme.json';
+          ? 'dark_${_currentThemeColor}_appainter_theme.json'
+          : '${_currentThemeColor}_appainter_theme.json';
 
       // Load new theme using loadThemeFromJson
       _themeData = await loadThemeFromJson(themeFileName);
@@ -85,6 +89,36 @@ class ThemeProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('Error setting theme: $e');
+    }
+  }
+
+  Future<void> setThemeColor(String color, bool isDark) async {
+    try {
+      // Validate color is one of the supported colors
+      if (!['blue', 'green', 'red', 'yellow'].contains(color)) {
+        print('Invalid theme color: $color');
+        return;
+      }
+
+      // Set theme color and dark mode
+      _currentThemeColor = color;
+      _isDarkMode = isDark;
+
+      // Determine theme file name based on color and dark mode
+      final themeFileName = isDark
+          ? 'dark_${color}_appainter_theme.json'
+          : '${color}_appainter_theme.json';
+
+      // Load new theme using loadThemeFromJson
+      _themeData = await loadThemeFromJson(themeFileName);
+
+      // Save preference to SharedPreferences using key 'isDarkMode'
+      await _prefs?.setBool('isDarkMode', _isDarkMode);
+
+      // Update UI
+      notifyListeners();
+    } catch (e) {
+      print('Error setting theme color: $e');
     }
   }
 }
