@@ -142,6 +142,8 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
             const SizedBox(height: 8),
             Text('Description: ${widget.item.description}'),
             const SizedBox(height: 8),
+            Text('Portability: ${widget.item.portability.name}'),
+            const SizedBox(height: 8),
             Text('Owner: ${widget.item.userId}'),
             const SizedBox(height: 8),
             const Spacer(),
