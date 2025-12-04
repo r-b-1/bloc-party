@@ -195,74 +195,169 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
+  // Method to show theme color selection dialog
+  void _showThemeColorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Theme Color'),
+          content: Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: ['blue', 'green', 'red', 'yellow']
+                    .map(
+                      (color) => RadioListTile<String>(
+                        title: Text(
+                          color[0].toUpperCase() + color.substring(1),
+                        ),
+                        value: color,
+                        groupValue: themeProvider.currentThemeColor,
+                        onChanged: (String? newColor) {
+                          if (newColor != null) {
+                            themeProvider.setThemeColor(
+                              newColor,
+                              themeProvider.isDarkMode,
+                            );
+                            Navigator.of(context).pop();
+                          }
+                        },
+                      ),
+                    )
+                    .toList(),
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _profileViewModel.isLoading
-                ? null
-                : () => _profileViewModel.refresh(),
-          ),
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: DropdownButton<String>(
-                  value: themeProvider.currentThemeColor,
-                  items: ['blue', 'green', 'red', 'yellow']
-                      .map(
-                        (color) => DropdownMenuItem<String>(
-                          value: color,
-                          child: Text(
-                            color[0].toUpperCase() + color.substring(1),
-                          ),
+          // Menu button with three lines that shows dropdown options
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.menu),
+            onSelected: (String value) {
+              switch (value) {
+                case 'refresh':
+                  if (!_profileViewModel.isLoading) {
+                    _profileViewModel.refresh();
+                  }
+                  break;
+                case 'theme':
+                  final themeProvider = Provider.of<ThemeProvider>(
+                    context,
+                    listen: false,
+                  );
+                  themeProvider.toggleTheme();
+                  break;
+                case 'theme_color':
+                  _showThemeColorDialog();
+                  break;
+                case 'signout':
+                  _signOutUser();
+                  break;
+                case 'delete_account':
+                  _showDeleteAccountConfirmation();
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              // Refresh option
+              PopupMenuItem<String>(
+                value: 'refresh',
+                enabled: !_profileViewModel.isLoading,
+                child: Row(
+                  children: [
+                    const Icon(Icons.refresh, size: 20),
+                    const SizedBox(width: 8),
+                    const Text('Refresh'),
+                    if (_profileViewModel.isLoading)
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                      )
-                      .toList(),
-                  onChanged: (String? newColor) {
-                    if (newColor != null) {
-                      themeProvider.setThemeColor(
-                        newColor,
-                        themeProvider.isDarkMode,
-                      );
-                    }
+                      ),
+                  ],
+                ),
+              ),
+              // Theme toggle option
+              PopupMenuItem<String>(
+                value: 'theme',
+                child: Consumer<ThemeProvider>(
+                  builder: (context, themeProvider, child) {
+                    return Row(
+                      children: [
+                        Icon(
+                          themeProvider.isDarkMode
+                              ? Icons.light_mode
+                              : Icons.dark_mode,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          themeProvider.isDarkMode ? 'Light Mode' : 'Dark Mode',
+                        ),
+                      ],
+                    );
                   },
-                  dropdownColor: Theme.of(context).colorScheme.surface,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  underline: Container(),
-                  icon: Icon(
-                    Icons.palette,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
                 ),
-              );
-            },
-          ),
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              return IconButton(
-                icon: Icon(
-                  themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+              ),
+              // Theme color option
+              PopupMenuItem<String>(
+                value: 'theme_color',
+                child: Consumer<ThemeProvider>(
+                  builder: (context, themeProvider, child) {
+                    return Row(
+                      children: [
+                        const Icon(Icons.palette, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Theme Color (${themeProvider.currentThemeColor[0].toUpperCase() + themeProvider.currentThemeColor.substring(1)})',
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                onPressed: () => themeProvider.toggleTheme(),
-                tooltip: themeProvider.isDarkMode
-                    ? 'Switch to light mode'
-                    : 'Switch to dark mode',
-              );
-            },
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              await _profileViewModel.signOutUser();
-              Navigator.of(context).pushReplacementNamed('/login');
-            },
-            child: const Text('Sign Out'),
+              ),
+              // Sign out option
+              const PopupMenuItem<String>(
+                value: 'signout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout, size: 20),
+                    SizedBox(width: 8),
+                    Text('Sign Out'),
+                  ],
+                ),
+              ),
+              // Delete account option
+              const PopupMenuItem<String>(
+                value: 'delete_account',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_forever, size: 20, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Delete Account', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -280,6 +375,121 @@ class _ProfileViewState extends State<ProfileView> {
         ],
       ),
     );
+  }
+
+  // Method to handle user sign out
+  Future<void> _signOutUser() async {
+    await _profileViewModel.signOutUser();
+    Navigator.of(context).pushReplacementNamed('/login');
+  }
+
+  // Method to show delete account confirmation dialog
+  Future<void> _showDeleteAccountConfirmation() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Account'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Are you sure you want to delete your account?',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'This action will:',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '• Permanently delete all your data',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    Text(
+                      '• Remove all your listed items',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    Text(
+                      '• Delete your account information',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'This action cannot be undone.',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Delete Account'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      await _deleteUserAccount();
+    }
+  }
+
+  // Method to delete user account
+  Future<void> _deleteUserAccount() async {
+    try {
+      await _profileViewModel.deleteAccount();
+
+      if (mounted) {
+        // Navigate to login or welcome screen after account deletion
+        Navigator.of(context).pushReplacementNamed('/login');
+
+        // Show confirmation message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete account: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildBody(BuildContext context) {
@@ -421,7 +631,7 @@ class _ProfileViewState extends State<ProfileView> {
                                   );
                                 },
                               ),
-                              // ADD: Edit icon positioned in top-right corner of item tile
+                              // Edit icon positioned in top-right corner of item tile
                               Positioned(
                                 top: 8,
                                 right: 8,
@@ -589,53 +799,6 @@ class _ProfileViewState extends State<ProfileView> {
                   })).toList(),
                 ],
               ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // updated widget to build new item tile for the user profile with edit button
-  Widget _buildProfileItemTile(Item item) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: HomeView.buildItemTile(
-                context,
-                item,
-                onTap: () {
-                  context.push('/item_description', extra: item);
-                },
-              ),
-            ),
-            Column(
-              children: [
-                // edit button
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
-                  onPressed: () => _navigateToEditItem(item),
-                ),
-                const SizedBox(height: 8),
-                // Toggle switch for availability
-                Switch(
-                  value: item.isAvailable,
-                  onChanged: (bool value) {
-                    _toggleItemAvailability(item);
-                  },
-                  activeColor: Colors.green,
-                ),
-                const SizedBox(height: 8),
-                // Delete button
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-                  onPressed: () => _deleteItem(item),
-                ),
-              ],
-            ),
           ],
         ),
       ),
