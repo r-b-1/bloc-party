@@ -156,7 +156,7 @@ class _chatViewState extends State<ChatView> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(onPressed: _sendMessage, child: Icon(Icons.send)),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
             ElevatedButton(onPressed: report, child: const Text('Report Chat')),
           ],
         ),
