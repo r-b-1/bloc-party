@@ -7,9 +7,11 @@ final uid = FirebaseAuth.instance.currentUser!.uid;
 
 /// Fetch appointments from Firestore
 Future<List<Appointment>> fetchAppointments() async {
+   final currentUser = FirebaseAuth.instance.currentUser;
+   if (currentUser == null) return [];
   final snapshot = await FirebaseFirestore.instance
       .collection('user_appointment')
-      .where('userId', isEqualTo: uid)
+      .where('userId', isEqualTo: currentUser.uid)
       .get();
 
   return snapshot.docs.map((doc) {

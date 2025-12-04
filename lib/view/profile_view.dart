@@ -318,10 +318,10 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   // Method to handle user sign out
-  Future<void> _signOutUser() async {
-    await _profileViewModel.signOutUser();
-    Navigator.of(context).pushReplacementNamed('/login');
-  }
+ Future<void> _signOutUser() async {
+  await _profileViewModel.signOutUser();
+  GoRouter.of(context).go('/auth');
+}
 
   // Method to show delete account confirmation dialog
   Future<void> _showDeleteAccountConfirmation() async {
@@ -406,33 +406,35 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   // Method to delete user account
-  Future<void> _deleteUserAccount() async {
-    try {
-      await _profileViewModel.deleteAccount();
+Future<void> _deleteUserAccount() async {
+  try {
+    await _profileViewModel.deleteAccount();
+    
+    if (mounted) {
+      // Navigate to auth (login) screen using GoRouter
+      GoRouter.of(context).go('/auth');
       
-      if (mounted) {
-        // Navigate to login or welcome screen after account deletion
-        Navigator.of(context).pushReplacementNamed('/login');
-        
-        // Show confirmation message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account deleted successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to delete account: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      // Show confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account deleted successfully'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete account: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
+}
 
   Widget _buildBody(BuildContext context) {
     if (_profileViewModel.isLoading) {
