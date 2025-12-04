@@ -105,6 +105,10 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
     }
   }
 
+  void report() {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Item Reported!')));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,6 +158,10 @@ class _PublicItemDescriptionViewState extends State<PublicItemDescriptionView> {
                     onPressed: () => _showBorrowRequestDialog(context),
                   ),
                   const SizedBox(height: 8),
+                  ElevatedButton(
+                    child: const Text('Report'),
+                    onPressed: report,
+                  ),
                   // Add Schedule button here
                   //ScheduleButton(),
                   //we talked about not having a schedule button on there listing

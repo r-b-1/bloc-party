@@ -122,6 +122,10 @@ class _chatViewState extends State<ChatView> {
     }
   }
 
+  void report() {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Chat Reported!')));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,6 +156,8 @@ class _chatViewState extends State<ChatView> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(onPressed: _sendMessage, child: Icon(Icons.send)),
+            const SizedBox(height: 32),
+            ElevatedButton(onPressed: report, child: const Text('Report Chat')),
           ],
         ),
       ),
