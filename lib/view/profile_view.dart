@@ -195,51 +195,6 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
-  // Method to show theme color selection dialog
-  void _showThemeColorDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select Theme Color'),
-          content: Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: ['blue', 'green', 'red', 'yellow']
-                    .map(
-                      (color) => RadioListTile<String>(
-                        title: Text(
-                          color[0].toUpperCase() + color.substring(1),
-                        ),
-                        value: color,
-                        groupValue: themeProvider.currentThemeColor,
-                        onChanged: (String? newColor) {
-                          if (newColor != null) {
-                            themeProvider.setThemeColor(
-                              newColor,
-                              themeProvider.isDarkMode,
-                            );
-                            Navigator.of(context).pop();
-                          }
-                        },
-                      ),
-                    )
-                    .toList(),
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -262,9 +217,6 @@ class _ProfileViewState extends State<ProfileView> {
                     listen: false,
                   );
                   themeProvider.toggleTheme();
-                  break;
-                case 'theme_color':
-                  _showThemeColorDialog();
                   break;
                 case 'signout':
                   _signOutUser();
@@ -311,24 +263,9 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          themeProvider.isDarkMode ? 'Light Mode' : 'Dark Mode',
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              // Theme color option
-              PopupMenuItem<String>(
-                value: 'theme_color',
-                child: Consumer<ThemeProvider>(
-                  builder: (context, themeProvider, child) {
-                    return Row(
-                      children: [
-                        const Icon(Icons.palette, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Theme Color (${themeProvider.currentThemeColor[0].toUpperCase() + themeProvider.currentThemeColor.substring(1)})',
+                          themeProvider.isDarkMode
+                              ? 'Light Mode'
+                              : 'Dark Mode',
                         ),
                       ],
                     );
@@ -353,7 +290,10 @@ class _ProfileViewState extends State<ProfileView> {
                   children: [
                     Icon(Icons.delete_forever, size: 20, color: Colors.red),
                     SizedBox(width: 8),
-                    Text('Delete Account', style: TextStyle(color: Colors.red)),
+                    Text(
+                      'Delete Account',
+                      style: TextStyle(color: Colors.red),
+                    ),
                   ],
                 ),
               ),
@@ -378,10 +318,10 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   // Method to handle user sign out
-  Future<void> _signOutUser() async {
-    await _profileViewModel.signOutUser();
-    Navigator.of(context).pushReplacementNamed('/login');
-  }
+ Future<void> _signOutUser() async {
+  await _profileViewModel.signOutUser();
+  GoRouter.of(context).go('/auth');
+}
 
   // Method to show delete account confirmation dialog
   Future<void> _showDeleteAccountConfirmation() async {
@@ -401,7 +341,9 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(height: 8),
               Text(
                 'This action will:',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                ),
               ),
               const SizedBox(height: 4),
               Padding(
@@ -464,33 +406,35 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   // Method to delete user account
-  Future<void> _deleteUserAccount() async {
-    try {
-      await _profileViewModel.deleteAccount();
-
-      if (mounted) {
-        // Navigate to login or welcome screen after account deletion
-        Navigator.of(context).pushReplacementNamed('/login');
-
-        // Show confirmation message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account deleted successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to delete account: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+Future<void> _deleteUserAccount() async {
+  try {
+    await _profileViewModel.deleteAccount();
+    
+    if (mounted) {
+      // Navigate to auth (login) screen using GoRouter
+      GoRouter.of(context).go('/auth');
+      
+      // Show confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account deleted successfully'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete account: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
+}
 
   Widget _buildBody(BuildContext context) {
     if (_profileViewModel.isLoading) {
@@ -799,6 +743,53 @@ class _ProfileViewState extends State<ProfileView> {
                   })).toList(),
                 ],
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // updated widget to build new item tile for the user profile with edit button
+  Widget _buildProfileItemTile(Item item) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: HomeView.buildItemTile(
+                context,
+                item,
+                onTap: () {
+                  context.push('/item_description', extra: item);
+                },
+              ),
+            ),
+            Column(
+              children: [
+                // edit button
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                  onPressed: () => _navigateToEditItem(item),
+                ),
+                const SizedBox(height: 8),
+                // Toggle switch for availability
+                Switch(
+                  value: item.isAvailable,
+                  onChanged: (bool value) {
+                    _toggleItemAvailability(item);
+                  },
+                  activeColor: Colors.green,
+                ),
+                const SizedBox(height: 8),
+                // Delete button
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                  onPressed: () => _deleteItem(item),
+                ),
+              ],
+            ),
           ],
         ),
       ),
