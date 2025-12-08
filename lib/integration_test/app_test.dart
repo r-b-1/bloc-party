@@ -28,7 +28,7 @@ void main() {
                         key: const Key('selected_text'),
                       ),
                       const SizedBox(height: 20),
-                      // Mock item 1 - like Power Drill in your app
+                      // Mock item 1 
                       ElevatedButton(
                         key: const Key('item_power_drill'),
                         onPressed: () {
@@ -39,7 +39,7 @@ void main() {
                         child: const Text('Select Power Drill'),
                       ),
                       const SizedBox(height: 10),
-                      // Mock item 2 - like Lawn Mower in your app
+                      // Mock item 2 
                       ElevatedButton(
                         key: const Key('item_lawn_mower'),
                         onPressed: () {
