@@ -194,13 +194,21 @@ class _PickNeighborhoodViewState extends State<PickNeighborhoodView> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Neighborhoods Avaliable'),
+        // Add back button to navigate to Home Screen
         leading: IconButton(
-          icon: const Icon(Icons.refresh),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            neighborhoodViewModel.fetchNeighborhoods();
+            // Use context.go to explicitly navigate to home route
+            context.go('/home');
           },
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              neighborhoodViewModel.fetchNeighborhoods();
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add_home_work_outlined),
             onPressed: () {
