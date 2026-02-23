@@ -2,6 +2,23 @@
 
 A cross-platform mobile app that helps neighbors share items and build community — built with Flutter and Firebase.
 
+<table align="center">
+  <tr>
+    <td>
+      <img width="346" height="598"
+        alt="CleanShot 2026-02-23 at 17 26 03@2x"
+        src="https://github.com/user-attachments/assets/6eff0097-ea81-4682-8f24-b15409e1f87b"
+      />
+    </td>
+    <td>
+      <img width="346" height="598"
+        alt="CleanShot 2026-02-23 at 17 30 48@2x"
+        src="https://github.com/user-attachments/assets/8d8b00e1-25ca-4d6c-9cf6-4defb47995c2"
+      />
+    </td>
+  </tr>
+</table>
+
 ## Overview
 
 Bloc Party lets users within a neighborhood lend and borrow items, schedule events, and communicate with each other in real time. The goal is to reduce waste and strengthen local community by making it easy to share what you have with the people around you.
@@ -74,7 +91,13 @@ flutter test test/item_model_test.dart  # single file
 flutter test integration_test/app_test.dart  # integration tests
 ```
 
+## Team
+Built by a team of 5 CS students at the University of Minnesota Duluth.
+
+I was responsible for the Home screen (view + model), 
+item data modeling, and Firestore item document structure.
+
 ## Privacy Policy
 
 See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for data collection and usage details.
-Contact: oien0034@d.umn.edu
+Contact: oiendjack@gmail.com
