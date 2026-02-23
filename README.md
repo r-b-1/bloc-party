@@ -94,8 +94,10 @@ flutter test integration_test/app_test.dart  # integration tests
 ## Team
 Built by a team of 5 CS students at the University of Minnesota Duluth.
 
-I was responsible for the Home screen (view + model), 
-item data modeling, and Firestore item document structure.
+I owned the home screen and item data layer (Firestore item model, live
+feed, neighborhood filtering, search, image system), built the
+JSON-driven theme system with runtime switching via Provider, and
+implemented the public/private item description views.
 
 ## Privacy Policy
 
