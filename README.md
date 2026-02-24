@@ -95,12 +95,7 @@ flutter test integration_test/app_test.dart  # integration tests
 
 Built by a team of 5 CS students at the University of Minnesota Duluth.
 
-**Jack Oiend** — CS student at UMD and core contributor to Bloc Party's data and UI layers.
-
-- **Item data layer** — Designed and implemented the `Item` model with full Firestore serialization, including defensive parsing for enums, lists, and edge-case Firestore field types. Built the `ItemViewModel` that drives the live item feed with neighborhood scoping, real-time search, multi-tag filtering, and availability toggling.
-- **Home screen** — Architected the home screen's two-column grid layout, image rendering with graceful fallbacks, and the neighborhood selection flow that gates what each user sees.
-- **Theme system** — Built a JSON-driven theming system supporting multiple color palettes and dark/light modes, with runtime switching via `ThemeProvider` (`ChangeNotifier`) and persistence through `SharedPreferences`.
-- **Item description views** — Implemented the public and private item description screens, including the borrow-request dialog flow that opens a direct chat with the item owner via Firebase Firestore.
+**Jack Oiend** — CS student at the University of Minnesota Duluth. Led the item data layer, including the Firestore model and live neighborhood-scoped feed with search and filtering. Built the home screen, the JSON-driven theme system with runtime dark/light switching, and the public and private item description views.
 
 Contact: oiendjack@gmail.com
 
