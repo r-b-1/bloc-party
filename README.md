@@ -92,12 +92,13 @@ flutter test integration_test/app_test.dart  # integration tests
 ```
 
 ## Team
-Built by a team of 5 CS students at the University of Minnesota Duluth.
 
-I owned the home screen and item data layer (Firestore item model, live
-feed, neighborhood filtering, search, image system), built the
-JSON-driven theme system with runtime switching via Provider, and
-implemented the public/private item description views.
+Built by a team of 5 Computer Science students at the University of Minnesota Duluth.
+
+**Core contributions include:**
+- Home screen and item data layer — Firestore item model, live neighborhood feed, filtering, search, and image upload/display system
+- JSON-driven dynamic theme system with runtime dark/light switching via Provider
+- Public and private item description views with role-aware rendering
 
 ## Privacy Policy
 

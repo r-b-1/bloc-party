@@ -1,5 +1,5 @@
 name: blocparty
-description: "A new Flutter project."
+description: "A Flutter + Firebase mobile app for neighborhood item-sharing, real-time messaging, and community event scheduling."
 publish_to: 'none' 
 version: 1.0.0+1
 
