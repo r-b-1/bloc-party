@@ -645,9 +645,9 @@ class _ProfileViewState extends State<ProfileView> {
                                     shape: BoxShape.circle,
                                   ),
                                   child: IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.edit,
-                                      color: Colors.blue,
+                                      color: Theme.of(context).colorScheme.primary,
                                       size: 18,
                                     ),
                                     onPressed: () => _navigateToEditItem(item),

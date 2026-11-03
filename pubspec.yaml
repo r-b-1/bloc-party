@@ -36,3 +36,24 @@ flutter:
   assets:
     - assets/images/
     - assets/themes/
+  fonts:
+    - family: BricolageGrotesque
+      fonts:
+        - asset: assets/fonts/BricolageGrotesque-400.ttf
+          weight: 400
+        - asset: assets/fonts/BricolageGrotesque-600.ttf
+          weight: 600
+        - asset: assets/fonts/BricolageGrotesque-700.ttf
+          weight: 700
+        - asset: assets/fonts/BricolageGrotesque-800.ttf
+          weight: 800
+    - family: Gabarito
+      fonts:
+        - asset: assets/fonts/Gabarito-400.ttf
+          weight: 400
+        - asset: assets/fonts/Gabarito-500.ttf
+          weight: 500
+        - asset: assets/fonts/Gabarito-600.ttf
+          weight: 600
+        - asset: assets/fonts/Gabarito-700.ttf
+          weight: 700

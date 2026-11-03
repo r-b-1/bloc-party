@@ -2,87 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:blocparty/model/itemview_model.dart';
 import 'package:blocparty/model/item_model.dart';
+import 'package:blocparty/view/widgets/item_card.dart';
 import 'package:blocparty/view/widgets/item_search_filter_widget.dart';
 import 'package:blocparty/model/login_model/auth_model.dart';
 import 'package:blocparty/view/widgets/neighborhood_selection_widget.dart';
+import 'package:blocparty/view/widgets/ui/tokens.dart';
 import 'package:blocparty/model/profile_model.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
-  // Make this a static method so it can be used by other files
+  // Kept static so other screens can reuse the card.
   static Widget buildItemTile(
     BuildContext context,
     Item item, {
     VoidCallback? onTap,
   }) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      margin: const EdgeInsets.all(2),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap:
-            onTap ??
-            () {
-              context.push('/public_item_description', extra: item);
-            },
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AspectRatio(
-                  aspectRatio: 1.23, //this number can not be changed or there will be a pixel overflow
-                  child: Image.asset(
-                    item.imagePath,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/images/confused-person.jpg',
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(9.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          text: item.name,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: ' - ${item.description}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.normal,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+    return ItemCard(
+      item: item,
+      onTap:
+          onTap ??
+          () {
+            context.push('/public_item_description', extra: item);
+          },
     );
   }
 
@@ -155,135 +97,162 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 0.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      context.go('/pick_neighborhood');
-                    },
-                    child: Text('NEIGHBORHOOD SELECTION'),
-                  ),
-                ),
+      appBar: AppBar(title: const Text('Bloc Party')),
+      body: RefreshIndicator(
+        onRefresh: () async => itemViewModel.fetchItems(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(
+              Spacing.lg, Spacing.xs, Spacing.lg, Spacing.xxl),
+          children: [
+            // Neighborhood: one calm selector, no caps-lock buttons.
+            NeighborhoodSelectionWidget(
+              onNeighborhoodChanged: _refreshItems,
+            ),
+            _AvailabilityToggle(itemViewModel: itemViewModel),
+            ItemSearchFilterWidget(
+              availableTags: itemViewModel.getAvailableTags(),
+              onSearchChanged: (searchText) {
+                itemViewModel.updateSearchText(searchText);
+              },
+              onTagsChanged: (tags) {
+                itemViewModel.updateSelectedTags(tags);
+              },
+              initialSearchText: itemViewModel.searchText,
+              initialSelectedTags: itemViewModel.selectedTags,
+            ),
+            SectionHeader(
+              'From your neighbors',
+              trailing: Text(
+                '${itemViewModel.filteredItems.length} items',
+                style: Theme.of(context).textTheme.bodySmall,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: NeighborhoodSelectionWidget(
-                  onNeighborhoodChanged: _refreshItems,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Switch(
-                      value: itemViewModel.showOnlyAvaliable,
-                      onChanged: (bool value) {
-                        itemViewModel.updateShowOnlyAvaliable(value);
-                      },
-                      activeColor: Colors.green,
-                      inactiveThumbColor: Colors.red,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      itemViewModel.showOnlyAvaliable
-                          ? 'Showing Avaliable'
-                          : 'Showing All',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(14.0),
-                child: ItemSearchFilterWidget(
-                  availableTags: itemViewModel.getAvailableTags(),
-                  onSearchChanged: (searchText) {
-                    itemViewModel.updateSearchText(searchText);
-                  },
-                  onTagsChanged: (tags) {
-                    itemViewModel.updateSelectedTags(tags);
-                  },
-                  initialSearchText: itemViewModel.searchText,
-                  initialSelectedTags: itemViewModel.selectedTags,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                child: Text(
-                  'List of Items (${itemViewModel.filteredItems.length})',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              if (itemViewModel.isLoading)
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              else
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 1,
-                    crossAxisSpacing: 0,
-                    mainAxisSpacing: 0,
-                  ),
-                  itemCount: itemViewModel.filteredItems.length,
-                  itemBuilder: (context, index) {
-                    return HomeView.buildItemTile(
-                      context,
-                      itemViewModel.filteredItems[index],
-                    );
-                  },
-                ),
-              SizedBox(
-                width: double.infinity,
-                child: Center(
-                  child: IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () {
-                      itemViewModel.fetchItems();
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+            _buildResults(context),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoCard(String title, String value) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        title: Text(title),
-        trailing: Text(
-          value,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+  Widget _buildResults(BuildContext context) {
+    if (itemViewModel.isLoading) {
+      return _buildSkeletonGrid(context);
+    }
+
+    final items = itemViewModel.filteredItems;
+    if (items.isEmpty) {
+      final hasFilters =
+          itemViewModel.searchText.isNotEmpty || itemViewModel.selectedTags.isNotEmpty;
+      return SizedBox(
+        height: 300,
+        child: EmptyState(
+          icon: hasFilters ? Icons.search_off_rounded : Icons.deck_rounded,
+          title: hasFilters ? 'Nothing matches' : 'Nothing nearby yet',
+          message: hasFilters
+              ? 'Try a different search, or clear your active filters below.'
+              : 'Items your neighbors lend will show up here. Be the first on your block — post something from your garage.',
+          action: hasFilters
+              ? TextButton(
+                  onPressed: () => setState(() {
+                    itemViewModel.clearFilters();
+                  }),
+                  child: const Text('Clear filters'),
+                )
+              : null,
         ),
+      );
+    }
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.78,
+        crossAxisSpacing: Spacing.md,
+        mainAxisSpacing: Spacing.md,
+      ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        return HomeView.buildItemTile(context, items[index]);
+      },
+    );
+  }
+
+  Widget _buildSkeletonGrid(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.78,
+        crossAxisSpacing: Spacing.md,
+        mainAxisSpacing: Spacing.md,
+      ),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(16),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Availability filter as a labeled segmented control.
+class _AvailabilityToggle extends StatelessWidget {
+  final ItemViewModel itemViewModel;
+
+  const _AvailabilityToggle({required this.itemViewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: Spacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: Spacing.xs),
+            child: Text(
+              'Show',
+              style: theme.textTheme.labelSmall,
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: SegmentedButton<bool>(
+              segments: const [
+                ButtonSegment(
+                  value: true,
+                  icon: Icon(Icons.check_circle_outline, size: 18),
+                  label: Text('Ready to borrow'),
+                ),
+                ButtonSegment(
+                  value: false,
+                  label: Text('Everything'),
+                ),
+              ],
+              selected: {itemViewModel.showOnlyAvaliable},
+              onSelectionChanged: (selection) {
+                itemViewModel.updateShowOnlyAvaliable(selection.first);
+              },
+              showSelectedIcon: false,
+              style: ButtonStyle(
+                textStyle: WidgetStateProperty.all(
+                  theme.textTheme.labelLarge,
+                ),
+                side: WidgetStateProperty.resolveWith((states) =>
+                    BorderSide(color: theme.colorScheme.outlineVariant)),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -8,11 +8,19 @@ class ThemeProvider extends ChangeNotifier {
   String _currentThemeColor = 'blue';
   SharedPreferences? _prefs;
 
+  /// Theme pre-loaded in main() before runApp. When present, startup never
+  /// renders a provisional default ThemeData, and _loadThemePreference only
+  /// reads prefs without swapping ThemeData instances (avoids AnimatedTheme
+  /// lerping between mismatched text themes).
+  final ThemeData? _preloadedThemeData;
+  bool _preloadedThemeHandled = false;
+
   ThemeData get themeData => _themeData;
   bool get isDarkMode => _isDarkMode;
   String get currentThemeColor => _currentThemeColor;
 
-  ThemeProvider() {
+  ThemeProvider({ThemeData? initialThemeData})
+      : _preloadedThemeData = initialThemeData {
     // Initialize with default light theme
     // Use Future.microtask to defer initialization until after build
     Future.microtask(() => _loadThemePreference());
@@ -25,6 +33,14 @@ class ThemeProvider extends ChangeNotifier {
 
       // Retrieve saved theme preference using key 'isDarkMode' (defaults to false if not found)
       _isDarkMode = _prefs?.getBool('isDarkMode') ?? false;
+
+      // The theme was already applied before runApp — adopt the saved
+      // prefs but keep the preloaded ThemeData.
+      if (_preloadedThemeData != null && !_preloadedThemeHandled) {
+        _preloadedThemeHandled = true;
+        notifyListeners();
+        return;
+      }
 
       // Determine theme file name based on preference
       final themeFileName = _isDarkMode

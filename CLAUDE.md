@@ -50,3 +50,12 @@ Bloc Party is a Flutter mobile app for neighborhood item-sharing. It follows an 
 **Navigation:** GoRouter with named routes. Auth guard redirects unauthenticated users to `/auth`. Post-login flow: `/auth` → `/verify-email` → `/create-profile` → `/home`.
 
 **Testing:** Unit tests live in `test/`, integration tests in `integration_test/`. Tests use pure Dart (no Flutter test widget setup) for model/logic tests.
+
+## Design system ("Front Porch")
+
+The visual language is defined in `.impeccable.md`. Key facts for any UI work:
+
+- **Themes:** JSON-driven via `assets/themes/*_appainter_theme.json` (8 files: 4 hues × light/dark). `loadThemeFromJson` in `lib/main.dart` parses these into a full `ThemeData` — typography and component theming live there, so most widgets need no inline styling.
+- **Fonts:** bundled in `assets/fonts/` and registered in `pubspec.yaml`. `BricolageGrotesque` is the display face (headers, app bars, dialogs); `Gabarito` carries all body/UI text. Don't hardcode `Colors.blue/green` or raw font sizes — use `Theme.of(context)` and the `textTheme` roles.
+- **Shared widgets:** `lib/view/widgets/ui/tokens.dart` (`Spacing`, `SectionHeader`, `EmptyState`, `showToast`) and `lib/view/widgets/item_card.dart` (`ItemCard`, `StatusChip`, `PortabilityChip`). Reuse these instead of building one-off cards and chips.
+- **Item cards** are photo-first: the image fills, chrome stays out of the way. The card grid uses `childAspectRatio: 0.78`; keep that unless deliberately changing the layout.
